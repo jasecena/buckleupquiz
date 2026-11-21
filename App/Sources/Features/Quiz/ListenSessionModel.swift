@@ -114,6 +114,7 @@ final class ListenSessionModel {
     @ObservationIgnored private var hasAttempts = false
     @ObservationIgnored private var feedbackRNG = SystemRandomNumberGenerator()
     @ObservationIgnored private(set) var runner: Task<Void, Never>?
+    @ObservationIgnored private var discussionTimer: Task<Void, Never>?
     /// Bumped on every (re)launch so a cancelled runner can't touch the new one's state.
     @ObservationIgnored private var generation = 0
 
@@ -279,6 +280,8 @@ final class ListenSessionModel {
     private func haltRunner() {
         runner?.cancel()
         runner = nil
+        discussionTimer?.cancel()
+        discussionTimer = nil
         isListening = false
         deps.speech.stop()
         if isThinking { deps.cues.stopThinking() }
@@ -494,23 +497,21 @@ final class ListenSessionModel {
     }
 
     /// Talk About: wait for "we're done" (voice), We're done / Next (tap or car button),
-    /// or the Parent mode timer.
+    /// or the Parent mode timer, which runs alongside as its own task.
     private func discuss(seconds: Double?, generation: Int) async throws {
         isDiscussionTimed = seconds != nil
-        let listens = isVoice && deps.listener != nil
-        try await withThrowingTaskGroup(of: Void.self) { group in
-            if let seconds {
+        if let seconds {
+            discussionTimer?.cancel()
+            discussionTimer = Task { [weak self] in
+                guard let self else { return }
                 // A quiet countdown: no ticking over the chat.
-                group.addTask { @MainActor in try await self.countdown(seconds: seconds, ticking: false, generation: generation) }
-            } else {
-                group.addTask { while true { try await Task.sleep(for: .seconds(3600)) } }
+                do { try await self.countdown(seconds: seconds, ticking: false, generation: generation) } catch { return }
+                guard generation == self.generation, self.isDiscussing else { return }
+                self.finishDiscussion()
             }
-            if listens {
-                group.addTask { @MainActor in try await self.listenForDiscussionCommands() }
-            }
-            _ = try await group.next()
-            group.cancelAll()
         }
+        if isVoice, deps.listener != nil { try await listenForDiscussionCommands() }
+        while true { try await Task.sleep(for: .seconds(3600)) }
     }
 
     private func listenForDiscussionCommands() async throws {
@@ -577,6 +578,8 @@ final class ListenSessionModel {
     private func tearDown() {
         guard status != .finished else { return }
         status = .finished
+        discussionTimer?.cancel()
+        discussionTimer = nil
         isDiscussing = false
         isListening = false
         if hasAttempts { scoreboard = session.scoreboard }
