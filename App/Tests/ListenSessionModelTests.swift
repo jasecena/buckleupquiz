@@ -264,6 +264,23 @@ struct ListenSessionModelTests {
         #expect(speech.spoken.last?.contains("Mia got 10 points") == true || speech.spoken.last?.contains("Mia wins") == true)
     }
 
+    @Test func dictationOffGivesTheGrownUpsTheFix() async {
+        let listener = FakeListener([], failure: SpeechListenerError.dictationOff)
+        let model = ListenSessionModel(
+            bank: makeBank(questions: 1), config: SessionConfig(topics: ["animals"],
+                                                                players: [Player(id: "mia", name: "Mia", age: 7)],
+                                                                length: .questions(1)),
+            settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
+                                listener: listener),
+            answerMode: .voice, rng: AnyRandomGenerator(seed: 1))
+        model.start()
+        await model.runner?.value
+        #expect(model.voiceOffHint?.contains("Dictation") == true)
+        #expect(!speech.spoken.contains { $0.contains("Dictation") }, "never said out loud to the kids")
+        #expect(SpeechListenerError.isDictationOff(domain: "kLSRErrorDomain", code: 201))
+    }
+
     @Test func scoreboardCanBeTurnedOff() async {
         let listener = FakeListener([["answer 0"]])
         let model = ListenSessionModel(

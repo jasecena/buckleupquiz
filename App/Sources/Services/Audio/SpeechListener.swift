@@ -15,11 +15,23 @@ protocol SpeechListening: AnyObject {
 
 enum SpeechListenerError: Error, LocalizedError {
     case unavailable(String)
+    /// Apple's speech recognition needs Dictation (or Siri) to be on (kLSRErrorDomain 201).
+    case dictationOff
+
+    static let dictationOffHelp = "Dictation is turned off on this iPhone, and spoken answers need it. "
+        + "Turn it on in Settings → General → Keyboard → Enable Dictation. Siri can stay off."
 
     var errorDescription: String? {
         switch self {
         case .unavailable(let reason): reason
+        case .dictationOff: Self.dictationOffHelp
         }
+    }
+
+    /// "Siri and Dictation are disabled": kLSRErrorDomain 201, or kAFAssistantErrorDomain 1700
+    /// on older systems.
+    static func isDictationOff(domain: String, code: Int) -> Bool {
+        (domain == "kLSRErrorDomain" && code == 201) || (domain == "kAFAssistantErrorDomain" && code == 1700)
     }
 }
 
@@ -101,6 +113,7 @@ final class SystemSpeechListener: SpeechListening {
 
         let deadline = Date.now.addingTimeInterval(seconds)
         var problems: [String] = []
+        var dictationOff = 0
         var attempts = 0
         var lastHeard: [String] = []
         // Recognition can end before the window does (an error, or a final result). Start it
@@ -121,6 +134,7 @@ final class SystemSpeechListener: SpeechListening {
             // quiet car, so keep listening with the same one.
             if pass.heard.isEmpty, Date.now.timeIntervalSince(passStart) < 2 {
                 problems.append("\(recognizer.locale.identifier): \(pass.problem ?? "recognition stopped")")
+                if pass.dictationOff { dictationOff += 1 }
                 telemetry?.record("voice.recognizerFailed", [
                     "locale": recognizer.locale.identifier, "error": pass.problem ?? "recognition stopped",
                 ])
@@ -128,6 +142,10 @@ final class SystemSpeechListener: SpeechListening {
             }
         }
         if !problems.isEmpty, problems.count == attempts {
+            if dictationOff == problems.count {
+                Self.lastProblem = SpeechListenerError.dictationOffHelp
+                throw SpeechListenerError.dictationOff
+            }
             throw fail("Speech recognition stopped straight away (\(problems.joined(separator: "; "))).")
         }
         return lastHeard
@@ -143,6 +161,7 @@ final class SystemSpeechListener: SpeechListening {
         /// Recognition ended by itself before the window closed.
         var endedEarly: Bool
         var problem: String?
+        var dictationOff = false
     }
 
     private func recognise(
@@ -181,7 +200,8 @@ final class SystemSpeechListener: SpeechListening {
             }
         }
         if state.isFinal {
-            return Pass(heard: state.latest, endedEarly: Date.now < deadline, problem: state.problem)
+            return Pass(heard: state.latest, endedEarly: Date.now < deadline, problem: state.problem,
+                        dictationOff: state.dictationOff)
         }
         // Let the recogniser finish the last words.
         feed.set(nil)
@@ -197,7 +217,7 @@ final class SystemSpeechListener: SpeechListening {
 
     enum RecognitionEvent: Sendable {
         case heard([String], isFinal: Bool)
-        case ended(String)
+        case ended(String, dictationOff: Bool)
     }
 
     @MainActor
@@ -206,6 +226,7 @@ final class SystemSpeechListener: SpeechListening {
         var lastChange = Date.now
         var isFinal = false
         var problem: String?
+        var dictationOff = false
 
         func apply(_ event: RecognitionEvent) {
             switch event {
@@ -215,8 +236,9 @@ final class SystemSpeechListener: SpeechListening {
                     lastChange = .now
                 }
                 isFinal = isFinal || final
-            case .ended(let reason):
+            case .ended(let reason, let off):
                 problem = reason
+                dictationOff = off
                 isFinal = true
             }
         }
@@ -251,7 +273,8 @@ final class SystemSpeechListener: SpeechListening {
             }
             if let error {
                 let ns = error as NSError
-                continuation.yield(.ended("\(ns.localizedDescription) [\(ns.domain) \(ns.code)]"))
+                continuation.yield(.ended("\(ns.localizedDescription) [\(ns.domain) \(ns.code)]",
+                                          dictationOff: SpeechListenerError.isDictationOff(domain: ns.domain, code: ns.code)))
             }
         }
     }

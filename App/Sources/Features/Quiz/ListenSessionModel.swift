@@ -93,6 +93,8 @@ final class ListenSessionModel {
     var showsFinalScores: Bool { showScoreboard && scoreboard.contains { $0.points > 0 } }
     /// Voice answers were asked for but aren't running (no mic, or it stopped working).
     var isVoiceOff: Bool { answerMode == .voice && !isVoice }
+    /// For the grown-ups, when listening stopped for a reason they can fix.
+    private(set) var voiceOffHint: String?
 
     var questionCount: Int? { session.config.length.limit }
 
@@ -490,6 +492,9 @@ final class ListenSessionModel {
             // still give the full think time. The reason shows in Settings → Mic check.
             isListening = false
             isVoice = false
+            if case SpeechListenerError.dictationOff = error {
+                voiceOffHint = "Not listening: turn on Dictation in Settings → General → Keyboard."
+            }
             voiceCounts["failed", default: 0] += 1
             var fields = Self.describe(error)
             fields["input"] = deps.audioSession?.inputType ?? "unknown"

@@ -69,6 +69,8 @@ struct MicCheckView: View {
             let heard = try await listener.listen(for: 5, hints: ["A", "B", "C", "true", "false"],
                                                   isConclusive: { !$0.isEmpty })
             state = heard.first.map(CheckState.heard) ?? .nothing
+        } catch SpeechListenerError.dictationOff {
+            state = .failed(SpeechListenerError.dictationOffHelp)
         } catch {
             state = .failed("Listening didn't work, so answers will be read out instead.\n\n\(error.localizedDescription)")
         }

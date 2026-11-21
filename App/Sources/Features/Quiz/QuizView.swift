@@ -166,7 +166,8 @@ struct QuizView: View {
             Label("Using: \(mic)", systemImage: "mic.fill").font(.footnote).foregroundStyle(.secondary)
         } else if model.isVoiceOff, model.status != .finished, model.audioWarning == nil {
             // For the grown-ups: listening isn't running, so answers are being read out.
-            Label("Not listening: answers are read out. See Settings → Mic check.", systemImage: "mic.slash")
+            Label(model.voiceOffHint ?? "Not listening: answers are read out. See Settings → Mic check.",
+                  systemImage: "mic.slash")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }

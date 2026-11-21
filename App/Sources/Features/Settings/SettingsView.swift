@@ -50,7 +50,7 @@ struct SettingsView: View {
                     Text("Answers")
                 } footer: {
                     Text(store.settings.answerMode == .voice
-                         ? "After each question there's a beep. Whoever's turn it is says the answer, and the app keeps score. Say \"skip\", \"repeat\", \"pause\" or \"stop\" any time. Speech is understood on this iPhone and never recorded or sent anywhere. If nobody is heard, the app reads the answers out instead."
+                         ? "After each question there's a beep. Whoever's turn it is says the answer, and the app keeps score. Say \"skip\", \"repeat\", \"pause\" or \"stop\" any time. Speech is understood on this iPhone and never recorded or sent anywhere. Needs Dictation turned on (Settings → General → Keyboard); Siri can stay off."
                          : "The app reads each answer after the think time. No score is kept.")
                 }
 
