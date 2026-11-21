@@ -68,4 +68,20 @@ struct PlayerStoreTests {
         #expect(settings.duckOthers == false)
         #expect(settings.selectedPlayerIDs.isEmpty)
     }
+
+    @Test func oldDefaultThinkTimeMovesTo6SecondsOnce() throws {
+        let old = try JSONDecoder().decode(AppSettings.self, from: Data(#"{"listen": {"thinkTime": 8}}"#.utf8))
+        #expect(old.listen.thinkTime == 6)
+        let chosen = try JSONDecoder().decode(AppSettings.self, from: Data(#"{"listen": {"thinkTime": 12}}"#.utf8))
+        #expect(chosen.listen.thinkTime == 12)
+        var picked8 = AppSettings()
+        picked8.listen.thinkTime = 8
+        let resaved = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(picked8))
+        #expect(resaved.listen.thinkTime == 8, "a parent who picks 8 again keeps it")
+    }
+
+    @Test @MainActor func freeGamesHaveTwoPlayersAndTheFamilyPassSix() {
+        #expect(EntitlementStore().playersPerGame == 2)
+        #expect(EntitlementStore(hasFamilyPass: true).playersPerGame == 6)
+    }
 }

@@ -6,11 +6,13 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(SettingsStore.self) private var store
     @Environment(Telemetry.self) private var telemetry
+    @Environment(EntitlementStore.self) private var entitlements
     @Environment(\.dismiss) private var dismiss
     private let voices = SystemSpeechOutput.availableVoices()
 
     var body: some View {
         @Bindable var store = store
+        @Bindable var entitlements = entitlements
         NavigationStack {
             Form {
                 Section("Voice") {
@@ -83,6 +85,16 @@ struct SettingsView: View {
                     Text("Audio")
                 } footer: {
                     Text("BuckleUp Quiz plays through your car's Bluetooth or CarPlay audio, and keeps going with the screen locked.")
+                }
+
+                if entitlements.isTestBuild {
+                    Section {
+                        Toggle("Family Pass (testing)", isOn: $entitlements.testerUnlock)
+                    } header: {
+                        Text("Testing")
+                    } footer: {
+                        Text("TestFlight only, until purchases are added. Unlocks every topic, Endless mode and games with up to \(PlayerStore.maxPlayers) players.")
+                    }
                 }
 
                 Section {

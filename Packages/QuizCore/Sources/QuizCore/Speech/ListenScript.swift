@@ -30,8 +30,8 @@ public enum SpeechStep: Hashable, Sendable {
 public struct ListenSettings: Hashable, Sendable, Codable {
     public static let thinkTimeRange: ClosedRange<Double> = 3...20
 
-    /// Think time for quiz questions.
-    public var thinkTime: Double = 8
+    /// Think time for quiz questions (and how long the app listens for an answer).
+    public var thinkTime: Double = 6
     /// Parent mode's own timer for Talk About prompts. nil = no limit. Defaults to 30 s so
     /// nobody waits forever if Talk About is turned on without looking at the timer.
     public var talkTime: Double? = 30

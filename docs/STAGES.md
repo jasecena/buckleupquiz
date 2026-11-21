@@ -114,6 +114,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [ ] `EntitlementStore` backed by `Transaction.currentEntitlements`
 - [ ] Parental gate before purchases, settings, links and support email
 - [ ] Locked topics, Endless mode and custom mixes enforced
+- [x] Free games: up to 2 players; Family Pass: up to 6 (Game setup note + alert). TestFlight-only "Family Pass (testing)" switch until purchases land
 
 **Exit:** acceptance criterion 9 passes in the StoreKit sandbox.
 

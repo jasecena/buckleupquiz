@@ -47,11 +47,12 @@
 - **The free tier unlocks 3 topics**, and the rest show a lock icon. Consider making Manners & Friendship one of the free topics, because it's a strong selling point for parents.
 - Each tile shows an icon, the topic name and the question count.
 - User picks a topic, then **who's playing** (named players with ages; each gets questions for their own age band: 6–8, 9–10 or 11–12). *(Changed by ADR-0015: originally an age-band picker.)*
+- **Up to 2 players per game for free.** Games with 3–6 players need the Family Pass (product decision, 2026-11-22). Anyone can create up to 6 player profiles.
 
 ### 2.2 Listen mode (no voice input)
 Game loop per question:
 1. App reads the question aloud, plus the multiple-choice options if the question has them.
-2. App waits for a **configurable "think time"** (default 8 seconds, range 3–20). A soft tick sound or countdown chime plays.
+2. App waits for a **configurable "think time"** (default 6 seconds, range 3–20). A soft tick plays ("ding, ding, ding"), and in voice mode the app listens during it.
 3. App says "The answer is… **X**" plus an optional one-line fun fact.
 4. Short pause (2 seconds), then the next question plays automatically.
 - **Session length:** 10, 20 or 30 questions, or Endless.
@@ -102,7 +103,8 @@ Goal: kids answer through the **car's built-in microphone**, and the app talks t
 ## 3. Paid Tier ("Family Pass")
 
 ### 3.1 Players
-- Create up to 6 player profiles, each with a **name**, **age band** and **avatar/colour**.
+- Create up to 6 player profiles, each with a **name**, **age band** and **avatar/colour**. Up to 6 can play together with the Family Pass (2 for free).
+- A **live scoreboard** sits at the top of the screen during every question, for every player, from the first question. Scores are kept per game and added to each player's lifetime points.
 - Before a session, pick who's playing.
 
 ### 3.2 Turn-based play

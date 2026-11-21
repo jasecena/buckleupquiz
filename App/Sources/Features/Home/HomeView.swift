@@ -67,6 +67,7 @@ struct HomeView: View {
             }
         }
         .onAppear(perform: normaliseSelection)
+        .onChange(of: entitlements.hasFamilyPass) { normaliseSelection() }
         .sheet(isPresented: $showSettings) { SettingsView() }
         .sheet(item: $setup, onDismiss: {
             if let topic = startAfterSetup {
@@ -178,6 +179,12 @@ struct HomeView: View {
         let known = Set(playerStore.players.map(\.id.uuidString))
         settingsStore.settings.selectedPlayerIDs.removeAll { !known.contains($0) }
         if playerStore.players.count == 1, let only = playerStore.players.first { settingsStore.select(only) }
+        // Free games have up to 2 players: keep the first ones picked.
+        let selected = playerStore.players.filter(settingsStore.isSelected).map(\.id.uuidString)
+        if selected.count > entitlements.playersPerGame {
+            let keep = Set(selected.prefix(entitlements.playersPerGame))
+            settingsStore.settings.selectedPlayerIDs.removeAll { !keep.contains($0) }
+        }
         if !entitlements.isAvailable(settingsStore.settings.lastSessionLength) {
             settingsStore.settings.lastSessionLength = .questions(10)
         }

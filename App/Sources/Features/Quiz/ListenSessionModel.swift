@@ -454,13 +454,18 @@ final class ListenSessionModel {
         let presented = turn.presented
         let started = Date.now
         let transcriptions: [String]
+        // The think tick runs while we listen, so everyone hears the clock ("ding, ding, ding").
+        deps.cues.startThinking()
         do {
             transcriptions = try await listener.listen(
                 for: seconds, hints: VoiceReply.hints(for: presented),
                 isConclusive: { VoiceReply.interpret($0, for: presented).isConclusive })
+            deps.cues.stopThinking()
         } catch is CancellationError {
+            deps.cues.stopThinking()
             throw CancellationError()
         } catch {
+            deps.cues.stopThinking()
             // The mic or recogniser can't be used: quietly carry on reading answers out, but
             // still give the full think time. The reason shows in Settings → Mic check.
             isListening = false

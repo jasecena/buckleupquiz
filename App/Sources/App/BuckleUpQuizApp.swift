@@ -14,6 +14,7 @@ struct BuckleUpQuizApp: App {
                 .environment(environment.players)
                 .environment(environment.telemetry)
                 .task {
+                    await environment.entitlements.detectTestBuild()
                     await environment.loadContent()
                     await environment.telemetry.flush()
                 }
