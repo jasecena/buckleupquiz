@@ -72,9 +72,9 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         GENERATE_INFOPLIST_FILE: NO
         CODE_SIGN_ENTITLEMENTS: App/BuckleUpQuiz.entitlements
-        # Error reports (ADR-0020/0021). Moves to https://api.buckleupquiz.com/v1/reports once the
-        # domain is registered; this CloudFront address keeps working for older builds.
-        TELEMETRY_URL: "https://d3fmbcooclif09.cloudfront.net/v1/reports"
+        # Error reports (ADR-0020/0021). Builds before v0.3.5 use the CloudFront address, which
+        # keeps working.
+        TELEMETRY_URL: "https://api.buckleupquiz.com/v1/reports"
 
 
   BuckleUpQuizTests:

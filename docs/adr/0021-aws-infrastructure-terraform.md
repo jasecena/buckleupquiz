@@ -114,6 +114,7 @@ Then put `reports_url` from the platform outputs into `project.yml` as `TELEMETR
 - Registration details for the domain are kept in `contact.auto.tfvars`, which git ignores,
   never in the repo.
 - Any CI that applies Terraform needs AWS credentials. Today applies are run by hand.
-- **Deployed 2026-11-22:** bootstrap and platform (on `d3fmbcooclif09.cloudfront.net` until the
-  domain exists). The domain is waiting on the registrant's contact details. Builds from v0.3.3
-  send reports to the CloudFront address.
+- **Deployed 2026-11-22:** bootstrap, domain (buckleupquiz.com registered, wildcard certificate
+  issued) and platform on **api.buckleupquiz.com**. buckleupquiz.com serves the GitHub Pages
+  site (custom domain set on the repo's Pages). Builds v0.3.3–v0.3.4 send reports to
+  `d3fmbcooclif09.cloudfront.net`, which stays valid; v0.3.5 onwards use api.buckleupquiz.com.
