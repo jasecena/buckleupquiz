@@ -52,6 +52,24 @@ struct SessionTests {
         #expect(session.learning[player.id]?.cards.values.first == ReviewCard(box: 2, due: 11, last: 10))
     }
 
+    @Test func unheardAnswerChangesNothing() {
+        let player = Player(id: "mia", name: "Mia", age: 7)
+        let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(3))
+        var session = QuizSession(bank: sampleBank(), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
+        session.advance()
+        session.record(.correct)
+        session.advance()
+        session.record(.correct)
+        session.advance()
+        session.record(.unheard)
+        session.advance()
+        let stats = session.scores.stats(for: "mia")
+        #expect(stats.points == 20)
+        #expect(stats.currentStreak == 2, "not being heard doesn't break a streak")
+        #expect(stats.attempted == 2)
+        #expect(session.learning["mia"]?.cards.count == 2, "the unheard question's boxes are untouched")
+    }
+
     @Test func rotatesPlayersWithTheirOwnAgeBand() {
         let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
         let leo = Player(id: "leo", name: "Leo", ageBand: .elevenToTwelve)
@@ -209,13 +227,16 @@ struct ListenScriptTests {
         #expect(steps.contains(.think(seconds: 20)))
     }
 
-    @Test func gentleFeedbackForValuesTopics() {
+    @Test func feedbackNeverSoundsLikeFailure() {
         var rng = SeededGenerator(seed: 1)
-        let p = present(makeQuestion(options: ["Laugh", "Help", "Run off"], answer: "Help"))
-        #expect(Phrases.feedback(.incorrect, presented: p, category: .values, using: &rng)
-            == "Good try! A kinder choice might be… B: Help.")
-        #expect(Phrases.feedback(.incorrect, presented: present(makeQuestion(answer: "Hobart")),
-                                 category: .knowledge, using: &rng) == "Not quite, the answer was A: Hobart.")
+        let values = present(makeQuestion(options: ["Laugh", "Help", "Run off"], answer: "Help"))
+        let hobart = present(makeQuestion(answer: "Hobart"))
+        for outcome in [AnswerOutcome.incorrect, .timedOut, .unheard] {
+            #expect(Phrases.feedback(outcome, presented: values, category: .values, using: &rng)
+                == "The best choice is… B: Help!")
+            #expect(Phrases.feedback(outcome, presented: hobart, category: .knowledge, using: &rng)
+                == "The answer is… A: Hobart!")
+        }
     }
 
     @Test func listenOutroNamesThePlayers() {

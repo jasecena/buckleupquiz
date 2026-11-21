@@ -84,8 +84,9 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] `SystemSpeechListener`: `SFSpeechRecognizer`, `requiresOnDeviceRecognition`, all alternatives (ADR-0018)
 - [x] Voice audio session: `.playAndRecord`, HFP/CarPlay/headset/USB input preferred, "Using: <mic>" label
 - [x] Half-duplex speak → 300 ms → chime → listen (`.default` mode instead of `.voiceChat`, ADR-0018)
-- [x] Silence detection (1.2 s after speech), retry once on a mumble, voice commands, hands-free Talk About
-- [x] Fallbacks: recogniser error or 3 silent turns → read answers out; permission refused → "Just listen"
+- [x] Silence detection (1.2 s after speech), voice commands, hands-free Talk About
+- [x] Joy, not correction: unheard turns aren't mentioned or scored; no "Not quite", no ✗, no zero-point announcements
+- [x] Fallbacks: recogniser error → quietly read answers out; permission refused → "Just listen"
 - [x] Mic check screen (Settings → Answers) with the HFP call-screen note
 - [ ] Verify on device and in 3+ cars; tune silence timing and the speech rate for HFP
 - [ ] 100-answer field test set (quiet + road noise) feeding `AnswerMatcher` tests

@@ -143,7 +143,7 @@ public struct QuizSession: Sendable {
         switch outcome {
         case .correct: currentResult = .correct
         case .incorrect, .timedOut: currentResult = .incorrect
-        case .skipped: currentResult = nil
+        case .skipped, .unheard: currentResult = nil
         case .notScored: break
         }
         let effective = turn.presented.question.type.isScored ? outcome : .notScored

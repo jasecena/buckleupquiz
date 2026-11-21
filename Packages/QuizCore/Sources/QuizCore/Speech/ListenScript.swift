@@ -17,7 +17,7 @@ public enum SpeechStep: Hashable, Sendable {
     case think(seconds: Double)
     /// Voice answers: chime, then listen for up to `seconds` for the player's answer (ADR-0018).
     case listen(seconds: Double)
-    /// Voice answers: say how the answer went ("Correct! Awesome!" / "Not quite, the answer was…").
+    /// Voice answers: a cheer when right ("Correct! Awesome!"), otherwise just the answer.
     case feedback
     /// Talk About time. Ends when the family says they're done (We're done / Next on
     /// screen, or the car's next-track button), or when the Parent mode timer runs out.

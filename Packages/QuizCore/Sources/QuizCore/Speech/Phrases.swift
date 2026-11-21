@@ -5,13 +5,11 @@ public enum Phrases {
     public static let outroPrefix = "That's the end of the ride!"
     public static let welcomeBack = "Welcome back! Let's keep going."
     public static let listening = "I'm listening."
-    public static let didntCatch = "Sorry, I didn't catch that. Say it again?"
     public static let greatChat = "Great chat!"
     /// Said before a review question, so it feels like a callback, not a repeat.
     public static let ownReviewIntro = "Here's one from before. Do you remember?"
     public static let sharedReviewIntro = "This one came up for someone else. Let's see!"
     public static let voiceTip = "Say your answer after the beep!"
-    public static let voiceFallback = "I can't hear any answers, so I'll read them out instead."
     public static let pausedByVoice = "Paused. Press play when you're ready."
     public static let talkItOver = "Take your time and talk it over. Press next when you're ready."
 
@@ -48,20 +46,18 @@ public enum Phrases {
         return "\(lead) \(answer.trimmedSentence)!"
     }
 
-    /// Spoken feedback after a voice answer. Never shames: values/safety topics get gentle wording.
+    /// Spoken feedback after a voice answer. Right answers get a cheer. Anything else just
+    /// shares the answer, exactly as Listen mode does: no "wrong", no "time's up", no
+    /// "I didn't hear you". It's about knowledge and joy, never failure (ADR-0018).
     public static func feedback(
         _ outcome: AnswerOutcome, presented: PresentedQuestion, category: Topic.Category?,
         using rng: inout some RandomNumberGenerator
     ) -> String {
-        let answer = presented.answerText?.trimmedSentence ?? ""
-        let gentle = category == .values || category == .safety
         switch outcome {
         case .correct:
             return cheers.randomElement(using: &rng) ?? "Correct!"
-        case .incorrect:
-            return gentle ? "Good try! A kinder choice might be… \(answer)." : "Not quite, the answer was \(answer)."
-        case .timedOut:
-            return gentle ? "Time's up! A good choice is… \(answer)." : "Time's up! The answer was \(answer)."
+        case .incorrect, .timedOut, .unheard:
+            return answerReveal(presented, category: category)
         case .skipped:
             return "Let's skip that one."
         case .notScored:
@@ -87,9 +83,10 @@ public enum Phrases {
     }
 
     /// End-of-session announcement, e.g. "Mia wins with 80 points! Leo got 60 points!"
+    /// Nobody is ever announced with zero points: they get "Great listening" instead.
     public static func scoreAnnouncement(_ entries: [ScoreboardEntry]) -> String {
         let named = entries.filter { !$0.player.name.isEmpty }
-        guard !named.isEmpty else { return "\(outroPrefix) Great listening, everyone!" }
+        guard named.contains(where: { $0.points > 0 }) else { return listenOutro(players: named.map(\.player)) }
         if named.count == 1 {
             return "\(outroPrefix) \(named[0].player.name) got \(points(named[0].points))!"
         }
@@ -102,7 +99,9 @@ public enum Phrases {
             parts.append("\(winners[0].player.name) wins with \(points(winners[0].points))!")
         }
         for entry in named where entry.rank != 1 {
-            parts.append("\(entry.player.name) got \(points(entry.points))!")
+            parts.append(entry.points > 0
+                ? "\(entry.player.name) got \(points(entry.points))!"
+                : "Great listening, \(entry.player.name)!")
         }
         return parts.joined(separator: " ")
     }

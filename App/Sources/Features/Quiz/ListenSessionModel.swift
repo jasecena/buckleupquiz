@@ -49,9 +49,6 @@ final class ListenSessionModel {
         var listener: (any SpeechListening)?
     }
 
-    /// Silent voice turns in a row before falling back to reading the answers out.
-    static let silentTurnsBeforeFallback = 3
-
     // MARK: Observable state for the UI
 
     private(set) var status: Status = .ready
@@ -110,7 +107,6 @@ final class ListenSessionModel {
     @ObservationIgnored private var category: Topic.Category?
     @ObservationIgnored private var welcomeBackPending = false
     @ObservationIgnored private var voiceTipPending = false
-    @ObservationIgnored private var silentTurns = 0
     @ObservationIgnored private var hasAttempts = false
     @ObservationIgnored private var feedbackRNG = SystemRandomNumberGenerator()
     @ObservationIgnored private(set) var runner: Task<Void, Never>?
@@ -393,65 +389,51 @@ final class ListenSessionModel {
 
     // MARK: Voice answers (ADR-0018)
 
-    /// Half-duplex: speech has finished → short gap → chime → listen. Retries once on a mumble.
+    /// Half-duplex: speech has finished → short gap → chime → listen, once. If nothing clear is
+    /// heard, nothing is said about it: the answer is shared and the game moves on (ADR-0018).
     private func listenForAnswer(seconds: Double, generation: Int) async throws {
         guard isVoice, let listener = deps.listener, let turn else {
-            // Voice is off (or fell back): behave like Listen mode.
+            // Voice is off (or the recogniser broke): behave like Listen mode.
             try await countdown(seconds: seconds, ticking: true, generation: generation)
             return
         }
         try await deps.sleeper.sleep(seconds: 0.3)
-        for attempt in 1...2 {
-            deps.cues.play(.listening)
-            try await deps.sleeper.sleep(seconds: 0.4)
-            isListening = true
-            let transcriptions: [String]
-            do {
-                transcriptions = try await listener.listen(for: seconds, hints: VoiceReply.hints(for: turn.presented))
-            } catch is CancellationError {
-                throw CancellationError()
-            } catch {
-                // The recogniser broke (route change, no mic): carry on reading answers out.
-                isListening = false
-                try await fallBackToListen()
-                return
-            }
+        deps.cues.play(.listening)
+        try await deps.sleeper.sleep(seconds: 0.4)
+        isListening = true
+        let transcriptions: [String]
+        do {
+            transcriptions = try await listener.listen(for: seconds, hints: VoiceReply.hints(for: turn.presented))
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            // The recogniser broke (route change, no mic): quietly carry on reading answers out.
             isListening = false
-            guard generation == self.generation else { return }
+            isVoice = false
+            return
+        }
+        isListening = false
+        guard generation == self.generation else { return }
 
-            switch VoiceReply.interpret(transcriptions, for: turn.presented) {
-            case .command(let command):
-                try await obey(command)
-                return
-            case .answer(let answerOutcome, let text):
-                heard = text
-                silentTurns = 0
-                record(answerOutcome)
-                return
-            case .garbled where attempt == 1:
-                heard = transcriptions.first
-                try await deps.speech.speak(Phrases.didntCatch)
-            case .garbled:
-                heard = transcriptions.first
-                silentTurns = 0
-                record(.timedOut)
-                return
-            case .silence:
-                record(.timedOut)
-                silentTurns += 1
-                return
-            }
+        switch VoiceReply.interpret(transcriptions, for: turn.presented) {
+        case .command(let command):
+            try await obey(command)
+        case .answer(let answerOutcome, let text):
+            heard = text
+            record(answerOutcome)
+        case .garbled, .silence:
+            record(.unheard)
         }
     }
 
     private func record(_ answerOutcome: AnswerOutcome) {
         session.record(answerOutcome)
         outcome = answerOutcome
-        hasAttempts = true
+        if answerOutcome != .unheard { hasAttempts = true }
         scoreboard = session.scoreboard
     }
 
-    /// "Correct! Awesome! That's three in a row!" / "Not quite, the answer was…"
+    /// "Correct! Awesome! That's three in a row!", or just "The answer is… Hobart!"
     private func giveFeedback() async throws {
         guard let turn else { return }
         let presented = turn.presented
@@ -467,13 +449,6 @@ final class ListenSessionModel {
             line += " " + streak
         }
         try await deps.speech.speak(line)
-        if silentTurns >= Self.silentTurnsBeforeFallback { try await fallBackToListen() }
-    }
-
-    private func fallBackToListen() async throws {
-        guard isVoice else { return }
-        isVoice = false
-        try await deps.speech.speak(Phrases.voiceFallback)
     }
 
     /// Spoken game controls (FEATURES §3.3).

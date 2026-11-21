@@ -31,22 +31,31 @@ mics.
   an answer already started). The reply is judged by `VoiceReply` in QuizCore:
   - **command** ("skip"/"next", "repeat", "pause", "stop") → obeyed;
   - **answer** → `AnswerMatcher` (letters, option text, true/false words, every alternative
-    transcription) → "Correct! Awesome!" plus a streak cheer from 3 in a row, or "Not quite,
-    the answer was B: Hobart.";
-  - **mumble** ("umm", "hmm") → "Sorry, I didn't catch that. Say it again?" once, then time's up;
-  - **silence** → "Time's up! The answer was…".
+    transcription) → "Correct! Awesome!" plus a streak cheer from 3 in a row. A wrong answer
+    gets no comment: the app just shares it ("The answer is… B: Hobart!"), as Listen mode does;
+  - **mumble or silence** → nothing is said about it. The answer is shared and the game moves
+    on (see "Joy, not correction" below).
 - **Scoring** uses the existing `ScoreKeeper`: +10, plus a +5 streak bonus from the third right
   answer in a row. A live scoreboard sits at the top of the screen. At the end, the app reads
   the scores aloud ("Mia wins with 80 points!") and announces new badges. Lifetime points,
   streaks and per-topic stats are saved per player (`PlayerProfile.statsData`). Badges come
   from `BadgeRules` and show in Players.
-- **Leitner boxes** (ADR-0016) use the spoken result: right → up a box, wrong or time's up →
-  start over. The "Got it / Not yet" buttons only appear in "Just listen" mode.
+- **Leitner boxes** (ADR-0016) use the spoken result: right → up a box, wrong → start over,
+  not heard → untouched. The "Got it / Not yet" buttons only appear in "Just listen" mode.
 - **Talk About** is hands-free too: while the family chats, the app listens for "we're done",
   "all done", "finished" or "next", alongside the Parent mode timer.
-- **Safety net:** after **three silent turns in a row**, the app says "I can't hear any
-  answers, so I'll read them out instead." and continues in Listen mode. If the recogniser
-  fails (route change, mic taken), it falls back straight away.
+- **Joy, not correction** (product decision, 2026-11-22): "It's all about knowledge and joy.
+  If we don't hear it, it's okay. We silently don't hear it."
+  - If we heard an answer, we record it. If not, we move on: no "Sorry, I didn't catch that",
+    no "Time's up", no retry. An unheard turn (`AnswerOutcome.unheard`) scores nothing, keeps
+    the streak and leaves the Leitner boxes alone.
+  - Nothing says or shows failure: no "Not quite", no ✗ on screen. Only right answers get a
+    line ("Correct!"). Everything else is the plain answer reveal.
+  - Nobody is announced with zero points: they get "Great listening, Leo!", and if nobody
+    scored, the ride ends with "Great job, Mia and Leo!".
+  - Listening carries on every turn, even after several silent ones, since an unheard turn
+    takes no longer than a Listen-mode turn and kids may join in later. If the recogniser
+    fails (route change, mic taken), the app quietly continues in Listen mode.
 
 ## Alternatives considered
 - **Speaker identification** to credit whoever answered — no on-device API for it. It's also
@@ -61,7 +70,8 @@ mics.
   field test set (quiet and road noise) will tune `AnswerMatcher` and the silence timing.
   External kids' mics are the fallback plan.
 - Some head units show a call screen while HFP is active (ADR-0008 already notes this).
-- A silent child loses the point and the box (time's up counts as wrong), but the safety net
-  stops a broken mic from wiping a whole session's progress after three turns.
+- A broken or poor mic can't hurt anyone's progress: unheard turns change nothing.
+- A child who stays quiet on purpose doesn't lose their streak. That's accepted: joy over
+  strictness.
 - Voice answers are meant for the Family Pass (FEATURES §3). They stay open until the
   paywall lands in M6.

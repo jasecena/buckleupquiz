@@ -28,9 +28,9 @@ The on-device voice (`AVSpeechSynthesizer`) doesn't sound natural. The product d
   generated audio before choosing.
 - **Per question, per voice:** `question` (question + options), `answer` ("The answer is… B,
   Hobart!") and `followup` (explanation or fun fact). Voice answers reuse `answer` for
-  "Not quite, the answer was…" through a shared lead-in clip.
+  anything that isn't a right answer (ADR-0018 never says "wrong").
 - **Phrase pack per voice** (downloaded once, kept): question numbers 1–100, intro and outro,
-  cheers, "Time's up!", "Not quite, the answer was…", "this one's for you", streaks, score
+  cheers, "this one's for you", streaks, "Great listening", score
   numbers (0–1000 in 5s), "points", badge names, Talk About lines. The text comes from
   `Phrases`, which stays the single source.
 - **Format:** mono AAC (`.m4a`), about 32 kbps, so ~4 KB per second. A question's clips come to

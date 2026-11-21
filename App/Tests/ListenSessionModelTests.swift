@@ -169,24 +169,27 @@ struct ListenSessionModelTests {
         #expect(summary?.learning["mia"]?.card("ani-1000")?.box == 2)
     }
 
-    @Test func wrongAnswerSaysTheRightOneAndStartsOver() async {
+    @Test func wrongAnswerJustSharesTheAnswerAndStartsOver() async {
         let (model, _) = makeVoiceModel([["another"]])
         var summary: SessionSummary?
         model.onFinish = { summary = $0 }
         model.start()
         await model.runner?.value
-        #expect(speech.spoken.contains { $0.hasPrefix("Not quite, the answer was") && $0.contains("Answer 0") })
+        #expect(speech.spoken.contains { $0.hasPrefix("The answer is") && $0.contains("Answer 0") })
+        #expect(!speech.spoken.contains { $0.contains("Not quite") })
         #expect(model.scoreboard.first?.points == 0)
         #expect(summary?.learning["mia"]?.card("ani-1000")?.box == 1)
     }
 
-    @Test func mumbleIsAskedAgainOnce() async {
-        let (model, listener) = makeVoiceModel([["umm"], ["answer 0"]])
+    @Test func mumbleIsQuietlyLetGo() async {
+        let (model, listener) = makeVoiceModel([["umm"]])
+        var summary: SessionSummary?
+        model.onFinish = { summary = $0 }
         model.start()
         await model.runner?.value
-        #expect(listener.listens == 2)
-        #expect(speech.spoken.contains(Phrases.didntCatch))
-        #expect(model.scoreboard.first?.points == 10)
+        #expect(listener.listens == 1, "no \"say it again\"")
+        #expect(speech.spoken.contains { $0.hasPrefix("The answer is") })
+        #expect(summary?.learning["mia"]?.card("ani-1000") == nil, "boxes untouched when not heard")
     }
 
     @Test func sayingSkipMovesOn() async {
@@ -197,14 +200,14 @@ struct ListenSessionModelTests {
         #expect(!speech.spoken.contains { $0.hasPrefix("Not quite") || $0.hasPrefix("Time's up") })
     }
 
-    @Test func fallsBackToReadingAnswersWhenNobodyIsHeard() async {
+    @Test func silenceIsNeverMentioned() async {
         let (model, listener) = makeVoiceModel([], questions: 5, length: 5)
         model.start()
         await model.runner?.value
-        #expect(listener.listens == 3, "three silent turns, then no more listening")
-        #expect(speech.spoken.contains(Phrases.voiceFallback))
-        #expect(speech.spoken.filter { $0.hasPrefix("The answer is") }.count == 2)
-        #expect(!model.isVoice)
+        #expect(listener.listens == 5, "keeps listening every turn, in case they join in")
+        #expect(speech.spoken.filter { $0.hasPrefix("The answer is") }.count == 5)
+        #expect(!speech.spoken.contains { $0.contains("Time's up") || $0.contains("hear") || $0.contains("0 points") })
+        #expect(model.isVoice)
     }
 
     @Test func endsEarlyWhenQuestionsRunOut() async {

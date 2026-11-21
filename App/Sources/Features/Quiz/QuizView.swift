@@ -156,16 +156,15 @@ struct QuizView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// Only a right answer gets a line. Anything else just shows the answer: no ✗, no
+    /// "time's up", no "didn't hear you" (ADR-0018).
     @ViewBuilder private func outcomeLine(_ outcome: AnswerOutcome) -> some View {
-        let (text, symbol, color): (String, String, Color) = switch outcome {
-        case .correct: ("Correct!", "checkmark.circle.fill", .green)
-        case .incorrect: ("Not quite", "xmark.circle.fill", .orange)
-        default: ("Time's up", "clock.fill", .secondary)
-        }
-        VStack(spacing: 4) {
-            Label(text, systemImage: symbol).font(Theme.title).foregroundStyle(color)
-            if let heard = model.heard {
-                Text("Heard: \"\(heard)\"").font(Theme.body).foregroundStyle(.secondary)
+        if outcome == .correct {
+            VStack(spacing: 4) {
+                Label("Correct!", systemImage: "star.fill").font(Theme.title).foregroundStyle(.green)
+                if let heard = model.heard {
+                    Text("Heard: \"\(heard)\"").font(Theme.body).foregroundStyle(.secondary)
+                }
             }
         }
     }

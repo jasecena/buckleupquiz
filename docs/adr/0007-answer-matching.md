@@ -31,8 +31,8 @@ matching in a quiet room and at least 75% with road noise (FEATURES §9).
    Naming two options ("Pacific or Atlantic") is treated as a hedge and is wrong.
 7. **Voice commands** ("skip", "repeat", "pause", "stop", "next") only count as exact short
    phrases, so a real answer is never taken as a command.
-8. Silence returns `.noAnswer`. The app then says "Time's up". Retrying after a garbled answer
-   is the app's job (M4).
+8. Silence returns `.noAnswer`. What the app does with it is ADR-0018's job: it says nothing
+   about it and just shares the answer.
 
 ## Consequences
 - The rules are deterministic and live in one place. M4's 100-answer field test set

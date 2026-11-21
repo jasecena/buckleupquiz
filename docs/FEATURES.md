@@ -116,9 +116,10 @@ After the question is read:
 1. Play an "I'm listening" chime.
 2. Listen for up to the think time.
 3. Pass what was heard to the answer matcher (3.4).
-4. Respond out loud with "Correct!" plus a random cheer, or "Not quite, the answer was X."
-- If nothing is heard, say "Time's up! The answer was X."
-- **Retry once** on garbled input: "Sorry, I didn't catch that. Say it again?"
+4. Respond out loud with "Correct!" plus a random cheer. Otherwise just share the answer
+   ("The answer is… X!"), with no "Not quite" or ✗.
+- If nothing (or only a mumble) is heard, say nothing about it: share the answer and move on.
+  No retry, no score, no change to the Leitner boxes (ADR-0018, "Joy, not correction").
 - Voice commands during the game: "skip", "repeat", "pause", "stop", "next".
 
 ### 3.4 Answer matching (in `QuizEngine`, unit-tested)

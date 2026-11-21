@@ -8,6 +8,9 @@ public enum AnswerOutcome: String, Codable, Sendable, Hashable {
     case skipped
     /// Talk About prompts and Listen mode: no score.
     case notScored
+    /// Voice answers: nothing (or only a mumble) was heard. No score, no comment, streak kept,
+    /// Leitner boxes untouched: not hearing a child is never their failure (ADR-0018).
+    case unheard
 }
 
 /// FEATURES §3.5: +10 per correct, +5 streak bonus from the third correct in a row.
@@ -99,7 +102,7 @@ public struct ScoreKeeper: Sendable {
             s.byTopic[topic, default: TopicStats()].attempted += 1
         case .skipped:
             s.currentStreak = 0
-        case .notScored:
+        case .notScored, .unheard:
             break
         }
         stats[playerID] = s
