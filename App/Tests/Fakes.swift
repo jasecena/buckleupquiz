@@ -29,8 +29,30 @@ final class FakeCues: CuePlaying {
 final class FakeAudioSession: AudioSessionControlling {
     var onEvent: ((AudioSessionEvent) -> Void)?
     private(set) var active = false
+    private(set) var voice = false
     func activateForListening(duckOthers: Bool) throws { active = true }
+    func activateForVoice(duckOthers: Bool, mic: MicPreference) throws -> String? {
+        active = true
+        voice = true
+        return "Test Car"
+    }
     func deactivate() { active = false }
+}
+
+/// Replies with scripted transcriptions, one per `listen` call ([] = silence).
+@MainActor
+final class FakeListener: SpeechListening {
+    var replies: [[String]]
+    private(set) var listens = 0
+
+    init(_ replies: [[String]]) { self.replies = replies }
+
+    func listen(for seconds: Double, hints: [String]) async throws -> [String] {
+        listens += 1
+        await Task.yield()
+        try Task.checkCancellation()
+        return replies.isEmpty ? [] : replies.removeFirst()
+    }
 }
 
 struct InstantSleeper: Sleeper {

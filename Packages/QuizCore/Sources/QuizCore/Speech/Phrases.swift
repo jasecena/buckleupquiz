@@ -10,6 +10,9 @@ public enum Phrases {
     /// Said before a review question, so it feels like a callback, not a repeat.
     public static let ownReviewIntro = "Here's one from before. Do you remember?"
     public static let sharedReviewIntro = "This one came up for someone else. Let's see!"
+    public static let voiceTip = "Say your answer after the beep!"
+    public static let voiceFallback = "I can't hear any answers, so I'll read them out instead."
+    public static let pausedByVoice = "Paused. Press play when you're ready."
     public static let talkItOver = "Take your time and talk it over. Press next when you're ready."
 
     public static let cheers = [
@@ -64,6 +67,16 @@ public enum Phrases {
         case .notScored:
             return greatChat
         }
+    }
+
+    /// Cheers a streak on top of "Correct!": "That's three in a row!"
+    public static func streak(_ count: Int) -> String? {
+        count >= 3 ? "That's \(NumberWords.spell(count)) in a row!" : nil
+    }
+
+    /// "Mia earned the High Five badge!"
+    public static func badgeEarned(_ badge: Badge, by player: Player) -> String {
+        player.name.isEmpty ? "You earned the \(badge.title) badge!" : "\(player.name) earned the \(badge.title) badge!"
     }
 
     /// End of a Listen-mode session (no scores): "That's the end of the ride! Great job, Mia and Leo!"

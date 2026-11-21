@@ -19,6 +19,8 @@ final class PlayerProfile {
     /// This player's Leitner boxes (ADR-0016), JSON-encoded `LearningRecord`.
     /// Stored as data so the schema stays simple and CloudKit-friendly.
     var learningData: Data = Data()
+    /// Lifetime scores (`PlayerStats`, JSON) from voice-answer games: points, streaks, per topic.
+    var statsData: Data = Data()
 
     init(name: String, age: Int, colorHex: String, now: Date = .now) {
         self.id = UUID()
@@ -28,6 +30,7 @@ final class PlayerProfile {
         self.colorHex = colorHex
         self.createdAt = now
         self.learningData = Data()
+        self.statsData = Data()
     }
 
     func currentAge(now: Date = .now) -> Int {
@@ -36,6 +39,11 @@ final class PlayerProfile {
     }
 
     var ageBand: AgeBand { AgeBand(age: currentAge()) }
+
+    var stats: PlayerStats {
+        get { (try? JSONDecoder().decode(PlayerStats.self, from: statsData)) ?? PlayerStats() }
+        set { statsData = (try? JSONEncoder().encode(newValue)) ?? statsData }
+    }
 
     var learning: LearningRecord {
         get { (try? JSONDecoder().decode(LearningRecord.self, from: learningData)) ?? LearningRecord() }

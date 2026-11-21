@@ -10,13 +10,17 @@ struct AppSettings: Codable, Equatable, Sendable {
     var speechRate: Float = 0.45
     /// Lower music volume instead of stopping it.
     var duckOthers = true
-    /// "Parent mode": include Talk About prompts (FEATURES §4.3).
-    /// Parent mode. Off by default: Talk About needs a grown-up to chat with.
+    /// Parent mode: include Talk About prompts (FEATURES §4.3).
+    /// Off by default: Talk About needs a grown-up to chat with.
     var includeTalkAbout = false
     /// Players picked last time ("Who's playing?"), as `PlayerProfile.id` strings.
     var selectedPlayerIDs: [String] = []
     var lastSessionLength: SessionLength = .questions(10)
     var hasCompletedOnboarding = false
+    /// Players say their answers and the app keeps score (ADR-0018). Falls back to reading
+    /// the answers out when the microphone can't be used.
+    var answerMode: AnswerMode = .voice
+    var micPreference: MicPreference = .automatic
 
     var voice: VoiceSettings { VoiceSettings(identifier: voiceIdentifier, rate: speechRate) }
 
@@ -24,7 +28,7 @@ struct AppSettings: Codable, Equatable, Sendable {
 
     private enum CodingKeys: String, CodingKey {
         case listen, voiceIdentifier, speechRate, duckOthers, includeTalkAbout
-        case selectedPlayerIDs, lastSessionLength, hasCompletedOnboarding
+        case selectedPlayerIDs, lastSessionLength, hasCompletedOnboarding, answerMode, micPreference
     }
 
     /// Key by key with defaults, so settings saved by older builds (testers!) never get wiped.
@@ -39,6 +43,8 @@ struct AppSettings: Codable, Equatable, Sendable {
         selectedPlayerIDs = (try? c.decodeIfPresent([String].self, forKey: .selectedPlayerIDs)) ?? d.selectedPlayerIDs
         lastSessionLength = (try? c.decodeIfPresent(SessionLength.self, forKey: .lastSessionLength)) ?? d.lastSessionLength
         hasCompletedOnboarding = (try? c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding)) ?? d.hasCompletedOnboarding
+        answerMode = (try? c.decodeIfPresent(AnswerMode.self, forKey: .answerMode)) ?? d.answerMode
+        micPreference = (try? c.decodeIfPresent(MicPreference.self, forKey: .micPreference)) ?? d.micPreference
     }
 }
 

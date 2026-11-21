@@ -2,8 +2,35 @@ import Foundation
 import Observation
 import QuizCore
 
-/// Drives a hands-free Listen-mode session (FEATURES §2.2–2.3): plays each question's
+/// How players answer (Settings → Answers, ADR-0018).
+enum AnswerMode: String, Codable, CaseIterable, Sendable {
+    /// The app reads the answer after the think time. No score.
+    case listen
+    /// Players say their answer; the app judges it and keeps score. Fully hands-free.
+    case voice
+}
+
+/// What a finished session hands back for saving.
+struct SessionSummary {
+    /// Leitner boxes for the whole family (ADR-0016).
+    var learning: [String: LearningRecord]
+    /// This session's scores per player id (voice answers only).
+    var stats: [String: PlayerStats]
+}
+
+/// A badge someone earned this session.
+struct EarnedBadge: Identifiable, Hashable {
+    let player: Player
+    let badge: Badge
+    var id: String { player.id + badge.id }
+}
+
+/// Drives a hands-free quiz session (FEATURES §2.2–2.3, §3.2–3.5): plays each question's
 /// `ListenScript` steps, and handles pause/resume, skip, repeat, interruptions and remote commands.
+///
+/// With voice answers (ADR-0018) it listens after each question, judges the reply with
+/// `VoiceReply`, says how it went and keeps score for whoever's turn it is. If nobody is
+/// heard for three questions in a row, it falls back to reading the answers out.
 ///
 /// Pausing cancels the running task; resuming re-runs the current step (re-reading the
 /// question or continuing the countdown where it left off).
@@ -18,7 +45,12 @@ final class ListenSessionModel {
         var sleeper: any Sleeper = TaskSleeper()
         var audioSession: (any AudioSessionControlling)?
         var nowPlaying: (any NowPlayingUpdating)?
+        /// nil when voice answers can't be used (no permission, or no on-device recognition).
+        var listener: (any SpeechListening)?
     }
+
+    /// Silent voice turns in a row before falling back to reading the answers out.
+    static let silentTurnsBeforeFallback = 3
 
     // MARK: Observable state for the UI
 
@@ -35,12 +67,28 @@ final class ListenSessionModel {
     private(set) var isDiscussionTimed = false
     /// "Got it" / "Not yet" for the current turn (ADR-0016). nil until the answer is heard.
     private(set) var result: ReviewResult?
-
-    /// Whether the current turn can be marked: a quiz question whose answer has been read.
-    var canMark: Bool { revealedAnswer != nil && turn?.presented.question.type.isScored == true }
+    /// Voice answers are on for this session (they switch off if nobody is heard).
+    private(set) var isVoice = false
+    /// The microphone is open.
+    private(set) var isListening = false
+    /// What the recogniser heard on this turn.
+    private(set) var heard: String?
+    /// How this turn's spoken answer went.
+    private(set) var outcome: AnswerOutcome?
+    /// Live scoreboard (voice answers).
+    private(set) var scoreboard: [ScoreboardEntry] = []
+    private(set) var earnedBadges: [EarnedBadge] = []
+    /// "Using: <car>" — the microphone in use.
+    private(set) var micName: String?
     private(set) var closingMessage: String?
     /// Set if the audio session could not be configured; the quiz still runs on the speaker.
     private(set) var audioWarning: String?
+
+    /// Whether the current turn can be marked by tap (Listen mode only; voice is graded by ear).
+    var canMark: Bool { !isVoice && revealedAnswer != nil && turn?.presented.question.type.isScored == true }
+
+    /// Scores are shown once anyone has answered out loud.
+    var showsScores: Bool { scoreboard.contains { $0.points > 0 } || hasAttempts }
 
     var questionCount: Int? { session.config.length.limit }
 
@@ -53,29 +101,40 @@ final class ListenSessionModel {
     private let bank: QuestionBank
     private let settings: ListenSettings
     private let duckOthers: Bool
+    private let answerMode: AnswerMode
+    private let mic: MicPreference
+    private let lifetimeStats: [String: PlayerStats]
     private let deps: Dependencies
     @ObservationIgnored private var steps: [SpeechStep] = []
     @ObservationIgnored private var stepIndex = 0
+    @ObservationIgnored private var category: Topic.Category?
     @ObservationIgnored private var welcomeBackPending = false
+    @ObservationIgnored private var voiceTipPending = false
+    @ObservationIgnored private var silentTurns = 0
+    @ObservationIgnored private var hasAttempts = false
+    @ObservationIgnored private var feedbackRNG = SystemRandomNumberGenerator()
     @ObservationIgnored private(set) var runner: Task<Void, Never>?
     /// Bumped on every (re)launch so a cancelled runner can't touch the new one's state.
     @ObservationIgnored private var generation = 0
 
-    /// Called once when the session ends (finished or stopped) with each player's
-    /// updated Leitner boxes, so they can be saved.
-    @ObservationIgnored var onFinish: (([String: LearningRecord]) -> Void)?
+    /// Called once when the session ends (finished or stopped), so boxes and scores can be saved.
+    @ObservationIgnored var onFinish: ((SessionSummary) -> Void)?
 
     /// "#RRGGBB" per player id, for the "Mia's turn" label.
     let playerColors: [String: String]
 
     init(bank: QuestionBank, config: SessionConfig, settings: ListenSettings, duckOthers: Bool,
-         dependencies: Dependencies, learning: [String: LearningRecord] = [:], day: Int = LearningDay.number(),
-         playerColors: [String: String] = [:], rng: AnyRandomGenerator = .system()) {
+         dependencies: Dependencies, answerMode: AnswerMode = .listen, mic: MicPreference = .automatic,
+         learning: [String: LearningRecord] = [:], lifetimeStats: [String: PlayerStats] = [:],
+         day: Int = LearningDay.number(), playerColors: [String: String] = [:], rng: AnyRandomGenerator = .system()) {
         self.bank = bank
         self.session = QuizSession(bank: bank, config: config, learning: learning, day: day, rng: rng)
         self.playerColors = playerColors
         self.settings = settings
         self.duckOthers = duckOthers
+        self.answerMode = answerMode
+        self.mic = mic
+        self.lifetimeStats = lifetimeStats
         self.deps = dependencies
     }
 
@@ -88,10 +147,20 @@ final class ListenSessionModel {
 
     func start() {
         guard status == .ready else { return }
-        do {
-            try deps.audioSession?.activateForListening(duckOthers: duckOthers)
-        } catch {
-            audioWarning = "Couldn't set up car audio. Playing through this device."
+        if answerMode == .voice, deps.listener != nil {
+            do {
+                micName = try deps.audioSession?.activateForVoice(duckOthers: duckOthers, mic: mic)
+                isVoice = true
+                voiceTipPending = true
+            } catch {
+                audioWarning = "Couldn't turn on the microphone, so answers will be read out."
+                activateForListening()
+            }
+        } else {
+            if answerMode == .voice {
+                audioWarning = "Voice answers need microphone and speech permission, so answers will be read out."
+            }
+            activateForListening()
         }
         deps.audioSession?.onEvent = { [weak self] in self?.handle($0) }
         deps.nowPlaying?.onCommand = { [weak self] in self?.handle($0) }
@@ -99,6 +168,14 @@ final class ListenSessionModel {
         deps.cues.startSession()
         status = .playing
         launchRunner()
+    }
+
+    private func activateForListening() {
+        do {
+            try deps.audioSession?.activateForListening(duckOthers: duckOthers)
+        } catch {
+            audioWarning = "Couldn't set up car audio. Playing through this device."
+        }
     }
 
     func pause() {
@@ -202,6 +279,7 @@ final class ListenSessionModel {
     private func haltRunner() {
         runner?.cancel()
         runner = nil
+        isListening = false
         deps.speech.stop()
         if isThinking { deps.cues.stopThinking() }
     }
@@ -214,6 +292,10 @@ final class ListenSessionModel {
                 welcomeBackPending = false
                 try await deps.speech.speak(Phrases.welcomeBack)
             }
+            if voiceTipPending {
+                voiceTipPending = false
+                try await deps.speech.speak(Phrases.voiceTip)
+            }
             while !Task.isCancelled {
                 if stepIndex >= steps.count {
                     guard loadNextTurn() else {
@@ -222,7 +304,7 @@ final class ListenSessionModel {
                     }
                 }
                 try await perform(steps[stepIndex], generation: generation)
-                guard generation == self.generation else { return }
+                guard generation == self.generation, status != .finished else { return }
                 stepIndex += 1
             }
         } catch {
@@ -232,16 +314,19 @@ final class ListenSessionModel {
 
     private func loadNextTurn() -> Bool {
         guard let next = session.advance() else { return false }
-        session.record(.notScored) // Listen mode keeps no score.
+        // Listen mode keeps no score; voice turns are recorded once the answer is heard.
+        if !isVoice { session.record(.notScored) }
         turn = next
         result = nil
+        heard = nil
+        outcome = nil
         isDiscussionTimed = false
         revealedAnswer = nil
         followUp = nil
         thinkRemaining = 0
-        let category = bank.topic(id: next.presented.question.topic)?.category
+        category = bank.topic(id: next.presented.question.topic)?.category
         steps = ListenScript.steps(for: next, category: category, settings: settings,
-                                   addressPlayer: session.config.isTurnBased)
+                                   addressPlayer: session.config.isTurnBased, voiceAnswers: isVoice)
         stepIndex = 0
         updateNowPlaying()
         return true
@@ -253,11 +338,7 @@ final class ListenSessionModel {
         case .say(let text, let purpose):
             if purpose == .answer {
                 revealedAnswer = turn?.presented.answerText ?? text
-                // Heard but not marked counts as right unless someone taps "Not yet".
-                if result == nil, turn?.presented.question.type.isScored == true {
-                    session.mark(.heard)
-                    result = .heard
-                }
+                markHeardIfUnmarked()
             }
             if purpose == .followUp { followUp = text }
             try await deps.speech.speak(text)
@@ -267,17 +348,22 @@ final class ListenSessionModel {
             deps.cues.play(.listening)
         case .think(let seconds):
             try await countdown(seconds: seconds, ticking: true, generation: generation)
+        case .listen(let seconds):
+            try await listenForAnswer(seconds: seconds, generation: generation)
+        case .feedback:
+            try await giveFeedback()
         case .discuss(let seconds):
-            isDiscussionTimed = seconds != nil
-            if let seconds {
-                // Parent mode timer: a quiet countdown (no ticking over the chat).
-                try await countdown(seconds: seconds, ticking: false, generation: generation)
-            } else {
-                // No limit: only `finishDiscussion()` (or skip, stop, pause) moves on.
-                while true { try await Task.sleep(for: .seconds(3600)) }
-            }
+            try await discuss(seconds: seconds, generation: generation)
         case .wait(let seconds):
             try await deps.sleeper.sleep(seconds: seconds)
+        }
+    }
+
+    /// Heard but not marked counts as right unless someone taps "Not yet" (ADR-0016).
+    private func markHeardIfUnmarked() {
+        if result == nil, turn?.presented.question.type.isScored == true {
+            session.mark(.heard)
+            result = .heard
         }
     }
 
@@ -302,6 +388,158 @@ final class ListenSessionModel {
         }
     }
 
+    // MARK: Voice answers (ADR-0018)
+
+    /// Half-duplex: speech has finished → short gap → chime → listen. Retries once on a mumble.
+    private func listenForAnswer(seconds: Double, generation: Int) async throws {
+        guard isVoice, let listener = deps.listener, let turn else {
+            // Voice is off (or fell back): behave like Listen mode.
+            try await countdown(seconds: seconds, ticking: true, generation: generation)
+            return
+        }
+        try await deps.sleeper.sleep(seconds: 0.3)
+        for attempt in 1...2 {
+            deps.cues.play(.listening)
+            try await deps.sleeper.sleep(seconds: 0.4)
+            isListening = true
+            let transcriptions: [String]
+            do {
+                transcriptions = try await listener.listen(for: seconds, hints: VoiceReply.hints(for: turn.presented))
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                // The recogniser broke (route change, no mic): carry on reading answers out.
+                isListening = false
+                try await fallBackToListen()
+                return
+            }
+            isListening = false
+            guard generation == self.generation else { return }
+
+            switch VoiceReply.interpret(transcriptions, for: turn.presented) {
+            case .command(let command):
+                try await obey(command)
+                return
+            case .answer(let answerOutcome, let text):
+                heard = text
+                silentTurns = 0
+                record(answerOutcome)
+                return
+            case .garbled where attempt == 1:
+                heard = transcriptions.first
+                try await deps.speech.speak(Phrases.didntCatch)
+            case .garbled:
+                heard = transcriptions.first
+                silentTurns = 0
+                record(.timedOut)
+                return
+            case .silence:
+                record(.timedOut)
+                silentTurns += 1
+                return
+            }
+        }
+    }
+
+    private func record(_ answerOutcome: AnswerOutcome) {
+        session.record(answerOutcome)
+        outcome = answerOutcome
+        hasAttempts = true
+        scoreboard = session.scoreboard
+    }
+
+    /// "Correct! Awesome! That's three in a row!" / "Not quite, the answer was…"
+    private func giveFeedback() async throws {
+        guard let turn else { return }
+        let presented = turn.presented
+        revealedAnswer = presented.answerText
+        guard let outcome else {
+            // No spoken result (voice fell back mid-turn): read the answer like Listen mode.
+            markHeardIfUnmarked()
+            try await deps.speech.speak(Phrases.answerReveal(presented, category: category))
+            return
+        }
+        var line = Phrases.feedback(outcome, presented: presented, category: category, using: &feedbackRNG)
+        if outcome == .correct, let streak = Phrases.streak(session.scores.stats(for: turn.player.id).currentStreak) {
+            line += " " + streak
+        }
+        try await deps.speech.speak(line)
+        if silentTurns >= Self.silentTurnsBeforeFallback { try await fallBackToListen() }
+    }
+
+    private func fallBackToListen() async throws {
+        guard isVoice else { return }
+        isVoice = false
+        try await deps.speech.speak(Phrases.voiceFallback)
+    }
+
+    /// Spoken game controls (FEATURES §3.3).
+    private func obey(_ command: VoiceCommand) async throws {
+        switch command {
+        case .skip: skip()
+        case .repeat: repeatQuestion()
+        case .pause:
+            try await deps.speech.speak(Phrases.pausedByVoice)
+            pause()
+        case .stop:
+            haltSpeechOnly()
+            session.stop()
+            try await finishNaturally()
+        }
+    }
+
+    private func haltSpeechOnly() {
+        isListening = false
+        if isThinking { deps.cues.stopThinking() }
+    }
+
+    /// Talk About: wait for "we're done" (voice), We're done / Next (tap or car button),
+    /// or the Parent mode timer.
+    private func discuss(seconds: Double?, generation: Int) async throws {
+        isDiscussionTimed = seconds != nil
+        let listens = isVoice && deps.listener != nil
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            if let seconds {
+                // A quiet countdown: no ticking over the chat.
+                group.addTask { @MainActor in try await self.countdown(seconds: seconds, ticking: false, generation: generation) }
+            } else {
+                group.addTask { while true { try await Task.sleep(for: .seconds(3600)) } }
+            }
+            if listens {
+                group.addTask { @MainActor in try await self.listenForDiscussionCommands() }
+            }
+            _ = try await group.next()
+            group.cancelAll()
+        }
+    }
+
+    private func listenForDiscussionCommands() async throws {
+        guard let listener = deps.listener else { return }
+        let hints = ["we're done", "all done", "finished", "next", "stop", "repeat"]
+        while true {
+            isListening = true
+            let transcriptions: [String]
+            do {
+                transcriptions = try await listener.listen(for: 30, hints: hints)
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                isListening = false
+                return try await Task.sleep(for: .seconds(3600 * 24))
+            }
+            isListening = false
+            guard let command = VoiceCommand.parse(transcriptions) else { continue }
+            switch command {
+            case .skip: finishDiscussion()
+            case .repeat: repeatQuestion()
+            case .pause, .stop: try await obey(command)
+            }
+            return
+        }
+    }
+
+    // MARK: Ending
+
     private func restartCurrentQuestion() {
         isDiscussing = false
         stepIndex = steps.firstIndex { if case .say(_, .question) = $0 { true } else { false } } ?? 0
@@ -311,17 +549,38 @@ final class ListenSessionModel {
     }
 
     private func finishNaturally() async throws {
-        // Listen mode keeps no score, so the outro just cheers the players by name.
-        closingMessage = Phrases.listenOutro(players: session.config.players)
         turn = nil
+        if hasAttempts {
+            // "Mia wins with 80 points! Leo got 60 points! Mia earned the High Five badge!"
+            scoreboard = session.scoreboard
+            earnedBadges = newlyEarnedBadges()
+            closingMessage = ([Phrases.scoreAnnouncement(scoreboard)]
+                + earnedBadges.map { Phrases.badgeEarned($0.badge, by: $0.player) }).joined(separator: " ")
+        } else {
+            closingMessage = Phrases.listenOutro(players: session.config.players)
+        }
         if let closingMessage { try await deps.speech.speak(closingMessage) }
         tearDown()
     }
 
+    private func newlyEarnedBadges() -> [EarnedBadge] {
+        session.config.players.flatMap { player -> [EarnedBadge] in
+            let before = lifetimeStats[player.id] ?? PlayerStats()
+            let after = before.adding(session.scores.stats(for: player.id))
+            let had = Set(BadgeRules.earned(by: before, topics: bank.topics).map(\.id))
+            return BadgeRules.earned(by: after, topics: bank.topics)
+                .filter { !had.contains($0.id) }
+                .map { EarnedBadge(player: player, badge: $0) }
+        }
+    }
+
     private func tearDown() {
+        guard status != .finished else { return }
         status = .finished
         isDiscussing = false
-        onFinish?(session.learning)
+        isListening = false
+        if hasAttempts { scoreboard = session.scoreboard }
+        onFinish?(SessionSummary(learning: session.learning, stats: session.scores.stats))
         onFinish = nil
         turn = nil
         if closingMessage == nil { closingMessage = Phrases.outroPrefix }

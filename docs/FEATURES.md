@@ -7,6 +7,7 @@
 > - Families add players with a name and age. Sessions start with "Who's playing?" instead of an age-band picker, and each child gets questions for their own age.
 > - Parent mode has its own Settings section and a **separate talk timer** (default: no limit).
 > - Questions repeat per player with **Leitner boxes**: today, tomorrow, then after 2, 4, 8 and 16 days. A wrong answer starts over, for that player only. Reviews are about 20% of a session (10% own, 10% from what the others had), nothing repeats on the same day, and the rest is new ([ADR-0016](adr/0016-leitner-spaced-repetition.md)).
+> - **Hands-free voice answers** are the default: after a beep, whoever's turn it is says the answer, and the app judges it, keeps score and reads the scoreboard at the end. If nobody is heard it falls back to reading answers out ([ADR-0018](adr/0018-hands-free-voice-answers.md)).
 > - **One tap to play:** who's playing and the length are remembered. Home has a big **Play** button (random topic), and tapping a topic starts it straight away. Setup appears only before the first game or via **Change** ([ADR-0017](adr/0017-one-tap-start.md)).
 
 ---

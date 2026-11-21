@@ -12,7 +12,8 @@ mid-session causes 1–3 second gaps on many car stereos.
 - **One `AVAudioSession` configuration per session, chosen at start and never switched:**
   - Listen mode (free): `.playback`, mode `.spokenAudio`, output over **A2DP**. Options
     `.duckOthers` + `.interruptSpokenAudioAndMixWithOthers` when "lower music" is on.
-  - Voice mode (M4): `.playAndRecord`, mode `.voiceChat`, with
+  - Voice mode (M4): *(superseded in part by [ADR-0018](0018-hands-free-voice-answers.md): mode
+    `.default`, not `.voiceChat`)* `.playAndRecord`, mode `.voiceChat`, with
     `[.allowBluetooth, .allowBluetoothA2DP, .defaultToSpeaker, .duckOthers]`. The Bluetooth HFP
     input is picked explicitly with `setPreferredInput`. Voice processing on the input node
     gives echo cancellation.

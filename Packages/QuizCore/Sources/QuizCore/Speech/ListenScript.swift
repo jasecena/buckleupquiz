@@ -15,6 +15,10 @@ public enum SpeechStep: Hashable, Sendable {
     case cue(Cue)
     /// Think time, shown as a countdown ring.
     case think(seconds: Double)
+    /// Voice answers: chime, then listen for up to `seconds` for the player's answer (ADR-0018).
+    case listen(seconds: Double)
+    /// Voice answers: say how the answer went ("Correct! Awesome!" / "Not quite, the answer was…").
+    case feedback
     /// Talk About time. Ends when the family says they're done (We're done / Next on
     /// screen, or the car's next-track button), or when the Parent mode timer runs out.
     /// `seconds == nil` means no time limit.
@@ -53,7 +57,8 @@ public struct ListenSettings: Hashable, Sendable, Codable {
 /// read question + options, think, reveal answer (+ fun fact), pause.
 public enum ListenScript {
     public static func steps(
-        for turn: Turn, category: Topic.Category?, settings: ListenSettings, addressPlayer: Bool
+        for turn: Turn, category: Topic.Category?, settings: ListenSettings, addressPlayer: Bool,
+        voiceAnswers: Bool = false
     ) -> [SpeechStep] {
         let presented = turn.presented
         let q = presented.question
@@ -75,9 +80,16 @@ public enum ListenScript {
             steps.append(.discuss(seconds: settings.talkTime.map { max($0, 10) }))
             steps.append(.say(Phrases.greatChat, .answer))
         } else {
-            steps.append(.cue(.think))
-            steps.append(.think(seconds: settings.thinkTime.clamped(to: ListenSettings.thinkTimeRange)))
-            steps.append(.say(Phrases.answerReveal(presented, category: category), .answer))
+            let thinkTime = settings.thinkTime.clamped(to: ListenSettings.thinkTimeRange)
+            if voiceAnswers {
+                // The player answers out loud; the app says whether it was right.
+                steps.append(.listen(seconds: thinkTime))
+                steps.append(.feedback)
+            } else {
+                steps.append(.cue(.think))
+                steps.append(.think(seconds: thinkTime))
+                steps.append(.say(Phrases.answerReveal(presented, category: category), .answer))
+            }
             // Explanations teach the "why" of values questions, so they are always read.
             if let explanation = q.explanation {
                 steps.append(.say(explanation, .followUp))

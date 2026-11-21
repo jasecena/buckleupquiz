@@ -84,13 +84,28 @@ final class PlayerStore {
         Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.learning) })
     }
 
+    /// Lifetime scores, keyed the way `QuizSession` expects.
+    func stats(for profiles: [PlayerProfile]) -> [String: PlayerStats] {
+        Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.stats) })
+    }
+
     /// Saves each player's boxes after a session.
     func recordLearning(_ learning: [String: LearningRecord]) {
+        record(SessionSummary(learning: learning, stats: [:]))
+    }
+
+    /// Saves boxes and adds the session's scores to each player's lifetime stats.
+    func record(_ summary: SessionSummary) {
         for profile in players {
-            guard let newer = learning[profile.id.uuidString] else { continue }
-            var record = profile.learning
-            record.merge(newer)
-            profile.learning = record
+            let id = profile.id.uuidString
+            if let newer = summary.learning[id] {
+                var record = profile.learning
+                record.merge(newer)
+                profile.learning = record
+            }
+            if let session = summary.stats[id], session.attempted > 0 {
+                profile.stats = profile.stats.adding(session)
+            }
         }
         save()
     }

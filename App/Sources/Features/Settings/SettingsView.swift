@@ -32,6 +32,26 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Picker("Answers", selection: $store.settings.answerMode) {
+                        Text("Say them out loud").tag(AnswerMode.voice)
+                        Text("Just listen").tag(AnswerMode.listen)
+                    }
+                    if store.settings.answerMode == .voice {
+                        Picker("Microphone", selection: $store.settings.micPreference) {
+                            Text("Car or headset if connected").tag(MicPreference.automatic)
+                            Text("This iPhone").tag(MicPreference.iPhone)
+                        }
+                        NavigationLink("Mic check") { MicCheckView() }
+                    }
+                } header: {
+                    Text("Answers")
+                } footer: {
+                    Text(store.settings.answerMode == .voice
+                         ? "After each question there's a beep. Whoever's turn it is says the answer, and the app keeps score. Say \"skip\", \"repeat\", \"pause\" or \"stop\" any time. Speech is understood on this iPhone and never recorded or sent anywhere. If nobody is heard, the app reads the answers out instead."
+                         : "The app reads each answer after the think time. No score is kept.")
+                }
+
+                Section {
                     Stepper(value: $store.settings.listen.thinkTime, in: ListenSettings.thinkTimeRange, step: 1) {
                         Text("Think time: \(Int(store.settings.listen.thinkTime)) seconds")
                     }

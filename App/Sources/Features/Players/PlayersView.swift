@@ -1,3 +1,4 @@
+import QuizCore
 import SwiftUI
 
 /// Manage the family's players (from Game setup → Edit players).
@@ -5,6 +6,17 @@ struct PlayersView: View {
     @Environment(PlayerStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     @State private var editing: PlayerEditorTarget?
+    @Environment(AppEnvironment.self) private var environment
+
+    /// "Age 7 · 120 points · 2 badges" (voice-answer games, ADR-0018).
+    private func summary(for profile: PlayerProfile) -> String {
+        let stats = profile.stats
+        var parts = ["Age \(profile.currentAge())"]
+        if stats.attempted > 0 { parts.append("\(stats.points) points") }
+        let badges = BadgeRules.earned(by: stats, topics: environment.bank?.topics ?? []).count
+        if badges > 0 { parts.append(badges == 1 ? "1 badge" : "\(badges) badges") }
+        return parts.joined(separator: " · ")
+    }
 
     var body: some View {
         NavigationStack {
@@ -16,7 +28,8 @@ struct PlayersView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                     ForEach(store.players) { profile in
                         Button { editing = .edit(profile) } label: {
-                            PlayerChip(name: profile.name, age: profile.currentAge(), colorHex: profile.colorHex)
+                            PlayerChip(name: profile.name, age: profile.currentAge(), colorHex: profile.colorHex,
+                                       note: summary(for: profile))
                         }
                         .buttonStyle(.plain)
                     }

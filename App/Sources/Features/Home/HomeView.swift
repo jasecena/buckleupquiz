@@ -162,8 +162,15 @@ struct HomeView: View {
             notice = "No more \(chosen.name) questions today for \(ListFormatter.localizedString(byJoining: selected.map(\.name))). Try another topic!"
             return
         }
-        activeSession = environment.makeListenSession(
-            topics: [chosen.id], profiles: players, length: settingsStore.settings.lastSessionLength)
+        let length = settingsStore.settings.lastSessionLength
+        Task {
+            // Voice answers ask for the microphone once, the first time they're used (ADR-0018).
+            if settingsStore.settings.answerMode == .voice, !SystemSpeechListener.hasPermission,
+               !(await SystemSpeechListener.requestPermission()) {
+                settingsStore.settings.answerMode = .listen
+            }
+            activeSession = environment.makeListenSession(topics: [chosen.id], profiles: players, length: length)
+        }
     }
 
     private func normaliseSelection() {

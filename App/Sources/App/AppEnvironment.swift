@@ -45,7 +45,10 @@ final class AppEnvironment {
                     speech: SystemSpeechOutput(voiceSettings: { [weak settings] in settings?.settings.voice ?? VoiceSettings() }),
                     cues: EngineCuePlayer(),
                     audioSession: AudioSessionController(),
-                    nowPlaying: NowPlayingController()
+                    nowPlaying: NowPlayingController(),
+                    // On-device recognition only (ADR-0004); nil falls back to reading answers out.
+                    listener: settings.settings.answerMode == .voice && SystemSpeechListener.hasPermission
+                        ? SystemSpeechListener() : nil
                 )
             }
         )
@@ -75,11 +78,13 @@ final class AppEnvironment {
         let model = ListenSessionModel(
             bank: bank, config: config, settings: s.listen, duckOthers: s.duckOthers,
             dependencies: makeListenDependencies(settings),
+            answerMode: s.answerMode, mic: s.micPreference,
             // The whole family's boxes: absent players' recent questions can be shared, and
             // nobody gets a question someone else already had today (ADR-0016).
-            learning: players.learning(for: players.players), day: LearningDay.number(),
+            learning: players.learning(for: players.players), lifetimeStats: players.stats(for: profiles),
+            day: LearningDay.number(),
             playerColors: Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.colorHex) }))
-        model.onFinish = { [weak players] learning in players?.recordLearning(learning) }
+        model.onFinish = { [weak players] summary in players?.record(summary) }
         return model
     }
 }

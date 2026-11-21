@@ -45,6 +45,21 @@ public struct PlayerStats: Codable, Hashable, Sendable {
     public init() {}
 
     public var accuracy: Double { attempted == 0 ? 0 : Double(correct) / Double(attempted) }
+
+    /// Lifetime totals after adding one session's stats.
+    public func adding(_ session: PlayerStats) -> PlayerStats {
+        var total = self
+        total.points += session.points
+        total.correct += session.correct
+        total.attempted += session.attempted
+        total.currentStreak = session.attempted > 0 ? session.currentStreak : currentStreak
+        total.bestStreak = max(bestStreak, session.bestStreak)
+        for (topic, stats) in session.byTopic {
+            total.byTopic[topic, default: TopicStats()].correct += stats.correct
+            total.byTopic[topic, default: TopicStats()].attempted += stats.attempted
+        }
+        return total
+    }
 }
 
 /// The score change from one answer, used for spoken feedback ("That's three in a row!").

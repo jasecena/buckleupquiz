@@ -11,8 +11,8 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 | M1 | Engine (`QuizCore`) | ✅ |
 | M2 | Listen mode audio | 🟡 |
 | M3 | UI | 🟡 |
-| M4 | Voice answers + car Bluetooth mic | ⬜ |
-| M5 | Players & scoring | 🟡 (players ✅, scoring engine ✅) |
+| M4 | Voice answers + car Bluetooth mic | 🟡 (built; needs real-car testing) |
+| M5 | Players & scoring | 🟡 (players, live and spoken scoreboard, lifetime stats ✅) |
 | M6 | Paywall & parental gate | ⬜ |
 | M7 | Content & polish | ⬜ |
 | M8 | TestFlight & real-car testing | 🟡 (first build on TestFlight ✅) |
@@ -79,13 +79,14 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 
 **Exit:** a parent can install, choose a topic and play without instructions.
 
-## M4 — Voice answers & car mic ⬜
-- [ ] `SpeechRecognizer` service: `SFSpeechRecognizer`, `requiresOnDeviceRecognition`, all alternatives
-- [ ] Voice audio session: `.playAndRecord` + `.voiceChat`, HFP input selection, "Using: <car>" label
-- [ ] Voice processing (echo cancellation); half-duplex speak → 300 ms → chime → listen
-- [ ] Silence detection (about 1.2 s after speech), retry once on garbled input, voice commands
-- [ ] Route-change fallback (phone mic/speaker or pause, per the "Microphone source" setting)
-- [ ] Mic check screen; HFP onboarding note
+## M4 — Voice answers & car mic 🟡
+- [x] `SystemSpeechListener`: `SFSpeechRecognizer`, `requiresOnDeviceRecognition`, all alternatives (ADR-0018)
+- [x] Voice audio session: `.playAndRecord`, HFP/CarPlay/headset/USB input preferred, "Using: <mic>" label
+- [x] Half-duplex speak → 300 ms → chime → listen (`.default` mode instead of `.voiceChat`, ADR-0018)
+- [x] Silence detection (1.2 s after speech), retry once on a mumble, voice commands, hands-free Talk About
+- [x] Fallbacks: recogniser error or 3 silent turns → read answers out; permission refused → "Just listen"
+- [x] Mic check screen (Settings → Answers) with the HFP call-screen note
+- [ ] Verify on device and in 3+ cars; tune silence timing and the speech rate for HFP
 - [ ] 100-answer field test set (quiet + road noise) feeding `AnswerMatcher` tests
 
 **Exit:** acceptance criteria 3–7 pass.
@@ -93,8 +94,10 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 ## M5 — Players & scoring ⬜
 - [x] SwiftData `PlayerProfile` (CloudKit-compatible, ADR-0009) + `PlayerStore`
 - [x] Player profiles (up to 6: name, age, colour), pick players per session (done early, in M3)
-- [ ] Turn-based voice sessions using `QuizSession` rotation (engine ✅)
-- [ ] Spoken and on-screen scoreboard, per-player stats, badges (engine ✅)
+- [x] Turn-based voice sessions using `QuizSession` rotation; whoever's turn it is gets the score (ADR-0018)
+- [x] Live on-screen scoreboard, spoken end-of-game scores, streak cheers, new-badge announcements
+- [x] Lifetime per-player stats (`PlayerProfile.statsData`), points and badges in Players
+- [ ] Per-player stats screen (accuracy per topic, badge gallery)
 - [x] Persist each player's Leitner boxes
 
 **Exit:** acceptance criterion 8 passes.

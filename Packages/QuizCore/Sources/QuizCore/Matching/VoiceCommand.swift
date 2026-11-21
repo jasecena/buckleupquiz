@@ -6,6 +6,9 @@ public enum VoiceCommand: String, CaseIterable, Sendable {
     private static let phrases: [String: VoiceCommand] = [
         "skip": .skip, "next": .skip, "skip it": .skip, "next one": .skip, "next question": .skip,
         "pass": .skip, "skip please": .skip, "next please": .skip,
+        // Ending a Talk About chat hands-free.
+        "done": .skip, "all done": .skip, "were done": .skip, "we are done": .skip, "finished": .skip,
+        "were finished": .skip, "we are finished": .skip,
         "repeat": .repeat, "say again": .repeat, "say it again": .repeat, "again": .repeat,
         "repeat please": .repeat, "repeat that": .repeat, "what": .repeat, "pardon": .repeat,
         "pause": .pause, "wait": .pause, "pause please": .pause, "hold on": .pause,

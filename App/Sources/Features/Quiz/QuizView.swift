@@ -9,6 +9,7 @@ struct QuizView: View {
     var body: some View {
         VStack(spacing: 24) {
             header
+            if model.showsScores, model.status != .finished { scoreStrip }
             Spacer(minLength: 0)
             content
             Spacer(minLength: 0)
@@ -43,12 +44,16 @@ struct QuizView: View {
     @ViewBuilder private var content: some View {
         if model.status == .finished {
             VStack(spacing: 20) {
-                Image(systemName: "flag.checkered")
+                Image(systemName: model.showsScores ? "trophy.fill" : "flag.checkered")
                     .font(.system(size: 64))
                     .foregroundStyle(Theme.accent)
-                Text(model.closingMessage ?? Phrases.outroPrefix)
-                    .font(Theme.title)
-                    .multilineTextAlignment(.center)
+                if model.showsScores {
+                    finalScores
+                } else {
+                    Text(model.closingMessage ?? Phrases.outroPrefix)
+                        .font(Theme.title)
+                        .multilineTextAlignment(.center)
+                }
                 Button("Done") { dismiss() }
                     .buttonStyle(BigButtonStyle())
             }
@@ -79,8 +84,11 @@ struct QuizView: View {
                         }
                     }
                 }
-                if let answer = model.revealedAnswer {
+                if model.isListening, !model.isDiscussing {
+                    listening(for: turn)
+                } else if let answer = model.revealedAnswer {
                     VStack(spacing: 8) {
+                        if let outcome = model.outcome { outcomeLine(outcome) }
                         Text(answer)
                             .font(Theme.hero)
                             .foregroundStyle(Theme.accent)
@@ -100,8 +108,9 @@ struct QuizView: View {
                             CountdownRing(remaining: model.thinkRemaining, total: model.thinkTotal)
                                 .frame(width: 110, height: 110)
                         }
-                        Text(model.isDiscussionTimed ? "Tap when you're ready, or wait for the timer."
-                                                     : "No rush. Tap when you're ready to move on.")
+                        Text(model.isListening ? "No rush. Say \"we're done\" when you're ready to move on."
+                             : model.isDiscussionTimed ? "Tap when you're ready, or wait for the timer."
+                             : "No rush. Tap when you're ready to move on.")
                             .font(Theme.body)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -124,6 +133,83 @@ struct QuizView: View {
         }
         if let warning = model.audioWarning {
             Text(warning).font(.footnote).foregroundStyle(.secondary)
+        }
+        if let mic = model.micName, model.isVoice, model.status != .finished {
+            Label("Using: \(mic)", systemImage: "mic.fill").font(.footnote).foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: Voice answers (ADR-0018)
+
+    private func listening(for turn: Turn) -> some View {
+        VStack(spacing: 12) {
+            Image(systemName: "waveform.circle.fill")
+                .font(.system(size: 88))
+                .foregroundStyle(Theme.accent)
+                .symbolEffect(.variableColor.iterative, options: .repeating)
+            Text(turn.player.name.isEmpty ? "Listening…" : "Listening to \(turn.player.name)…")
+                .font(Theme.title)
+            Text(turn.presented.question.type == .trueFalse ? "Say true or false" : "Say A, B or C, or the answer")
+                .font(Theme.body)
+                .foregroundStyle(.secondary)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder private func outcomeLine(_ outcome: AnswerOutcome) -> some View {
+        let (text, symbol, color): (String, String, Color) = switch outcome {
+        case .correct: ("Correct!", "checkmark.circle.fill", .green)
+        case .incorrect: ("Not quite", "xmark.circle.fill", .orange)
+        default: ("Time's up", "clock.fill", .secondary)
+        }
+        VStack(spacing: 4) {
+            Label(text, systemImage: symbol).font(Theme.title).foregroundStyle(color)
+            if let heard = model.heard {
+                Text("Heard: \"\(heard)\"").font(Theme.body).foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    /// Live points per player, in turn order.
+    private var scoreStrip: some View {
+        HStack(spacing: 8) {
+            ForEach(model.scoreboard, id: \.player.id) { entry in
+                HStack(spacing: 6) {
+                    Text(entry.player.name.isEmpty ? "Score" : entry.player.name).lineLimit(1)
+                    Text("\(entry.points)").monospacedDigit().fontWeight(.heavy)
+                }
+                .font(Theme.body)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .foregroundStyle(.white)
+                .background(Capsule().fill(Color(hex: model.playerColors[entry.player.id] ?? "#FF6919")))
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(model.scoreboard.map { "\($0.player.name) \($0.points) points" }.joined(separator: ", "))
+    }
+
+    /// End-of-game scoreboard with any new badges.
+    private var finalScores: some View {
+        VStack(spacing: 12) {
+            ForEach(model.scoreboard, id: \.player.id) { entry in
+                HStack {
+                    Text(entry.rank == 1 ? "🏆" : "\(entry.rank).").frame(width: 36)
+                    Text(entry.player.name.isEmpty ? "You" : entry.player.name).font(Theme.title)
+                    Spacer()
+                    Text("\(entry.points)").font(Theme.title).monospacedDigit()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(RoundedRectangle(cornerRadius: Theme.corner, style: .continuous)
+                    .fill(Color(hex: model.playerColors[entry.player.id] ?? "#FF6919").opacity(0.15)))
+            }
+            ForEach(model.earnedBadges) { earned in
+                Label("\(earned.player.name): \(earned.badge.title)", systemImage: "rosette")
+                    .font(Theme.headline)
+                    .foregroundStyle(Theme.accent)
+            }
         }
     }
 
