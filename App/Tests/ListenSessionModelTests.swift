@@ -221,6 +221,27 @@ struct ListenSessionModelTests {
         #expect(!everything.contains("Mia"), "no names in reports")
     }
 
+    @Test func skippingMidQuestionKeepsItTheSamePlayersTurn() async {
+        let mia = Player(id: "mia", name: "Mia", age: 7)
+        let leo = Player(id: "leo", name: "Leo", age: 11)
+        let listener = FakeListener([["skip"], ["answer 1"], []])
+        let model = ListenSessionModel(
+            bank: makeBank(questions: 3, olderCount: 3), config: SessionConfig(topics: ["animals"], players: [mia, leo],
+                                                                                length: .questions(2)),
+            settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
+                                listener: listener),
+            answerMode: .voice, rng: AnyRandomGenerator(seed: 2))
+        model.start()
+        for _ in 0..<20000 where model.status != .finished { await Task.yield() }
+        #expect(model.status == .finished)
+        let names = speech.spoken.filter { $0.hasPrefix("Mia") || $0.hasPrefix("Leo") }
+        #expect(names == ["Mia, this one's for you!", "Mia.", "Leo, this one's for you!"])
+        #expect(speech.spoken.filter { $0 == "Question two." }.count == 1, "the skip didn't use up a question")
+        #expect(speech.spoken.filter { $0 == Phrases.intro }.count == 1)
+        #expect(speech.spoken.contains(Phrases.anotherOne))
+    }
+
     @Test func silenceIsNeverMentioned() async {
         let (model, listener) = makeVoiceModel([], questions: 5, length: 5)
         model.start()

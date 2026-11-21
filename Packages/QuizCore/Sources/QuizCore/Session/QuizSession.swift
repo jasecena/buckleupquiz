@@ -104,11 +104,20 @@ public struct QuizSession: Sendable {
 
     /// Moves to the next turn. Returns nil (and finishes) when the length is reached
     /// or no player has questions left. An unrecorded current turn counts as skipped.
+    ///
+    /// `samePlayer`: the current question was skipped before it was answered, so it's still
+    /// the same player's turn. They get another question with the same number, and the skipped
+    /// one doesn't use up a turn. If they have no questions left, play moves on as usual.
     @discardableResult
-    public mutating func advance() -> Turn? {
+    public mutating func advance(samePlayer: Bool = false) -> Turn? {
         guard !isFinished else { return nil }
+        let replaced = samePlayer ? currentTurn : nil
         if currentTurn != nil, !recordedCurrent { record(.skipped) }
         commitCurrent()
+        if let replaced, let index = config.players.firstIndex(where: { $0.id == replaced.player.id }) {
+            turnsPlayed -= 1
+            nextPlayerIndex = index
+        }
         if let limit = config.length.limit, turnsPlayed >= limit { return finish() }
 
         // Rotate through players, skipping anyone whose pool is empty.

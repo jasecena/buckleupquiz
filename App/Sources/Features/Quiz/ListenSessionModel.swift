@@ -113,6 +113,8 @@ final class ListenSessionModel {
     /// Voice health for the end-of-game diagnostics summary (ADR-0020): counts only.
     @ObservationIgnored private var voiceCounts: [String: Int] = [:]
     @ObservationIgnored private var startedInVoice = false
+    /// Set by `skip()` before the answer: the next question goes to the same player.
+    @ObservationIgnored private var keepPlayerForNextTurn = false
     /// Players who've already heard "this one's for you" this game.
     @ObservationIgnored private var introducedPlayers: Set<String> = []
     @ObservationIgnored private var feedbackRNG = SystemRandomNumberGenerator()
@@ -205,6 +207,9 @@ final class ListenSessionModel {
     func skip() {
         guard status == .playing || status == .paused else { return }
         if isDiscussing { return finishDiscussion() }
+        // Skipped before the answer: it's still this player's turn, with a new question.
+        // After the answer, Next just moves on to the next player.
+        keepPlayerForNextTurn = revealedAnswer == nil && outcome == nil
         haltRunner()
         session.record(.skipped)
         stepIndex = steps.count
@@ -322,7 +327,10 @@ final class ListenSessionModel {
     }
 
     private func loadNextTurn() -> Bool {
-        guard let next = session.advance() else { return false }
+        let samePlayer = keepPlayerForNextTurn
+        let previousPlayer = turn?.player.id
+        keepPlayerForNextTurn = false
+        guard let next = session.advance(samePlayer: samePlayer) else { return false }
         // Listen mode keeps no score; voice turns are recorded once the answer is heard.
         if !isVoice { session.record(.notScored) }
         turn = next
@@ -338,6 +346,9 @@ final class ListenSessionModel {
         steps = ListenScript.steps(for: next, category: category, settings: settings,
                                    addressPlayer: session.config.isTurnBased, firstTurnForPlayer: firstTurn,
                                    voiceAnswers: isVoice)
+        if samePlayer, next.player.id == previousPlayer, case .say(_, .number) = steps.first {
+            steps[0] = .say(Phrases.anotherOne, .number)
+        }
         stepIndex = 0
         updateNowPlaying()
         return true

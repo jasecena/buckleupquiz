@@ -40,7 +40,10 @@ mics.
   think time as a Listen-mode countdown and the game continues in Listen mode. The reason is
   shown in Settings → Mic check.
 - The reply is judged by `VoiceReply` in QuizCore:
-  - **command** ("skip"/"next", "repeat", "pause", "stop") → obeyed;
+  - **command** ("skip"/"next", "repeat", "pause", "stop") → obeyed. Skipping before the
+    answer keeps the turn with the same player: "Here's another one.", same question number,
+    and the skipped question doesn't use up the game's length (product decision, 2026-11-22).
+    After the answer, Next moves on to the next player;
   - **answer** → `AnswerMatcher` (letters, option text, true/false words, every alternative
     transcription) → "Correct! Awesome!" plus a streak cheer from 3 in a row. A wrong answer
     must name another option; random words never count as wrong. A wrong answer

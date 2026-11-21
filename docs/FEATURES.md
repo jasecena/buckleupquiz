@@ -121,6 +121,9 @@ After the question is read:
 - If nothing (or only a mumble) is heard, say nothing about it: share the answer and move on.
   No retry, no score, no change to the Leitner boxes (ADR-0018, "Joy, not correction").
 - Voice commands during the game: "skip", "repeat", "pause", "stop", "next".
+- **Skip or Next before the answer keeps the turn with the same player** (on screen, car
+  button or voice): they get another question ("Here's another one."), and the skip doesn't use
+  up one of the game's questions. After the answer, Next moves on to the next player.
 
 ### 3.4 Answer matching (in `QuizEngine`, unit-tested)
 - Normalise both sides: lowercase, strip punctuation, ignore "the/a/an", trim.

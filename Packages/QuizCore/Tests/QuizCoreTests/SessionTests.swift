@@ -52,6 +52,21 @@ struct SessionTests {
         #expect(session.learning[player.id]?.cards.values.first == ReviewCard(box: 2, due: 11, last: 10))
     }
 
+    @Test func skippingKeepsTheTurnWithTheSamePlayer() {
+        let mia = Player(id: "mia", name: "Mia", age: 7)
+        let leo = Player(id: "leo", name: "Leo", age: 7)
+        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(2))
+        var session = QuizSession(bank: sampleBank(), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
+        let first = session.advance()
+        let replacement = session.advance(samePlayer: true)
+        #expect(replacement?.player.id == "mia")
+        #expect(replacement?.number == 1, "same question number")
+        #expect(replacement?.presented.question.id != first?.presented.question.id)
+        #expect(session.advance()?.player.id == "leo")
+        #expect(session.advance() == nil, "the skipped question didn't use up the game's length")
+        #expect(session.learning["mia"]?.card(first!.presented.question.id) == nil, "skipping leaves the boxes alone")
+    }
+
     @Test func unheardAnswerChangesNothing() {
         let player = Player(id: "mia", name: "Mia", age: 7)
         let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(3))
