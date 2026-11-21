@@ -67,6 +67,31 @@ struct ListenSessionModelTests {
         model.stop()
     }
 
+    @Test func namedPlayersTakeTurnsWithTheirOwnAgeQuestions() async {
+        let mia = Player(id: "mia", name: "Mia", age: 7)
+        let leo = Player(id: "leo", name: "Leo", age: 11)
+        let config = SessionConfig(topics: ["animals"], players: [mia, leo], length: .questions(4))
+        var seen: [String: Set<String>] = [:]
+        let model = ListenSessionModel(
+            bank: makeBank(questions: 3, olderCount: 3), config: config, settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio),
+            rng: AnyRandomGenerator(seed: 2))
+        model.onFinish = { seen = $0 }
+        model.start()
+        await model.runner?.value
+
+        let addressed = speech.spoken.filter { $0.contains("this one's for you") }
+        #expect(addressed.count == 4)
+        #expect(addressed[0].hasPrefix("Mia,"))
+        #expect(addressed[1].hasPrefix("Leo,"))
+        #expect(speech.spoken.last == "That's the end of the ride! Great job, Mia and Leo!")
+        #expect(seen["mia"]?.count == 2)
+        #expect(seen["leo"]?.count == 2)
+        // Mia (7) only heard 6–8 questions; Leo (11) only 11–12 ones (ids ani-1003…).
+        #expect(seen["mia"]?.allSatisfy { ["ani-1000", "ani-1001", "ani-1002"].contains($0) } == true)
+        #expect(seen["leo"]?.allSatisfy { ["ani-1003", "ani-1004", "ani-1005"].contains($0) } == true)
+    }
+
     @Test func endsEarlyWhenQuestionsRunOut() async {
         let model = makeModel(questions: 2, length: .questions(10))
         model.start()

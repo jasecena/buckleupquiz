@@ -35,6 +35,9 @@ final class ListenSessionModel {
 
     var questionCount: Int? { session.config.length.limit }
 
+    /// Whether turns are addressed to named players.
+    var isTurnBased: Bool { session.config.isTurnBased }
+
     // MARK: Internals
 
     @ObservationIgnored private var session: QuizSession
@@ -49,10 +52,19 @@ final class ListenSessionModel {
     /// Bumped on every (re)launch so a cancelled runner can't touch the new one's state.
     @ObservationIgnored private var generation = 0
 
+    /// Called once when the session ends (finished or stopped) with every question
+    /// each player heard, so they can be persisted and avoided next time.
+    @ObservationIgnored var onFinish: (([String: Set<String>]) -> Void)?
+
+    /// "#RRGGBB" per player id, for the "Mia's turn" label.
+    let playerColors: [String: String]
+
     init(bank: QuestionBank, config: SessionConfig, settings: ListenSettings, duckOthers: Bool,
-         dependencies: Dependencies, rng: AnyRandomGenerator = .system()) {
+         dependencies: Dependencies, seenQuestionIDs: [String: Set<String>] = [:],
+         playerColors: [String: String] = [:], rng: AnyRandomGenerator = .system()) {
         self.bank = bank
-        self.session = QuizSession(bank: bank, config: config, rng: rng)
+        self.session = QuizSession(bank: bank, config: config, seenQuestionIDs: seenQuestionIDs, rng: rng)
+        self.playerColors = playerColors
         self.settings = settings
         self.duckOthers = duckOthers
         self.deps = dependencies
@@ -249,7 +261,8 @@ final class ListenSessionModel {
     }
 
     private func finishNaturally() async throws {
-        closingMessage = Phrases.scoreAnnouncement(session.scoreboard)
+        // Listen mode keeps no score, so the outro just cheers the players by name.
+        closingMessage = Phrases.listenOutro(players: session.config.players)
         turn = nil
         if let closingMessage { try await deps.speech.speak(closingMessage) }
         tearDown()
@@ -257,6 +270,8 @@ final class ListenSessionModel {
 
     private func tearDown() {
         status = .finished
+        onFinish?(session.seenQuestionIDs)
+        onFinish = nil
         turn = nil
         if closingMessage == nil { closingMessage = Phrases.outroPrefix }
         deps.cues.endSession()

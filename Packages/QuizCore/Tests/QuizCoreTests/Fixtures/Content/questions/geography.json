@@ -1,4 +1,40 @@
 [
-  {"id": "geo-0001", "topic": "geography", "ageBand": "6-8", "type": "open", "question": "What is the capital city of Tasmania?", "options": null, "answer": "Hobart", "acceptedAnswers": ["hobart", "hobart city"], "funFact": "Hobart is Australia's second-oldest capital city.", "difficulty": 2, "minAge": null, "region": "AU"},
-  {"id": "geo-0002", "topic": "geography", "ageBand": "6-8", "type": "multipleChoice", "question": "Which is the biggest ocean?", "options": ["Indian", "Pacific", "Atlantic"], "answer": "Pacific", "acceptedAnswers": ["pacific ocean"], "difficulty": 1}
+  {
+    "id": "geo-0001",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is the capital city of Tasmania?",
+    "options": [
+      "Hobart",
+      "Launceston",
+      "Darwin"
+    ],
+    "answer": "Hobart",
+    "acceptedAnswers": [
+      "hobart",
+      "hobart city"
+    ],
+    "funFact": "Hobart is Australia's second-oldest capital city.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0002",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which is the biggest ocean?",
+    "options": [
+      "Indian",
+      "Pacific",
+      "Atlantic"
+    ],
+    "answer": "Pacific",
+    "acceptedAnswers": [
+      "pacific ocean"
+    ],
+    "difficulty": 1
+  }
 ]

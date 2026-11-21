@@ -12,7 +12,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 | M2 | Listen mode audio | 🟡 |
 | M3 | UI | 🟡 |
 | M4 | Voice answers + car Bluetooth mic | ⬜ |
-| M5 | Players & scoring | ⬜ (engine side ✅) |
+| M5 | Players & scoring | 🟡 (players ✅, scoring engine ✅) |
 | M6 | Paywall & parental gate | ⬜ |
 | M7 | Content & polish | ⬜ |
 | M8 | TestFlight & real-car testing | 🟡 (first build on TestFlight ✅) |
@@ -62,7 +62,10 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 ## M3 — UI 🟡
 - [x] Home topic grid (icon, name, count, lock), topic setup (age band, length), quiz screen
       (question, countdown ring, answer reveal, big Pause/Skip/Repeat), settings
-- [ ] Onboarding (FEATURES §6): welcome, 3-question demo, optional first player
+- [x] Choice-only questions; content converted (ADR-0015)
+- [x] Players: add/edit/remove with name, age and colour; "Who's playing?" replaces the age picker;
+      turns per player with age-appropriate questions; seen questions remembered (ADR-0015)
+- [ ] Onboarding (FEATURES §6): welcome, 3-question demo, add the first player
 - [ ] Mascot and app icon (original, not seatbelt-themed)
 - [ ] Mixed-topic sessions (paid)
 - [ ] Accessibility pass: Dynamic Type, VoiceOver labels, contrast
@@ -82,11 +85,11 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 **Exit:** acceptance criteria 3–7 pass.
 
 ## M5 — Players & scoring ⬜
-- [ ] SwiftData models (CloudKit-compatible, ADR-0009), repositories
-- [ ] Player profiles (up to 6: name, age band, avatar/colour), pick players per session
+- [x] SwiftData `PlayerProfile` (CloudKit-compatible, ADR-0009) + `PlayerStore`
+- [x] Player profiles (up to 6: name, age, colour), pick players per session (done early, in M3)
 - [ ] Turn-based voice sessions using `QuizSession` rotation (engine ✅)
 - [ ] Spoken and on-screen scoreboard, per-player stats, badges (engine ✅)
-- [ ] Persist seen questions per player
+- [x] Persist seen questions per player
 
 **Exit:** acceptance criterion 8 passes.
 

@@ -129,7 +129,7 @@ struct ContentLoadingTests {
 
 @Suite("Listen script")
 struct ListenScriptTests {
-    @Test func openQuestionSteps() {
+    @Test func multipleChoiceSteps() {
         var q = makeQuestion(text: "What is the capital city of Tasmania?", answer: "Hobart")
         q.funFact = "Hobart is Australia's second-oldest capital city."
         let turn = Turn(number: 1, player: .listener(ageBand: .sixToEight), presented: present(q))
@@ -137,9 +137,10 @@ struct ListenScriptTests {
         #expect(steps == [
             .say("Buckle up, kids… question one!", .number),
             .say("What is the capital city of Tasmania?", .question),
+            .say("A: Hobart. B: Launceston. C: Darwin.", .options),
             .cue(.think),
             .think(seconds: 8),
-            .say("The answer is… Hobart!", .answer),
+            .say("The answer is… A: Hobart!", .answer),
             .say("Hobart is Australia's second-oldest capital city.", .followUp),
             .wait(seconds: 2),
         ])
@@ -188,7 +189,32 @@ struct ListenScriptTests {
         #expect(Phrases.feedback(.incorrect, presented: p, category: .values, using: &rng)
             == "Good try! A kinder choice might be… B: Help.")
         #expect(Phrases.feedback(.incorrect, presented: present(makeQuestion(answer: "Hobart")),
-                                 category: .knowledge, using: &rng) == "Not quite, the answer was Hobart.")
+                                 category: .knowledge, using: &rng) == "Not quite, the answer was A: Hobart.")
+    }
+
+    @Test func listenOutroNamesThePlayers() {
+        let mia = Player(id: "m", name: "Mia", age: 7)
+        let leo = Player(id: "l", name: "Leo", age: 11)
+        #expect(Phrases.listenOutro(players: [mia, leo]) == "That's the end of the ride! Great job, Mia and Leo!")
+        #expect(Phrases.listenOutro(players: [.listener(ageBand: .sixToEight)])
+            == "That's the end of the ride! Great listening, everyone!")
+    }
+
+    @Test func settingsFromOlderBuildsStillDecode() throws {
+        let old = #"{"thinkTime": 12, "readOptions": false}"#
+        let settings = try JSONDecoder().decode(ListenSettings.self, from: Data(old.utf8))
+        #expect(settings.thinkTime == 12)
+        #expect(settings.funFacts == true)
+    }
+}
+
+@Suite("Players and ages")
+struct PlayerAgeTests {
+    @Test(arguments: [(4, AgeBand.sixToEight), (6, .sixToEight), (8, .sixToEight), (9, .nineToTen),
+                      (10, .nineToTen), (11, .elevenToTwelve), (12, .elevenToTwelve), (14, .elevenToTwelve)])
+    func ageMapsToBand(age: Int, band: AgeBand) {
+        #expect(AgeBand(age: age) == band)
+        #expect(Player(id: "p", name: "P", age: age).ageBand == band)
     }
 }
 

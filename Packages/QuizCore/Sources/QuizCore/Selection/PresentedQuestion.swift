@@ -3,7 +3,7 @@ public struct PresentedQuestion: Hashable, Sendable {
     public static let letters = ["A", "B", "C", "D", "E", "F"]
 
     public let question: Question
-    /// Options in the order they are read out. `nil` for open and talkAbout questions.
+    /// Options in the order they are read out. `nil` for talkAbout prompts.
     public let options: [String]?
     /// Index of the correct option in `options`.
     public let correctOptionIndex: Int?
@@ -36,7 +36,7 @@ public struct PresentedQuestion: Hashable, Sendable {
         Array(Self.letters.prefix(options?.count ?? 0))
     }
 
-    /// The correct answer as it should be spoken/shown, e.g. "B: help them up" or "Hobart".
+    /// The correct answer as it should be spoken/shown, e.g. "B: Hobart" or "True".
     public var answerText: String? {
         if question.type == .trueFalse { return question.answer }
         if let options, let i = correctOptionIndex, i < Self.letters.count {

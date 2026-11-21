@@ -21,6 +21,15 @@ public enum AgeBand: String, Codable, CaseIterable, Sendable, Hashable, Comparab
         }
     }
 
+    /// The content band for a child's age. Younger than 6 uses 6–8; older than 12 uses 11–12.
+    public init(age: Int) {
+        switch age {
+        case ...8: self = .sixToEight
+        case 9...10: self = .nineToTen
+        default: self = .elevenToTwelve
+        }
+    }
+
     public static func < (lhs: AgeBand, rhs: AgeBand) -> Bool {
         lhs.ageRange.lowerBound < rhs.ageRange.lowerBound
     }

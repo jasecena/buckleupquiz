@@ -9,50 +9,52 @@ struct AnswerMatcherTests {
         matcher.match(transcriptions: heard, to: present(q))
     }
 
-    // MARK: Open questions
+    // MARK: Saying the option text instead of the letter
 
-    @Test(arguments: ["Hobart", "hobart.", "The Hobart", "Hobert", "hobart city", "I think it's Hobart"])
-    func acceptsOpenAnswerVariants(heard: String) {
-        let q = makeQuestion(answer: "Hobart", accepted: ["hobart city"])
-        #expect(judge([heard], q) == .correct(heard: heard))
+    var tasmania: Question { makeQuestion(answer: "Hobart", accepted: ["hobart city"]) }
+
+    @Test(arguments: ["Hobart", "hobart.", "The Hobart", "Hobert", "hobart city", "I think it's Hobart", "A", "option A"])
+    func acceptsOptionTextVariants(heard: String) {
+        #expect(judge([heard], tasmania) == .correct(heard: heard))
     }
 
-    @Test(arguments: ["Launceston", "Melbourne", "Ho", "I know lots of cities like Melbourne and Sydney and Hobart"])
-    func rejectsWrongOpenAnswers(heard: String) {
-        #expect(judge([heard], makeQuestion(answer: "Hobart")) == .incorrect(heard: heard))
+    @Test(arguments: ["Launceston", "Darwin", "Melbourne", "Ho", "Hobart or Darwin", "B", "D"])
+    func rejectsWrongOptions(heard: String) {
+        #expect(judge([heard], tasmania) == .incorrect(heard: heard))
     }
 
     @Test func numbersMatchWordsAndDigits() {
-        let q = makeQuestion(answer: "21")
-        #expect(judge(["twenty one"], q) == .correct(heard: "twenty one"))
-        #expect(judge(["twenty-one"], q) == .correct(heard: "twenty-one"))
-        #expect(judge(["21"], q) == .correct(heard: "21"))
-        let seven = makeQuestion(answer: "seven")
+        let q = makeQuestion(options: ["20", "21", "22"], answer: "21")
+        for heard in ["twenty one", "twenty-one", "21", "B"] {
+            #expect(judge([heard], q) == .correct(heard: heard), "\(heard)")
+        }
+        let seven = makeQuestion(options: ["six", "seven", "eight"], answer: "seven")
         #expect(judge(["7"], seven) == .correct(heard: "7"))
     }
 
     @Test func numbersAreNeverFuzzy() {
-        let q = makeQuestion(answer: "21")
+        let q = makeQuestion(options: ["20", "21", "22"], answer: "21")
         #expect(judge(["22"], q) == .incorrect(heard: "22"))
         #expect(judge(["twenty two"], q) == .incorrect(heard: "twenty two"))
+        #expect(judge(["23"], q) == .incorrect(heard: "23"))
     }
 
     @Test func shortWordsMustBeExact() {
-        let q = makeQuestion(answer: "cat")
+        let q = makeQuestion(options: ["cat", "bat", "dog"], answer: "cat")
         #expect(judge(["bat"], q) == .incorrect(heard: "bat"))
+        #expect(judge(["cap"], q) == .incorrect(heard: "cap"))
         #expect(judge(["cat"], q) == .correct(heard: "cat"))
     }
 
     @Test func longWordsAllowTwoEdits() {
-        let q = makeQuestion(answer: "Kookaburra")
+        let q = makeQuestion(options: ["Kookaburra", "Cockatoo", "Magpie"], answer: "Kookaburra")
         #expect(judge(["cookaburra"], q) == .correct(heard: "cookaburra"))
         #expect(judge(["kookaburro"], q) == .correct(heard: "kookaburro"))
         #expect(judge(["cockatoo"], q) == .incorrect(heard: "cockatoo"))
     }
 
     @Test func anyAlternativeTranscriptionCounts() {
-        let q = makeQuestion(answer: "Hobart")
-        #expect(judge(["low bat", "hobart"], q) == .correct(heard: "hobart"))
+        #expect(judge(["low bat", "hobart"], tasmania) == .correct(heard: "hobart"))
     }
 
     @Test func silenceIsNoAnswer() {

@@ -7,6 +7,7 @@ struct HomeView: View {
     @Environment(EntitlementStore.self) private var entitlements
     @State private var lockedTopic: Topic?
     @State private var showSettings = false
+    @State private var showPlayers = false
 
     private var topics: [Topic] { bank.topics.filter { bank.questionCount(topic: $0.id) > 0 } }
     private let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
@@ -46,6 +47,11 @@ struct HomeView: View {
             SessionSetupView(topic: topic, bank: bank)
         }
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button { showPlayers = true } label: {
+                    Label("Players", systemImage: "person.2.fill")
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showSettings = true } label: {
                     Label("Settings", systemImage: "gearshape.fill")
@@ -53,6 +59,7 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showSettings) { SettingsView() }
+        .sheet(isPresented: $showPlayers) { PlayersView() }
         .sheet(item: $lockedTopic) { topic in
             FamilyPassTeaser(topic: topic)
                 .presentationDetents([.medium])
@@ -90,6 +97,7 @@ private struct FamilyPassTeaser: View {
         HomeView(bank: .preview)
     }
     .environment(EntitlementStore())
+    .environment(PlayerStore.inMemory())
     .environment(SettingsStore(defaults: UserDefaults(suiteName: "preview")!))
 }
 #endif

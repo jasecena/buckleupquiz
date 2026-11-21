@@ -9,10 +9,11 @@ extension QuestionBank {
             Topic(id: "space", name: "Space", symbol: "moon.stars.fill", color: "#6C5CE7", category: .knowledge, isFree: false),
         ],
         questions: [
-            Question(id: "ani-0001", topic: "animals", ageBand: .sixToEight, type: .open,
-                     question: "What is a baby kangaroo called?", answer: "Joey", acceptedAnswers: ["joey"]),
-            Question(id: "spc-0001", topic: "space", ageBand: .sixToEight, type: .open,
-                     question: "What is the closest star to Earth?", answer: "The Sun", acceptedAnswers: ["sun"]),
+            Question(id: "ani-0001", topic: "animals", ageBand: .sixToEight, type: .multipleChoice,
+                     question: "What is a baby kangaroo called?", options: ["Joey", "Cub", "Chick"], answer: "Joey"),
+            Question(id: "spc-0001", topic: "space", ageBand: .sixToEight, type: .multipleChoice,
+                     question: "What is the closest star to Earth?", options: ["The Moon", "The Sun", "The North Star"],
+                     answer: "The Sun"),
         ]
     )
 }

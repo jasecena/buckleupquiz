@@ -1,6 +1,6 @@
 # 0007. Answer-matching rules
 
-- **Status:** Accepted
+- **Status:** Accepted. Amended by [ADR-0015](0015-choice-questions-and-named-players.md): there are no open questions any more, so rule 3 now applies to saying an option's text.
 - **Date:** 2026-11-22
 
 ## Context

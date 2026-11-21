@@ -10,6 +10,7 @@ struct BuckleUpQuizApp: App {
                 .environment(environment)
                 .environment(environment.settings)
                 .environment(environment.entitlements)
+                .environment(environment.players)
                 .task { await environment.loadContent() }
         }
     }

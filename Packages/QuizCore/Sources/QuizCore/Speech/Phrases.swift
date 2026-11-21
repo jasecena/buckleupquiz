@@ -62,6 +62,13 @@ public enum Phrases {
         }
     }
 
+    /// End of a Listen-mode session (no scores): "That's the end of the ride! Great job, Mia and Leo!"
+    public static func listenOutro(players: [Player]) -> String {
+        let names = players.map(\.name).filter { !$0.isEmpty }
+        guard !names.isEmpty else { return "\(outroPrefix) Great listening, everyone!" }
+        return "\(outroPrefix) Great job, \(listJoined(names))!"
+    }
+
     /// End-of-session announcement, e.g. "Mia wins with 80 points! Leo got 60 points!"
     public static func scoreAnnouncement(_ entries: [ScoreboardEntry]) -> String {
         let named = entries.filter { !$0.player.name.isEmpty }

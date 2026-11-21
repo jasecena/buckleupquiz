@@ -35,7 +35,6 @@ struct SettingsView: View {
                     Stepper(value: $store.settings.listen.thinkTime, in: ListenSettings.thinkTimeRange, step: 1) {
                         Text("Think time: \(Int(store.settings.listen.thinkTime)) seconds")
                     }
-                    Toggle("Read the options aloud", isOn: $store.settings.listen.readOptions)
                     Toggle("Fun facts", isOn: $store.settings.listen.funFacts)
                     Toggle("Parent mode (Talk About prompts)", isOn: $store.settings.includeTalkAbout)
                 } header: {

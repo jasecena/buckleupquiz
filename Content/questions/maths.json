@@ -3,13 +3,15 @@
     "id": "mat-0001",
     "topic": "maths",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is five plus three?",
-    "options": null,
-    "answer": "8",
-    "acceptedAnswers": [
-      "eight"
+    "options": [
+      "7",
+      "8",
+      "9"
     ],
+    "answer": "8",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": null
@@ -18,13 +20,15 @@
     "id": "mat-0002",
     "topic": "maths",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "How many sides does a triangle have?",
-    "options": null,
-    "answer": "3",
-    "acceptedAnswers": [
-      "three"
+    "options": [
+      "3",
+      "4",
+      "5"
     ],
+    "answer": "3",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": null
@@ -33,13 +37,15 @@
     "id": "mat-0003",
     "topic": "maths",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is ten take away four?",
-    "options": null,
-    "answer": "6",
-    "acceptedAnswers": [
-      "six"
+    "options": [
+      "5",
+      "6",
+      "7"
     ],
+    "answer": "6",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": null
@@ -61,13 +67,15 @@
     "id": "mat-0101",
     "topic": "maths",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is seven times eight?",
-    "options": null,
-    "answer": "56",
-    "acceptedAnswers": [
-      "fifty six"
+    "options": [
+      "54",
+      "56",
+      "64"
     ],
+    "answer": "56",
+    "acceptedAnswers": [],
     "difficulty": 2,
     "minAge": null,
     "region": null
@@ -76,13 +84,15 @@
     "id": "mat-0102",
     "topic": "maths",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "How many minutes are in an hour?",
-    "options": null,
-    "answer": "60",
-    "acceptedAnswers": [
-      "sixty"
+    "options": [
+      "30",
+      "60",
+      "100"
     ],
+    "answer": "60",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": null
@@ -91,13 +101,15 @@
     "id": "mat-0103",
     "topic": "maths",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is half of fifty?",
-    "options": null,
-    "answer": "25",
-    "acceptedAnswers": [
-      "twenty five"
+    "options": [
+      "20",
+      "25",
+      "30"
     ],
+    "answer": "25",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": null
@@ -125,13 +137,15 @@
     "id": "mat-0201",
     "topic": "maths",
     "ageBand": "11-12",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is twelve times twelve?",
-    "options": null,
-    "answer": "144",
-    "acceptedAnswers": [
-      "one hundred and forty four"
+    "options": [
+      "124",
+      "144",
+      "148"
     ],
+    "answer": "144",
+    "acceptedAnswers": [],
     "difficulty": 2,
     "minAge": null,
     "region": null
@@ -140,13 +154,15 @@
     "id": "mat-0202",
     "topic": "maths",
     "ageBand": "11-12",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is twenty-five percent of two hundred?",
-    "options": null,
-    "answer": "50",
-    "acceptedAnswers": [
-      "fifty"
+    "options": [
+      "25",
+      "50",
+      "75"
     ],
+    "answer": "50",
+    "acceptedAnswers": [],
     "difficulty": 2,
     "minAge": null,
     "region": null
@@ -155,13 +171,15 @@
     "id": "mat-0203",
     "topic": "maths",
     "ageBand": "11-12",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "How many degrees are in a right angle?",
-    "options": null,
-    "answer": "90",
-    "acceptedAnswers": [
-      "ninety"
+    "options": [
+      "45",
+      "90",
+      "180"
     ],
+    "answer": "90",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": null

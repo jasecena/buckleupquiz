@@ -2,6 +2,10 @@
 
 > **BuckleUp Quiz** — a hands-free, voice-first educational quiz for kids aged 6–12, built for car trips and home. The app reads a question aloud, waits, then reveals the answer. The paid tier listens for spoken answers, takes turns between named players and keeps score.
 
+> **Changes since this spec was written** (see [ADR-0015](adr/0015-choice-questions-and-named-players.md)):
+> - Every question is a single choice between options (multiple choice, scenario, or true/false). Open questions are dropped.
+> - Families add players with a name and age. Sessions start with "Who's playing?" instead of an age-band picker, and each child gets questions for their own age.
+
 ---
 
 ## 0. Branding
@@ -38,7 +42,7 @@
 - Home screen shows a grid of big topic tiles, for example: Animals, Geography, Space, Maths, Aussie History, Science, Sport, Food, **Manners & Friendship** (see 4.3).
 - **The free tier unlocks 3 topics**, and the rest show a lock icon. Consider making Manners & Friendship one of the free topics, because it's a strong selling point for parents.
 - Each tile shows an icon, the topic name and the question count.
-- User picks a topic and an **age band**: 6–8, 9–10 or 11–12.
+- User picks a topic, then **who's playing** (named players with ages; each gets questions for their own age band: 6–8, 9–10 or 11–12). *(Changed by ADR-0015: originally an age-band picker.)*
 
 ### 2.2 Listen mode (no voice input)
 Game loop per question:
@@ -159,7 +163,7 @@ After the question is read:
   "region": "AU"
 }
 ```
-- `type`: `open` | `multipleChoice` | `trueFalse` | `scenario` | `talkAbout`.
+- `type`: `multipleChoice` | `trueFalse` | `scenario` | `talkAbout`. *(`open` was removed by ADR-0015: every question is a choice.)*
   - `scenario`: a short social situation with 3 spoken options. Scored like multiple choice.
   - `talkAbout`: an open discussion prompt with **no scoring** and no right answer (see 4.3).
 - Optional field `explanation`: one kind sentence explaining *why* the answer is the good choice. It's read aloud after the answer in place of `funFact`.

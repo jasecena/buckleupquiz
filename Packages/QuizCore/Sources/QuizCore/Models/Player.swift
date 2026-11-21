@@ -13,7 +13,12 @@ public struct Player: Codable, Hashable, Identifiable, Sendable {
         self.age = age
     }
 
-    /// The single player used by Listen mode (free tier). Its name is never spoken.
+    /// A named family member; their age decides which questions they get (ADR-0015).
+    public init(id: String, name: String, age: Int) {
+        self.init(id: id, name: name, ageBand: AgeBand(age: age), age: age)
+    }
+
+    /// The single anonymous player (free tier). Its name is never spoken.
     public static func listener(ageBand: AgeBand) -> Player {
         Player(id: "listener", name: "", ageBand: ageBand)
     }

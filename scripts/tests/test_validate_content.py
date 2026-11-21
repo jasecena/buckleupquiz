@@ -19,8 +19,9 @@ TOPICS = [
 
 
 def question(**overrides):
-    q = {"id": "geo-0001", "topic": "geography", "ageBand": "6-8", "type": "open",
-         "question": "What is the capital city of Tasmania?", "options": None, "answer": "Hobart",
+    q = {"id": "geo-0001", "topic": "geography", "ageBand": "6-8", "type": "multipleChoice",
+         "question": "What is the capital city of Tasmania?", "options": ["Launceston", "Hobart", "Darwin"],
+         "answer": "Hobart",
          "acceptedAnswers": ["hobart"], "difficulty": 2, "minAge": None, "region": "AU"}
     q.update(overrides)
     return q
@@ -45,8 +46,12 @@ class ValidateContentTests(unittest.TestCase):
     def test_duplicate_ids(self):
         self.assertError(self.run_with([question(), question()]), "duplicate id")
 
-    def test_open_needs_accepted_answers(self):
-        self.assertError(self.run_with([question(acceptedAnswers=[])]), "need acceptedAnswers")
+    def test_open_questions_are_rejected(self):
+        q = question(type="open", options=None)
+        self.assertError(self.run_with([q]), "open questions are not allowed")
+
+    def test_multiple_choice_needs_three_or_four_options(self):
+        self.assertError(self.run_with([question(options=["Hobart", "Darwin"])]), "needs 3-4")
 
     def test_unknown_topic_and_band(self):
         self.assertError(self.run_with([question(topic="nope")]), "unknown topic")

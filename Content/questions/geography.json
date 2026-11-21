@@ -3,12 +3,15 @@
     "id": "geo-0001",
     "topic": "geography",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the capital city of Tasmania?",
-    "options": null,
+    "options": [
+      "Launceston",
+      "Hobart",
+      "Darwin"
+    ],
     "answer": "Hobart",
     "acceptedAnswers": [
-      "hobart",
       "hobart city"
     ],
     "funFact": "Hobart is Australia's second-oldest capital city.",
@@ -39,13 +42,15 @@
     "id": "geo-0003",
     "topic": "geography",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the capital city of Australia?",
-    "options": null,
-    "answer": "Canberra",
-    "acceptedAnswers": [
-      "canberra"
+    "options": [
+      "Sydney",
+      "Melbourne",
+      "Canberra"
     ],
+    "answer": "Canberra",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": "AU"
@@ -67,12 +72,15 @@
     "id": "geo-0005",
     "topic": "geography",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the name of the big red rock in the middle of Australia?",
-    "options": null,
+    "options": [
+      "Uluru",
+      "Wave Rock",
+      "The Three Sisters"
+    ],
     "answer": "Uluru",
     "acceptedAnswers": [
-      "uluru",
       "ayers rock"
     ],
     "funFact": "Uluru is sacred to the Anangu people, its traditional owners.",
@@ -84,12 +92,15 @@
     "id": "geo-0101",
     "topic": "geography",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the longest river in Australia?",
-    "options": null,
+    "options": [
+      "Yarra",
+      "Murray",
+      "Swan"
+    ],
     "answer": "Murray",
     "acceptedAnswers": [
-      "murray",
       "murray river",
       "river murray"
     ],
@@ -120,12 +131,15 @@
     "id": "geo-0103",
     "topic": "geography",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the huge coral reef off the coast of Queensland called?",
-    "options": null,
+    "options": [
+      "Ningaloo Reef",
+      "Shark Bay",
+      "Great Barrier Reef"
+    ],
     "answer": "Great Barrier Reef",
     "acceptedAnswers": [
-      "great barrier reef",
       "barrier reef"
     ],
     "funFact": "The Great Barrier Reef can be seen from space.",
@@ -150,15 +164,18 @@
     "id": "geo-0201",
     "topic": "geography",
     "ageBand": "11-12",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the tallest mountain in mainland Australia?",
-    "options": null,
+    "options": [
+      "Mount Kosciuszko",
+      "Mount Townsend",
+      "Mount Bogong"
+    ],
     "answer": "Mount Kosciuszko",
     "acceptedAnswers": [
       "kosciuszko",
       "kosciusko",
-      "mount kosciusko",
-      "mt kosciuszko"
+      "mount kosciusko"
     ],
     "difficulty": 3,
     "minAge": null,
@@ -187,13 +204,15 @@
     "id": "geo-0203",
     "topic": "geography",
     "ageBand": "11-12",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the capital city of Japan?",
-    "options": null,
-    "answer": "Tokyo",
-    "acceptedAnswers": [
-      "tokyo"
+    "options": [
+      "Kyoto",
+      "Tokyo",
+      "Osaka"
     ],
+    "answer": "Tokyo",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": null

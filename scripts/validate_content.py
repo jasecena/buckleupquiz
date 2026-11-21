@@ -2,8 +2,8 @@
 """Validate the BuckleUp Quiz content bank (FEATURES §4.2, ADR-0006).
 
 Checks the topic catalogue and every question file for schema errors, duplicate ids,
-missing acceptedAnswers, answers that are not one of the options, and questions that
-take too long to read aloud. Prints a coverage table against the launch targets.
+free-answer ("open") questions, answers that are not one of the options, and questions
+that take too long to read aloud (options included). Prints a coverage table against the launch targets.
 
 Usage:
     python3 scripts/validate_content.py [--content Content] [--strict] [--json]
@@ -24,7 +24,7 @@ from pathlib import Path
 
 AGE_BANDS = ("6-8", "9-10", "11-12")
 BAND_AGES = {"6-8": (6, 8), "9-10": (9, 10), "11-12": (11, 12)}
-TYPES = ("open", "multipleChoice", "trueFalse", "scenario", "talkAbout")
+TYPES = ("multipleChoice", "trueFalse", "scenario", "talkAbout")  # no free answers (ADR-0015)
 CATEGORIES = ("knowledge", "values", "safety")
 ID_PATTERN = re.compile(r"^[a-z]{3}-\d{4}$")
 HEX_COLOUR = re.compile(r"^#[0-9A-Fa-f]{6}$")
@@ -124,6 +124,10 @@ def validate_question(q, where: str, topics: dict[str, dict], report: Report) ->
     qid, qtype, band = q.get("id", ""), q.get("type"), q.get("ageBand")
     if isinstance(qid, str) and not ID_PATTERN.match(qid):
         report.error(where, "id must look like 'abc-0001'")
+    if qtype == "open":
+        report.error(where, "open questions are not allowed; every question is a choice (ADR-0015). "
+                            "Use multipleChoice with 3-4 options, or trueFalse")
+        return
     if qtype not in TYPES:
         report.error(where, f"type must be one of {TYPES}")
         return
@@ -176,6 +180,10 @@ def validate_question(q, where: str, topics: dict[str, dict], report: Report) ->
                 report.error(where, "answer must be one of the options")
             if any(len(normalise(a)) == 1 for a in accepted):
                 report.error(where, "don't put option letters in acceptedAnswers; options are shuffled")
+            if qtype == "multipleChoice":
+                for o in options:
+                    if word_count(o) > MAX_ANSWER_WORDS:
+                        report.warn(where, f"option '{o}' has more than {MAX_ANSWER_WORDS} words; keep options easy to say")
     elif qtype == "trueFalse":
         if options is not None:
             report.error(where, "trueFalse questions must not set options")
@@ -183,13 +191,6 @@ def validate_question(q, where: str, topics: dict[str, dict], report: Report) ->
             report.error(where, "trueFalse answer must be 'True' or 'False'")
         if "true or false" not in q["question"].lower():
             report.warn(where, "trueFalse questions should end with 'True or false?'")
-    elif qtype == "open":
-        if options is not None:
-            report.error(where, "open questions must not set options")
-        if not accepted:
-            report.error(where, "open questions need acceptedAnswers")
-        if word_count(answer) > MAX_ANSWER_WORDS:
-            report.warn(where, f"answer has more than {MAX_ANSWER_WORDS} words; keep answers easy to say")
 
     # Read-aloud length (question + options as spoken).
     spoken = q["question"] + (" " + " ".join(options) if isinstance(options, list) else "")

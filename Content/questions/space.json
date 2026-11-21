@@ -3,13 +3,15 @@
     "id": "spc-0001",
     "topic": "space",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the closest star to Earth?",
-    "options": null,
-    "answer": "The Sun",
-    "acceptedAnswers": [
-      "sun"
+    "options": [
+      "The Moon",
+      "The North Star",
+      "The Sun"
     ],
+    "answer": "The Sun",
+    "acceptedAnswers": [],
     "funFact": "The Sun is so big that about a million Earths could fit inside it.",
     "difficulty": 1,
     "minAge": null,
@@ -19,16 +21,19 @@
     "id": "spc-0002",
     "topic": "space",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "How many planets are in our solar system?",
-    "options": null,
-    "answer": "8",
-    "acceptedAnswers": [
-      "eight"
+    "options": [
+      "7",
+      "8",
+      "9"
     ],
+    "answer": "8",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
-    "region": null
+    "region": null,
+    "funFact": "Pluto used to be called the ninth planet, but now it's a dwarf planet."
   },
   {
     "id": "spc-0003",
@@ -67,13 +72,15 @@
     "id": "spc-0101",
     "topic": "space",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the biggest planet in our solar system?",
-    "options": null,
-    "answer": "Jupiter",
-    "acceptedAnswers": [
-      "jupiter"
+    "options": [
+      "Saturn",
+      "Earth",
+      "Jupiter"
     ],
+    "answer": "Jupiter",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": null
@@ -82,13 +89,15 @@
     "id": "spc-0102",
     "topic": "space",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "Which planet is famous for its beautiful rings?",
-    "options": null,
-    "answer": "Saturn",
-    "acceptedAnswers": [
-      "saturn"
+    "options": [
+      "Saturn",
+      "Mars",
+      "Mercury"
     ],
+    "answer": "Saturn",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": null
@@ -116,10 +125,14 @@
     "id": "spc-0201",
     "topic": "space",
     "ageBand": "11-12",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the name of our galaxy?",
-    "options": null,
-    "answer": "Milky Way",
+    "options": [
+      "The Solar System",
+      "The Milky Way",
+      "Andromeda"
+    ],
+    "answer": "The Milky Way",
     "acceptedAnswers": [
       "milky way"
     ],

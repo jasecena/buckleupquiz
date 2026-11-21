@@ -13,7 +13,7 @@ public enum MatchOutcome: Equatable, Sendable {
 /// Judges spoken answers against a presented question (FEATURES §3.4).
 /// Pure and deterministic, so the rules are pinned down by unit tests.
 public struct AnswerMatcher: Sendable {
-    /// Open answers may be wrapped in a few filler words ("I think it's Hobart"),
+    /// Option text may be wrapped in a few filler words ("I think it's Hobart"),
     /// but long rambles that list many guesses are not accepted.
     public var maxExtraWords = 4
     /// For long choice options, the share of the option's key words that must be heard.
@@ -38,9 +38,6 @@ public struct AnswerMatcher: Sendable {
         switch q.type {
         case .talkAbout:
             return false
-        case .open:
-            let targets = ([q.answer].compactMap { $0 } + q.acceptedAnswers)
-            return targets.contains { matchesPhrase(heard: transcript, target: $0) != .none }
         case .multipleChoice, .scenario, .trueFalse:
             guard let options = presented.options, let correct = presented.correctOptionIndex else { return false }
             return chosenOption(transcript, options: options, presented: presented) == correct

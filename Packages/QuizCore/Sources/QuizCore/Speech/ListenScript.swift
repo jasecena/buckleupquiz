@@ -24,15 +24,26 @@ public struct ListenSettings: Hashable, Sendable, Codable {
 
     public var thinkTime: Double = 8
     public var talkAboutThinkTime: Double = 30
-    public var readOptions = true
     public var funFacts = true
     public var pauseAfterAnswer: Double = 2
 
     public init() {}
+
+    // Decoded key by key so settings saved by older builds (missing or extra keys) still load.
+    private enum CodingKeys: String, CodingKey { case thinkTime, talkAboutThinkTime, funFacts, pauseAfterAnswer }
+
+    public init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let d = ListenSettings()
+        thinkTime = try c.decodeIfPresent(Double.self, forKey: .thinkTime) ?? d.thinkTime
+        talkAboutThinkTime = try c.decodeIfPresent(Double.self, forKey: .talkAboutThinkTime) ?? d.talkAboutThinkTime
+        funFacts = try c.decodeIfPresent(Bool.self, forKey: .funFacts) ?? d.funFacts
+        pauseAfterAnswer = try c.decodeIfPresent(Double.self, forKey: .pauseAfterAnswer) ?? d.pauseAfterAnswer
+    }
 }
 
 /// Turns a `Turn` into the ordered steps of Listen mode (FEATURES §2.2):
-/// read question (+ options), think, reveal answer (+ fun fact), pause.
+/// read question + options, think, reveal answer (+ fun fact), pause.
 public enum ListenScript {
     public static func steps(
         for turn: Turn, category: Topic.Category?, settings: ListenSettings, addressPlayer: Bool
@@ -43,7 +54,8 @@ public enum ListenScript {
             .say(Phrases.questionNumber(turn.number), .number),
             .say(Phrases.addressed(q.question, to: addressPlayer ? turn.player : nil), .question),
         ]
-        if settings.readOptions, let options = Phrases.options(presented) {
+        // Every question is a choice, so the options are always read (ADR-0015).
+        if let options = Phrases.options(presented) {
             steps.append(.say(options, .options))
         }
         steps.append(.cue(.think))

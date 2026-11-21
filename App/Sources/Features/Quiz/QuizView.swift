@@ -54,11 +54,19 @@ struct QuizView: View {
             }
         } else if let turn = model.turn {
             VStack(spacing: 24) {
+                if model.isTurnBased, !turn.player.name.isEmpty {
+                    Text("\(turn.player.name)'s turn")
+                        .font(Theme.headline)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .foregroundStyle(.white)
+                        .background(Capsule().fill(Color(hex: model.playerColors[turn.player.id] ?? "#FF6919")))
+                }
                 Text(turn.presented.question.question)
                     .font(Theme.question)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
-                if let options = turn.presented.options, turn.presented.question.type != .trueFalse {
+                if let options = turn.presented.options {
                     VStack(alignment: .leading, spacing: 8) {
                         ForEach(Array(zip(turn.presented.optionLetters, options)), id: \.0) { letter, option in
                             Text("\(letter): \(option)").font(Theme.headline)

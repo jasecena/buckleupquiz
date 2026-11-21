@@ -16,17 +16,20 @@ final class AppEnvironment {
     private(set) var content: ContentState = .loading
     let settings: SettingsStore
     let entitlements: EntitlementStore
+    let players: PlayerStore
     let questionSource: any QuestionSource
     let makeListenDependencies: @MainActor (SettingsStore) -> ListenSessionModel.Dependencies
 
     init(
         settings: SettingsStore,
         entitlements: EntitlementStore,
+        players: PlayerStore,
         questionSource: any QuestionSource,
         makeListenDependencies: @escaping @MainActor (SettingsStore) -> ListenSessionModel.Dependencies
     ) {
         self.settings = settings
         self.entitlements = entitlements
+        self.players = players
         self.questionSource = questionSource
         self.makeListenDependencies = makeListenDependencies
     }
@@ -35,6 +38,7 @@ final class AppEnvironment {
         AppEnvironment(
             settings: SettingsStore(),
             entitlements: EntitlementStore(),
+            players: PlayerStore.live(),
             questionSource: BundledContent.source(),
             makeListenDependencies: { settings in
                 ListenSessionModel.Dependencies(
@@ -61,12 +65,19 @@ final class AppEnvironment {
         }
     }
 
-    func makeListenSession(topics: [String], ageBand: AgeBand, length: SessionLength) -> ListenSessionModel? {
-        guard let bank else { return nil }
+    /// A Listen-mode session for the chosen players, taking turns, each with questions
+    /// for their own age (ADR-0015).
+    func makeListenSession(topics: [String], profiles: [PlayerProfile], length: SessionLength) -> ListenSessionModel? {
+        guard let bank, !profiles.isEmpty else { return nil }
         let s = settings.settings
-        let config = SessionConfig(topics: topics, players: [.listener(ageBand: ageBand)], length: length,
+        let config = SessionConfig(topics: topics, players: profiles.map(\.quizPlayer), length: length,
                                    includeTalkAbout: s.includeTalkAbout)
-        return ListenSessionModel(bank: bank, config: config, settings: s.listen, duckOthers: s.duckOthers,
-                                  dependencies: makeListenDependencies(settings))
+        let model = ListenSessionModel(
+            bank: bank, config: config, settings: s.listen, duckOthers: s.duckOthers,
+            dependencies: makeListenDependencies(settings),
+            seenQuestionIDs: players.seenQuestionIDs(for: profiles),
+            playerColors: Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.colorHex) }))
+        model.onFinish = { [weak players] seen in players?.recordSeen(seen) }
+        return model
     }
 }

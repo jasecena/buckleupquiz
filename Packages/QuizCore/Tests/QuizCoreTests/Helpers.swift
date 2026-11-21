@@ -1,13 +1,15 @@
 import Foundation
 @testable import QuizCore
 
+/// Choice questions default to the options Hobart / Launceston / Darwin.
 func makeQuestion(
     _ id: String = "q-1", topic: String = "geography", band: AgeBand = .sixToEight,
-    type: QuestionType = .open, text: String = "Question?", options: [String]? = nil,
+    type: QuestionType = .multipleChoice, text: String = "Question?", options: [String]? = nil,
     answer: String? = "Hobart", accepted: [String] = [], minAge: Int? = nil
 ) -> Question {
-    Question(id: id, topic: topic, ageBand: band, type: type, question: text, options: options,
-             answer: answer, acceptedAnswers: accepted, minAge: minAge)
+    let opts = options ?? ((type == .multipleChoice || type == .scenario) ? ["Hobart", "Launceston", "Darwin"] : nil)
+    return Question(id: id, topic: topic, ageBand: band, type: type, question: text, options: opts,
+                    answer: answer, acceptedAnswers: accepted, minAge: minAge)
 }
 
 /// Presents without shuffling so option letters are predictable.

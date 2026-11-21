@@ -3,14 +3,16 @@
     "id": "ani-0001",
     "topic": "animals",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What Australian animal hops and carries its baby in a pouch?",
-    "options": null,
+    "options": [
+      "Koala",
+      "Kangaroo",
+      "Wombat"
+    ],
     "answer": "Kangaroo",
     "acceptedAnswers": [
-      "kangaroo",
-      "roo",
-      "wallaby"
+      "roo"
     ],
     "funFact": "A baby kangaroo is called a joey.",
     "difficulty": 1,
@@ -57,13 +59,15 @@
     "id": "ani-0004",
     "topic": "animals",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "How many legs does a spider have?",
-    "options": null,
-    "answer": "8",
-    "acceptedAnswers": [
-      "eight"
+    "options": [
+      "6",
+      "8",
+      "10"
     ],
+    "answer": "8",
+    "acceptedAnswers": [],
     "funFact": "Insects have six legs, so spiders are not insects.",
     "difficulty": 1,
     "minAge": null,
@@ -73,14 +77,15 @@
     "id": "ani-0005",
     "topic": "animals",
     "ageBand": "6-8",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is a baby kangaroo called?",
-    "options": null,
-    "answer": "Joey",
-    "acceptedAnswers": [
-      "joey",
-      "joeys"
+    "options": [
+      "Joey",
+      "Cub",
+      "Chick"
     ],
+    "answer": "Joey",
+    "acceptedAnswers": [],
     "difficulty": 1,
     "minAge": null,
     "region": "AU"
@@ -108,12 +113,15 @@
     "id": "ani-0101",
     "topic": "animals",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the only mammal that can truly fly?",
-    "options": null,
+    "options": [
+      "Sugar glider",
+      "Flying squirrel",
+      "Bat"
+    ],
     "answer": "Bat",
     "acceptedAnswers": [
-      "bat",
       "bats"
     ],
     "funFact": "Flying foxes are big bats that live in Australia.",
@@ -158,16 +166,17 @@
     "id": "ani-0104",
     "topic": "animals",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What shape is wombat poo?",
-    "options": null,
+    "options": [
+      "Ball",
+      "Cube",
+      "Sausage"
+    ],
     "answer": "Cube",
     "acceptedAnswers": [
-      "cube",
       "cubes",
-      "square",
-      "squares",
-      "cube shaped"
+      "square"
     ],
     "funFact": "Wombats are the only animals known to make cube-shaped poo.",
     "difficulty": 1,
@@ -178,13 +187,15 @@
     "id": "ani-0105",
     "topic": "animals",
     "ageBand": "9-10",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "How many hearts does an octopus have?",
-    "options": null,
-    "answer": "3",
-    "acceptedAnswers": [
-      "three"
+    "options": [
+      "1",
+      "2",
+      "3"
     ],
+    "answer": "3",
+    "acceptedAnswers": [],
     "difficulty": 3,
     "minAge": null,
     "region": null
@@ -212,14 +223,15 @@
     "id": "ani-0202",
     "topic": "animals",
     "ageBand": "11-12",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What is the largest animal that has ever lived?",
-    "options": null,
-    "answer": "Blue whale",
-    "acceptedAnswers": [
-      "blue whale",
-      "blue whales"
+    "options": [
+      "Blue whale",
+      "T. rex",
+      "African elephant"
     ],
+    "answer": "Blue whale",
+    "acceptedAnswers": [],
     "difficulty": 2,
     "minAge": null,
     "region": null
@@ -242,13 +254,16 @@
     "id": "ani-0204",
     "topic": "animals",
     "ageBand": "11-12",
-    "type": "open",
+    "type": "multipleChoice",
     "question": "What do we call animals that eat only plants?",
-    "options": null,
+    "options": [
+      "Carnivores",
+      "Herbivores",
+      "Omnivores"
+    ],
     "answer": "Herbivores",
     "acceptedAnswers": [
-      "herbivore",
-      "herbivores"
+      "herbivore"
     ],
     "difficulty": 2,
     "minAge": null,
