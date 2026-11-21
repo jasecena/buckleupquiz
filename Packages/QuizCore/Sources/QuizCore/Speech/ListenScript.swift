@@ -15,8 +15,8 @@ public enum SpeechStep: Hashable, Sendable {
     case cue(Cue)
     /// Think time, shown as a countdown ring.
     case think(seconds: Double)
-    /// Voice answers (ADR-0018): listen from the end of the question, while `options` are read
-    /// (kids answer early), then for up to `seconds` of think time.
+    /// Voice answers (ADR-0018): read the `options`, then listen straight away for up to
+    /// `seconds` of think time (no beep).
     case listen(seconds: Double, options: String? = nil)
     /// Voice answers: a cheer when right ("Correct! Awesome!"), otherwise just the answer.
     case feedback
@@ -91,7 +91,7 @@ public enum ListenScript {
         }
         steps.append(.say(q.question, .question))
         // Every question is a choice, so the options are always read (ADR-0015). With voice
-        // answers they're read inside the listening step, so early answers are heard.
+        // answers they're read by the listening step, which opens the mic as soon as they end.
         let options = Phrases.options(presented)
         if let options, !(voiceAnswers && q.type != .talkAbout) {
             steps.append(.say(options, .options))

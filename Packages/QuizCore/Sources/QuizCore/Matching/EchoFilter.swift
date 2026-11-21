@@ -1,9 +1,9 @@
-/// Removes the app's own voice from what the microphone heard (ADR-0018 amendment).
+/// Removes the app's own voice from what the microphone heard (ADR-0018).
 ///
-/// The app listens while it reads the options, because excited kids answer early. On a phone
-/// speaker the microphone also hears the app ("A: Hobart. B: Launceston…"). Since we know exactly
-/// what was said, those words are taken out in order and only what's left is judged: a child
-/// shouting "Hobart!" over the options leaves "hobart".
+/// The mic opens the moment the options finish. Over Bluetooth the end of the options ("…C:
+/// Darwin") can reach it a moment late, and must never count as the child saying "Darwin".
+/// Since we know exactly what was said, those words are taken out in order and only what's
+/// left is judged.
 public enum EchoFilter {
     /// `heard` with the words of `spoken` removed. Uses the longest in-order (fuzzy) alignment
     /// between the two, so an answer said before, during or after the echo is what's left.

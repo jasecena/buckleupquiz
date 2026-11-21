@@ -472,38 +472,21 @@ final class ListenSessionModel {
 
     /// Half-duplex: speech has finished → short gap → chime → listen, once. If nothing clear is
     /// heard, nothing is said about it: the answer is shared and the game moves on (ADR-0018).
-    /// When the think time ends; open-ended while the options are still being read.
-    @MainActor
-    final class AnswerWindow {
-        var deadline = Date.distantFuture
-    }
-
-    /// Full duplex (ADR-0018 amendment): the mic opens as soon as the question is read, and
-    /// stays open while the options are read, because excited kids answer early. Then comes the
-    /// think time with the tick and the countdown. What the app itself said is taken out of what
-    /// was heard (`EchoFilter`), so it never mistakes its own voice for an answer.
+    /// Voice answers (ADR-0018): all the options are read first, then the mic opens straight
+    /// away (no beep, no gap) for the think time, with the tick and the countdown. Kids keep
+    /// saying their answer until it's heard. The end of the options can reach the mic a moment
+    /// late over Bluetooth, so the app's own words are taken out of what was heard.
     private func listenForAnswer(seconds: Double, options: String?, generation: Int) async throws {
+        if let options { try await deps.speech.speak(options) }
         guard isVoice, let listener = deps.listener, let turn else {
             // Voice is off (or the recogniser broke): behave like Listen mode.
-            if let options { try await deps.speech.speak(options) }
             try await countdown(seconds: seconds, ticking: true, generation: generation)
             return
         }
         let presented = turn.presented
-        let echo = [presented.question.question, options].compactMap { $0 }.joined(separator: " ")
-        let window = AnswerWindow()
+        let echo = options ?? ""
         isListening = true
-        let listening = Task { [listener] in
-            try await listener.listen(
-                until: { window.deadline }, hints: VoiceReply.hints(for: presented),
-                isConclusive: { VoiceReply.interpret(EchoFilter.remove(echo, from: $0), for: presented).isConclusive })
-        }
-        defer { listening.cancel() }
-        if let options { try await deps.speech.speak(options) }
-
-        // Think time: the tick ("ding, ding, ding") and the countdown beside the microphone.
         let started = Date.now
-        window.deadline = started.addingTimeInterval(seconds)
         deps.cues.startThinking()
         thinkTotal = seconds
         thinkRemaining = seconds
@@ -520,11 +503,9 @@ final class ListenSessionModel {
         }
         let raw: [String]
         do {
-            raw = try await withTaskCancellationHandler {
-                try await listening.value
-            } onCancel: {
-                listening.cancel()
-            }
+            raw = try await listener.listen(
+                for: seconds, hints: VoiceReply.hints(for: presented),
+                isConclusive: { VoiceReply.interpret(EchoFilter.remove(echo, from: $0), for: presented).isConclusive })
             deps.cues.stopThinking()
         } catch is CancellationError {
             deps.cues.stopThinking()

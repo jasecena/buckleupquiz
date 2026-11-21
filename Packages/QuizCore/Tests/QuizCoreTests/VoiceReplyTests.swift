@@ -50,7 +50,7 @@ struct VoiceReplyTests {
                                        voiceAnswers: true)
         let listen = steps.firstIndex(of: .listen(seconds: 6, options: "A: Hobart. B: Launceston. C: Darwin."))
         #expect(!steps.contains { if case .say(_, .options) = $0 { true } else { false } },
-                "options are read inside the listening step, so early answers are heard")
+                "the listening step reads the options, then listens straight away")
         let feedback = steps.firstIndex(of: .feedback)
         #expect(listen != nil && feedback != nil && listen! < feedback!)
         #expect(!steps.contains { if case .think = $0 { true } else { false } })

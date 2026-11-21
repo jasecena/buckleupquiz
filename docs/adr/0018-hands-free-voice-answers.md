@@ -108,21 +108,16 @@ mics.
 - Voice answers are meant for the Family Pass (FEATURES §3). They stay open until the
   paywall lands in M6.
 
-## Amendment (2026-11-22): listen while the options are read
-Excited kids answer before the options finish, and the "after the beep" cue was unreliable
-(the cue engine stopped whenever the microphone reconfigured audio). Now:
-- In voice mode the options are read **inside** the listening step
-  (`SpeechStep.listen(seconds:options:)`). The mic opens as soon as the question has been read,
-  stays open through the options, then for the think time with the tick and countdown. The
-  listener's deadline is a closure: open-ended while the options play, then end of think time.
-- **Echo removal:** the phone's mic hears the app reading the options. Since we know exactly
-  what was said (question and options), `EchoFilter` takes those words out of each transcript
-  using the longest in-order fuzzy alignment, and only what's left is judged. An answer said
-  before, over or after the options survives; the app's own "A: Hobart…" never counts. Car
-  hands-free systems also cancel their own speaker sound.
-- The early answer is judged once the options finish (the recogniser waits for a 1.2 s pause).
-- No more beep: "Say your answer as soon as you know it!" The cue player now remembers
-  whether it was ticking and restarts properly after audio reconfiguration (it used to stack
-  restart observers and fall silent).
-- A next step, if echo removal proves weak on some phones: play speech through the same
-  `AVAudioEngine` with voice processing (hardware echo cancellation) enabled.
+## Amendment (2026-11-22): listen straight after the options, no beep
+The "after the beep" cue was unreliable (the cue engine stopped whenever the mic reconfigured
+audio), and kids answer early. Product decision: keep it simple, **no listening while the app
+speaks**.
+- In voice mode the listening step reads all the options, then opens the mic **straight
+  away**, with no beep and no gap, for the think time with the tick and countdown
+  (`SpeechStep.listen(seconds:options:)`). Kids keep saying their answer until it's heard.
+- Over Bluetooth the end of the options can reach the mic a moment late. `EchoFilter` removes
+  the options' words from what was heard (in-order fuzzy alignment), so "…C: Darwin" never
+  counts as the child's answer.
+- "Say your answer as soon as you know it!" replaces "Say your answer after the beep!".
+- The cue player now remembers whether it was ticking, and restarts properly after the audio
+  is reconfigured.
