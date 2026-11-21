@@ -56,12 +56,10 @@ struct GameSetupView: View {
 
                     section("How many questions?") {
                         ForEach(SessionLength.presets, id: \.self) { length in
-                            let available = entitlements.isAvailable(length)
-                            choice(length.displayName, detail: available ? nil : "BuckleUp Basic",
+                            choice(length.displayName, detail: nil,
                                    selected: store.settings.lastSessionLength == length) {
                                 store.settings.lastSessionLength = length
                             }
-                            .disabled(!available)
                         }
                     }
 

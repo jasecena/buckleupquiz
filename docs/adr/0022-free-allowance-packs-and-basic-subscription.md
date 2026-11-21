@@ -33,7 +33,6 @@ charges what was actually asked when a game ends.
 | Topics | Animals, Geography (free knowledge topics) + Manners & Friendship | — | **All 10** (every topic with content) |
 | New questions | **30** per free knowledge topic + **2 more each day the app is opened**; Manners **10**, no top-up | **+50**, any topic you can open, never expire | **40 a day**, any topic (packs add on top) |
 | Players per game | 2 | — | 6 |
-| Endless mode | — | — | ✓ |
 | Fix scores after a game | — | — | ✓ |
 | Reviews of questions already heard | free | free | free |
 
@@ -44,7 +43,7 @@ same subscription group so families can move between them.
 `QuizSession` plans every turn when it's created. Players take turns in order, the review mix
 (ADR-0016) applies, nothing repeats in a day, and the budget is spent. If a round can't be
 completed for everyone, it's dropped, so **every player gets the same number**. Length is
-**questions each**: 5, 10, 15 or Endless (Basic). Before starting, Home checks `plannedEach`:
+**questions each**: 5, 10 or 15, and never more than **50 questions in one game** (no Endless mode, product decision 2026-11-22). Before starting, Home checks `plannedEach`:
 - equals what was asked, or ≥ 5 → start;
 - **3–4** → "Almost out of questions for today: N each left". Play N each / Get more questions /
   Not now;

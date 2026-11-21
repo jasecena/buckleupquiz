@@ -39,6 +39,7 @@ struct AllowanceStoreTests {
         #expect(store.state.packCredits == 50)
         store.charge(["a": .topic, "b": .shared, "c": .shared, "d": .free], hasBasic: false, day: 1)
         #expect(store.state.packCredits == 48)
+        #expect(store.state.packUsed == 2)
         #expect(store.state.unlocked == ["a", "b", "c", "d"])
     }
 

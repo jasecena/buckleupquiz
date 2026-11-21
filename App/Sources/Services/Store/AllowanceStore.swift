@@ -18,25 +18,77 @@ final class AllowanceStore {
     static let basicDaily = 40
     static let packSize = 50
 
+    /// Everything here only grows (or is a max), so copies from two devices, iCloud and the
+    /// Keychain merge without losing anything or handing out free questions twice (ADR-0023).
     struct State: Codable, Equatable {
         /// Question ids the family has heard: never charged again.
         var unlocked: Set<String> = []
         /// Extra free questions per topic from daily top-ups.
         var topUps: [String: Int] = [:]
         var lastOpenDay: Int?
-        /// New questions bought in packs and not used yet.
-        var packCredits = 0
         /// BuckleUp Basic's daily allowance used, and the day it was used.
         var basicDay: Int?
         var basicUsed = 0
-        /// Pack purchases already credited (so a replayed transaction never counts twice).
+        /// Pack purchases credited, by App Store transaction id (each counts once, everywhere).
         var creditedTransactions: Set<UInt64> = []
-        /// Packs bought ever, for the record.
-        var packsBought = 0
+        /// Pack questions used so far, all time.
+        var packUsed = 0
+
+        var packsBought: Int { creditedTransactions.count }
+        /// Bought questions not used yet.
+        var packCredits: Int { max(0, packsBought * AllowanceStore.packSize - packUsed) }
+
+        init() {}
+
+        private enum CodingKeys: String, CodingKey {
+            case unlocked, topUps, lastOpenDay, basicDay, basicUsed, creditedTransactions, packUsed
+        }
+
+        /// Key by key, so a backup from another build version never fails to load.
+        init(from decoder: any Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            unlocked = (try? c.decodeIfPresent(Set<String>.self, forKey: .unlocked)) ?? []
+            topUps = (try? c.decodeIfPresent([String: Int].self, forKey: .topUps)) ?? [:]
+            lastOpenDay = try? c.decodeIfPresent(Int.self, forKey: .lastOpenDay)
+            basicDay = try? c.decodeIfPresent(Int.self, forKey: .basicDay)
+            basicUsed = (try? c.decodeIfPresent(Int.self, forKey: .basicUsed)) ?? 0
+            creditedTransactions = (try? c.decodeIfPresent(Set<UInt64>.self, forKey: .creditedTransactions)) ?? []
+            packUsed = (try? c.decodeIfPresent(Int.self, forKey: .packUsed)) ?? 0
+        }
+
+        /// Combines two copies: unions and maxima, never less than either.
+        func merged(with other: State) -> State {
+            var m = self
+            m.unlocked.formUnion(other.unlocked)
+            m.topUps.merge(other.topUps, uniquingKeysWith: max)
+            m.lastOpenDay = [lastOpenDay, other.lastOpenDay].compactMap { $0 }.max()
+            switch (basicDay, other.basicDay) {
+            case let (a?, b?) where a == b: m.basicUsed = max(basicUsed, other.basicUsed)
+            case let (a?, b?) where b > a: (m.basicDay, m.basicUsed) = (b, other.basicUsed)
+            case (nil, _?): (m.basicDay, m.basicUsed) = (other.basicDay, other.basicUsed)
+            default: break
+            }
+            m.creditedTransactions.formUnion(other.creditedTransactions)
+            m.packUsed = max(packUsed, other.packUsed)
+            return m
+        }
+    }
+
+    /// Called after any change, so the backup (iCloud and Keychain) stays current.
+    @ObservationIgnored var onChange: (() -> Void)?
+
+    /// Brings in a copy from iCloud, the Keychain or another device.
+    func merge(_ other: State) {
+        state = state.merged(with: other)
     }
 
     private(set) var state: State {
-        didSet { if state != oldValue { save() } }
+        didSet {
+            if state != oldValue {
+                save()
+                onChange?()
+            }
+        }
     }
     private let defaults: UserDefaults
     private let key = "allowance.v1"
@@ -115,7 +167,7 @@ final class AllowanceStore {
             next.basicUsed += fromDaily
             shared -= fromDaily
         }
-        next.packCredits = max(0, next.packCredits - shared)
+        next.packUsed += min(shared, next.packCredits)
         state = next
     }
 
@@ -124,8 +176,6 @@ final class AllowanceStore {
     func creditPack(transactionID: UInt64) -> Bool {
         guard !state.creditedTransactions.contains(transactionID) else { return false }
         state.creditedTransactions.insert(transactionID)
-        state.packCredits += Self.packSize
-        state.packsBought += 1
         return true
     }
 

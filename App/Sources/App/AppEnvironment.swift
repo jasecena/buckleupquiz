@@ -25,6 +25,8 @@ final class AppEnvironment {
     let store: StoreService
     let makeListenDependencies: @MainActor (SettingsStore) -> ListenSessionModel.Dependencies
     @ObservationIgnored private var metricKit: MetricKitCollector?
+    /// Progress kept in iCloud and the Keychain, so a reinstall picks up where it left off.
+    @ObservationIgnored private var sync: ProgressSync?
 
     init(
         settings: SettingsStore,
@@ -76,6 +78,9 @@ final class AppEnvironment {
             }
         )
         environment.metricKit = MetricKitCollector(telemetry: telemetry)
+        let sync = ProgressSync.live(allowance: allowance, players: environment.players)
+        sync.start()
+        environment.sync = sync
         return environment
     }
 

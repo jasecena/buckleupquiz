@@ -120,7 +120,8 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Games planned up front; 0–2 each blocks, 3–4 warns, 5 each minimum; lengths are questions each
 - [x] StoreKit 2 store (products, purchase, restore, Transaction.updates), plans screen, parental gate
 - [ ] Create the products in App Store Connect; Paid Applications agreement (account holder)
-- [ ] Move pack credits to iCloud key-value storage (consumables can't be restored)
+- [x] Progress survives a reinstall: iCloud key-value storage + Keychain backup, merged at launch (ADR-0023)
+- [x] No Endless mode; games are 5/10/15 each, at most 50 questions
 - [ ] Parental gate before settings, links and support email
 - [ ] Locked topics, Endless mode and custom mixes enforced
 - [x] Free games: up to 2 players; Family Pass: up to 6 (Game setup note + alert). TestFlight-only "Family Pass (testing)" switch until purchases land

@@ -13,11 +13,21 @@ final class PlayerStore {
     static let palette = ["#E84393", "#2E86DE", "#00B894", "#F39C12", "#6C5CE7", "#D63031"]
 
     private(set) var players: [PlayerProfile] = []
+    /// Players removed on this device, so a backup can't bring them back (ADR-0023).
+    private(set) var deletedIDs: Set<String> {
+        didSet { defaults.set(Array(deletedIDs), forKey: Self.deletedKey) }
+    }
+    /// Called after any change, so the backup stays current.
+    @ObservationIgnored var onChange: (() -> Void)?
+    private let defaults: UserDefaults
+    private static let deletedKey = "players.deleted"
     private let container: ModelContainer
     private var context: ModelContext { container.mainContext }
 
-    init(container: ModelContainer) {
+    init(container: ModelContainer, defaults: UserDefaults = .standard) {
         self.container = container
+        self.defaults = defaults
+        deletedIDs = Set(defaults.stringArray(forKey: Self.deletedKey) ?? [])
         reload()
     }
 
@@ -35,7 +45,8 @@ final class PlayerStore {
     static func inMemory() -> PlayerStore {
         do {
             let config = ModelConfiguration(isStoredInMemoryOnly: true)
-            return PlayerStore(container: try ModelContainer(for: PlayerProfile.self, configurations: config))
+            return PlayerStore(container: try ModelContainer(for: PlayerProfile.self, configurations: config),
+                               defaults: UserDefaults(suiteName: "players-\(UUID())") ?? .standard)
         } catch {
             fatalError("Could not create an in-memory player store: \(error)")
         }
@@ -71,8 +82,58 @@ final class PlayerStore {
     }
 
     func delete(_ profile: PlayerProfile) {
+        deletedIDs.insert(profile.id.uuidString)
         context.delete(profile)
         save()
+    }
+
+    // MARK: Backup (ADR-0023)
+
+    /// One player as stored in the backup.
+    struct Snapshot: Codable, Equatable, Sendable {
+        var id: UUID
+        var name: String
+        var age: Int
+        var ageSetAt: Date
+        var colorHex: String
+        var createdAt: Date
+        var learning: LearningRecord
+        var stats: PlayerStats
+    }
+
+    func snapshot() -> [Snapshot] {
+        players.map {
+            Snapshot(id: $0.id, name: $0.name, age: $0.age, ageSetAt: $0.ageSetAt, colorHex: $0.colorHex,
+                     createdAt: $0.createdAt, learning: $0.learning, stats: $0.stats)
+        }
+    }
+
+    /// Brings players back from a backup: missing ones are re-created with their progress, and
+    /// existing ones keep the more recent answer for each question and the fuller scores.
+    func merge(_ snapshots: [Snapshot], deleted: Set<String>) {
+        deletedIDs.formUnion(deleted)
+        for profile in players where deletedIDs.contains(profile.id.uuidString) {
+            context.delete(profile)
+        }
+        for snap in snapshots where !deletedIDs.contains(snap.id.uuidString) {
+            if let profile = players.first(where: { $0.id == snap.id }) {
+                var learning = profile.learning
+                learning.mergeKeepingLatest(snap.learning)
+                if learning != profile.learning { profile.learning = learning }
+                if snap.stats.attempted > profile.stats.attempted || snap.stats.points > profile.stats.points {
+                    profile.stats = snap.stats
+                }
+            } else if players.count < Self.maxPlayers {
+                let profile = PlayerProfile(name: snap.name, age: snap.age, colorHex: snap.colorHex, now: snap.ageSetAt)
+                profile.id = snap.id
+                profile.createdAt = snap.createdAt
+                profile.learning = snap.learning
+                profile.stats = snap.stats
+                context.insert(profile)
+            }
+        }
+        try? context.save()
+        reload()
     }
 
     func profile(id: String) -> PlayerProfile? {
@@ -122,6 +183,7 @@ final class PlayerStore {
     private func save() {
         try? context.save()
         reload()
+        onChange?()
     }
 
     private func reload() {

@@ -87,6 +87,18 @@ struct ReviewMixTests {
         #expect(kinds.filter { $0 == .new }.count == 16)
     }
 
+    @Test func backupsMergeKeepingTheLatestAnswer() {
+        var phone = LearningRecord()
+        phone.record(.correct, for: "a", on: 10)          // box 2, last 10
+        phone.record(.correct, for: "b", on: 12)
+        var backup = LearningRecord()
+        backup.record(.incorrect, for: "a", on: 11)       // later: back to box 1
+        backup.record(.correct, for: "c", on: 9)
+        phone.mergeKeepingLatest(backup)
+        #expect(phone.card("a")?.box == 1)
+        #expect(phone.card("b") != nil && phone.card("c") != nil)
+    }
+
     @Test func sharedReviewsComeFromWhatTheOthersHadYesterday() {
         var leoRecord = LearningRecord()
         for id in ids(5) { leoRecord.record(.incorrect, for: id, on: 99) }
@@ -105,7 +117,7 @@ struct ReviewMixTests {
     @Test func nobodyGetsAQuestionTwiceInOneDay() {
         var leoRecord = LearningRecord()
         leoRecord.record(.correct, for: "geography-6-8-0", on: 100) // Leo had it this morning
-        let config = SessionConfig(topics: ["geography"], players: [mia], length: .endless)
+        let config = SessionConfig(topics: ["geography"], players: [mia], length: .questions(50))
         var session = QuizSession(bank: sampleBank(perBand: 3), config: config, learning: ["leo": leoRecord],
                                   day: 100, rng: AnyRandomGenerator(seed: 1))
         var asked: [String] = []

@@ -57,7 +57,6 @@ struct PlansView: View {
                 "All 10 topics",
                 "\(AllowanceStore.basicDaily) new questions every day",
                 "Up to \(PlayerStore.maxPlayers) players",
-                "Endless mode for long trips",
                 "Fix scores after a game",
                 "Cancel anytime",
             ],

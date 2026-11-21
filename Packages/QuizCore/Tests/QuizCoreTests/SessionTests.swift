@@ -6,7 +6,7 @@ import Testing
 struct SessionTests {
     @Test func neverRepeatsWithinSession() {
         let bank = sampleBank(perBand: 5)
-        let config = SessionConfig(topics: ["geography"], players: [.listener(ageBand: .sixToEight)], length: .endless)
+        let config = SessionConfig(topics: ["geography"], players: [.listener(ageBand: .sixToEight)], length: .questions(50))
         var session = QuizSession(bank: bank, config: config, rng: AnyRandomGenerator(seed: 7))
         var ids: [String] = []
         while let turn = session.advance() { ids.append(turn.presented.question.id) }
@@ -75,6 +75,16 @@ struct SessionTests {
         #expect(session.plan.map(\.player.id) == ["a", "b", "c", "a", "b", "c", "a", "b", "c"])
         while session.advance() != nil {}
         #expect(players.map { session.turns(for: $0.id) } == [3, 3, 3])
+    }
+
+    @Test func aGameIsAtMost50Questions() {
+        let six = (1...6).map { Player(id: "p\($0)", name: "P\($0)", age: 7) }
+        #expect(SessionLength.questions(15).each(players: 6) == 8, "6 × 8 = 48")
+        #expect(SessionLength.questions(5).each(players: 6) == 5)
+        let session = QuizSession(bank: sampleBank(perBand: 60), config: SessionConfig(topics: ["geography"], players: six,
+                                                                                       length: .questions(15)),
+                                  day: 10)
+        #expect(session.plan.count <= SessionLength.maxQuestions)
     }
 
     @Test func aShortRoundIsDroppedSoEveryoneStaysEqual() {

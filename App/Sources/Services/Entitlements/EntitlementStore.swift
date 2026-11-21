@@ -8,7 +8,7 @@ import StoreKit
 /// - **Free:** the free topics (Animals, Geography, and Manners & Friendship with fewer
 ///   questions), up to 2 players per game, a set number of new questions (`AllowanceStore`).
 /// - **BuckleUp Basic** (monthly subscription, cancel anytime): every topic, up to 6 players,
-///   40 new questions a day, Endless mode and fixing scores after a game.
+///   40 new questions a day and fixing scores after a game.
 @MainActor
 @Observable
 final class EntitlementStore {
@@ -35,8 +35,6 @@ final class EntitlementStore {
     var hasBasic: Bool { subscribed || (isTestBuild && testerUnlock) }
 
     func isUnlocked(_ topic: Topic) -> Bool { topic.isFree || hasBasic }
-
-    func isAvailable(_ length: SessionLength) -> Bool { length != .endless || hasBasic }
 
     /// How many players can play in one game.
     var playersPerGame: Int { hasBasic ? PlayerStore.maxPlayers : Self.freePlayersPerGame }

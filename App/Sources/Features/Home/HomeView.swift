@@ -222,7 +222,7 @@ struct HomeView: View {
         }
         // Lengths are questions each now (ADR-0022): anything else goes back to 5 each.
         let length = settingsStore.settings.lastSessionLength
-        if !entitlements.isAvailable(length) || !SessionLength.presets.contains(length) {
+        if !SessionLength.presets.contains(length) {
             settingsStore.settings.lastSessionLength = .questions(5)
         }
     }

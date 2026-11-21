@@ -29,3 +29,4 @@ accepted: to change a decision, add a new ADR that supersedes the old one.
 
 New ADR: copy [template.md](template.md) to the next number.
 | [0022](0022-free-allowance-packs-and-basic-subscription.md) | Free allowance, question packs and the BuckleUp Basic subscription | Accepted |
+| [0023](0023-progress-survives-reinstall.md) | Progress survives a reinstall: iCloud key-value storage + Keychain | Accepted |

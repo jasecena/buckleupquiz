@@ -15,7 +15,7 @@ struct AppSettings: Codable, Equatable, Sendable {
     var includeTalkAbout = false
     /// Players picked last time ("Who's playing?"), as `PlayerProfile.id` strings.
     var selectedPlayerIDs: [String] = []
-    var lastSessionLength: SessionLength = .questions(10)
+    var lastSessionLength: SessionLength = .questions(5)
     var hasCompletedOnboarding = false
     /// Players say their answers and the app keeps score (ADR-0018). Falls back to reading
     /// the answers out when the microphone can't be used.

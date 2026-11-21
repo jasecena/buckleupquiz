@@ -90,6 +90,15 @@ public struct LearningRecord: Codable, Hashable, Sendable {
         talkedAbout.formUnion(newer.talkedAbout)
     }
 
+    /// Combines two copies of the same player's record (a backup, another device): each card
+    /// keeps whichever copy was answered more recently (ADR-0023).
+    public mutating func mergeKeepingLatest(_ other: LearningRecord) {
+        cards.merge(other.cards) { mine, theirs in
+            (theirs.last, theirs.box) > (mine.last, mine.box) ? theirs : mine
+        }
+        talkedAbout.formUnion(other.talkedAbout)
+    }
+
     // Decoded key by key so records written by older or newer builds still load.
     private enum CodingKeys: String, CodingKey { case cards, talkedAbout }
 

@@ -1,28 +1,26 @@
 /// How long a session runs (FEATURES §2.2): a number of questions **for each player**, so
-/// everyone gets the same number (product decision, 2026-11-22).
+/// everyone gets the same number. A game is at most `maxQuestions` in total (product decision,
+/// 2026-11-22: no Endless mode).
 public enum SessionLength: Hashable, Codable, Sendable {
     case questions(Int)
-    /// Paid tier only. Runs until fresh questions run out (up to `endlessRounds`) or someone stops.
-    case endless
 
-    public static let presets: [SessionLength] = [.questions(5), .questions(10), .questions(15), .endless]
+    public static let presets: [SessionLength] = [.questions(5), .questions(10), .questions(15)]
     /// The fewest questions each that makes a proper game.
     public static let minimumEach = 5
-    /// Endless plans at most this many rounds.
-    public static let endlessRounds = 50
+    /// The most questions in one game, all players together.
+    public static let maxQuestions = 50
 
-    /// Questions for each player; nil for Endless.
-    public var perPlayer: Int? {
-        if case .questions(let n) = self { return n }
-        return nil
+    /// Questions for each player.
+    public var perPlayer: Int {
+        switch self { case .questions(let n): n }
     }
 
-    public var displayName: String {
-        switch self {
-        case .questions(let n): "\(n) questions each"
-        case .endless: "Endless"
-        }
+    /// Questions each for this many players, keeping the game within `maxQuestions`.
+    public func each(players: Int) -> Int {
+        max(1, min(perPlayer, Self.maxQuestions / max(1, players)))
     }
+
+    public var displayName: String { "\(perPlayer) questions each" }
 }
 
 public struct SessionConfig: Sendable, Hashable {
@@ -130,7 +128,7 @@ public struct QuizSession: Sendable {
         // Anything the family has already had is theirs: never charged again.
         for record in learning.values { budget.unlocked.formUnion(record.cards.keys) }
 
-        let requested = config.length.perPlayer ?? SessionLength.endlessRounds
+        let requested = config.length.each(players: config.players.count)
         var kinds: [String: [TurnKind]] = [:]
         for player in config.players { kinds[player.id] = ReviewMix.plan(turns: requested, using: &rng) }
 
@@ -228,8 +226,8 @@ public struct QuizSession: Sendable {
     /// Ends the session early (e.g. "stop").
     public mutating func stop() { _ = finish() }
 
-    /// Questions in this game (everyone gets `plannedEach`). nil for Endless.
-    public var questionLimit: Int? { config.length.perPlayer == nil ? nil : plan.count }
+    /// Questions in this game (everyone gets `plannedEach`).
+    public var questionLimit: Int? { plan.count }
 
     /// Questions this player has been asked so far (skipped ones don't count).
     public func turns(for playerID: String) -> Int { turnsTaken[playerID] ?? 0 }

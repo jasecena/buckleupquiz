@@ -124,7 +124,7 @@ struct SettingsView: View {
                     } header: {
                         Text("Testing")
                     } footer: {
-                        Text("TestFlight only, until purchases are added. Unlocks every topic, 40 new questions a day, Endless mode, fixing scores and games with up to \(PlayerStore.maxPlayers) players.")
+                        Text("TestFlight only, until purchases are added. Unlocks every topic, 40 new questions a day, fixing scores and games with up to \(PlayerStore.maxPlayers) players.")
                     }
                 }
 
