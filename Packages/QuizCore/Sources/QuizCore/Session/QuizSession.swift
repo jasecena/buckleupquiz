@@ -175,6 +175,9 @@ public struct QuizSession: Sendable {
     /// Ends the session early (e.g. "stop").
     public mutating func stop() { _ = finish() }
 
+    /// True once the current turn's outcome has been recorded.
+    public var isCurrentRecorded: Bool { currentTurn == nil || recordedCurrent }
+
     public var scoreboard: [ScoreboardEntry] { Scoreboard.rank(players: config.players, scores: scores) }
 
     /// Updates the boxes when a turn ends (ADR-0016). The player whose turn it was moves up

@@ -87,7 +87,10 @@ final class ListenSessionModel {
     var canMark: Bool { !isVoice && revealedAnswer != nil && turn?.presented.question.type.isScored == true }
 
     /// Scores are shown once anyone has answered out loud.
-    var showsScores: Bool { scoreboard.contains { $0.points > 0 } || hasAttempts }
+    /// Named players always see the scoreboard, from the first question (everyone starts at 0).
+    var showsScores: Bool { isTurnBased || scoreboard.contains { $0.points > 0 } || hasAttempts }
+    /// The trophy screen only when someone scored; otherwise just "Great job, everyone".
+    var showsFinalScores: Bool { scoreboard.contains { $0.points > 0 } }
 
     var questionCount: Int? { session.config.length.limit }
 
@@ -230,10 +233,32 @@ final class ListenSessionModel {
 
     /// "Got it" (`.correct`) or "Not yet" (`.incorrect`) for the player whose turn it is.
     /// A wrong answer sends the question back to box 1 for that player only.
+    /// In Listen mode this is also the score: "Got it" gives the player their points. It's
+    /// recorded when the turn ends, so a parent can change their mind; the scoreboard shows
+    /// it straight away.
     func mark(_ result: ReviewResult) {
         guard canMark else { return }
         session.mark(result)
         self.result = result
+        if !session.isCurrentRecorded {
+            var preview = session
+            preview.record(result == .incorrect ? .incorrect : .correct)
+            scoreboard = preview.scoreboard
+        }
+    }
+
+    /// Ends a turn nobody spoke an answer for (Listen mode, or voice that fell back): scores it
+    /// from "Got it" / "Not yet". Untapped earns no points and costs nothing.
+    private func closeUnrecordedTurn() {
+        guard turn != nil, !session.isCurrentRecorded else { return }
+        let marked = result
+        switch marked {
+        case .correct: record(.correct)
+        case .incorrect: record(.incorrect)
+        case .heard, nil: record(.unheard)
+        }
+        // Recording resets the turn's box result; put the parent's mark (or "heard") back.
+        if let marked { session.mark(marked) }
     }
 
     /// Re-reads the current question from the start.
@@ -249,6 +274,7 @@ final class ListenSessionModel {
     func stop() {
         guard status != .finished else { return }
         haltRunner()
+        closeUnrecordedTurn()
         session.stop()
         tearDown()
     }
@@ -330,9 +356,8 @@ final class ListenSessionModel {
         let samePlayer = keepPlayerForNextTurn
         let previousPlayer = turn?.player.id
         keepPlayerForNextTurn = false
+        closeUnrecordedTurn()
         guard let next = session.advance(samePlayer: samePlayer) else { return false }
-        // Listen mode keeps no score; voice turns are recorded once the answer is heard.
-        if !isVoice { session.record(.notScored) }
         turn = next
         result = nil
         heard = nil
@@ -505,6 +530,7 @@ final class ListenSessionModel {
             pause()
         case .stop:
             haltSpeechOnly()
+            closeUnrecordedTurn()
             session.stop()
             try await finishNaturally()
         }

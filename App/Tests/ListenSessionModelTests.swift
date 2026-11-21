@@ -242,6 +242,28 @@ struct ListenSessionModelTests {
         #expect(speech.spoken.contains(Phrases.anotherOne))
     }
 
+    @Test func gotItScoresInListenModeAndTheScoreboardShowsFromTheStart() async {
+        let mia = Player(id: "mia", name: "Mia", age: 7)
+        let leo = Player(id: "leo", name: "Leo", age: 11)
+        let model = ListenSessionModel(
+            bank: makeBank(questions: 3, olderCount: 3), config: SessionConfig(topics: ["animals"], players: [mia, leo],
+                                                                                length: .questions(2)),
+            settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio),
+            rng: AnyRandomGenerator(seed: 2))
+        #expect(model.showsScores, "named players see the scoreboard before anyone answers")
+        model.start()
+        for _ in 0..<20000 where !model.canMark { await Task.yield() }
+        #expect(model.turn?.player.id == "mia")
+        model.mark(.correct)
+        #expect(model.scoreboard.first { $0.player.id == "mia" }?.points == 10, "shows straight away")
+        await model.runner?.value
+        #expect(model.scoreboard.first { $0.player.id == "mia" }?.points == 10)
+        #expect(model.scoreboard.first { $0.player.id == "leo" }?.points == 0)
+        #expect(model.showsFinalScores)
+        #expect(speech.spoken.last?.contains("Mia got 10 points") == true || speech.spoken.last?.contains("Mia wins") == true)
+    }
+
     @Test func silenceIsNeverMentioned() async {
         let (model, listener) = makeVoiceModel([], questions: 5, length: 5)
         model.start()

@@ -44,10 +44,10 @@ struct QuizView: View {
     @ViewBuilder private var content: some View {
         if model.status == .finished {
             VStack(spacing: 20) {
-                Image(systemName: model.showsScores ? "trophy.fill" : "flag.checkered")
+                Image(systemName: model.showsFinalScores ? "trophy.fill" : "flag.checkered")
                     .font(.system(size: 64))
                     .foregroundStyle(Theme.accent)
-                if model.showsScores {
+                if model.showsFinalScores {
                     finalScores
                 } else {
                     Text(model.closingMessage ?? Phrases.outroPrefix)
