@@ -81,9 +81,8 @@ struct ListenSessionModelTests {
         await model.runner?.value
 
         let addressed = speech.spoken.filter { $0.contains("this one's for you") }
-        #expect(addressed.count == 4)
-        #expect(addressed[0].hasPrefix("Mia,"))
-        #expect(addressed[1].hasPrefix("Leo,"))
+        #expect(addressed == ["Mia, this one's for you!", "Leo, this one's for you!"], "only on each player's first turn")
+        #expect(speech.spoken.filter { $0 == "Mia." || $0 == "Leo." } == ["Mia.", "Leo."])
         #expect(speech.spoken.last == "That's the end of the ride! Great job, Mia and Leo!")
         let miaCards = learned["mia"]?.cards ?? [:]
         let leoCards = learned["leo"]?.cards ?? [:]
@@ -198,6 +197,22 @@ struct ListenSessionModelTests {
         for _ in 0..<5000 where model.status != .finished { await Task.yield() }
         #expect(model.status == .finished)
         #expect(!speech.spoken.contains { $0.hasPrefix("Not quite") || $0.hasPrefix("Time's up") })
+    }
+
+    @Test func brokenMicStillWaitsTheThinkTime() async {
+        let listener = FakeListener([], failure: SpeechListenerError.unavailable("no input"))
+        let config = SessionConfig(topics: ["animals"], players: [Player(id: "mia", name: "Mia", age: 7)],
+                                   length: .questions(1))
+        let model = ListenSessionModel(
+            bank: makeBank(questions: 1), config: config, settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
+                                listener: listener),
+            answerMode: .voice, rng: AnyRandomGenerator(seed: 1))
+        model.start()
+        await model.runner?.value
+        #expect(cues.events.contains("think"), "falls back to the think countdown instead of answering at once")
+        #expect(speech.spoken.contains { $0.hasPrefix("The answer is") })
+        #expect(!model.isVoice)
     }
 
     @Test func silenceIsNeverMentioned() async {

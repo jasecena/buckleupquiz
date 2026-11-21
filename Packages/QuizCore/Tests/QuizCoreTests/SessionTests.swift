@@ -187,7 +187,8 @@ struct ListenScriptTests {
                                        category: .values, settings: settings, addressPlayer: true)
         #expect(steps == [
             .say("Question two.", .number),
-            .say("Mia, this one's for you: Your friend falls over.", .question),
+            .say("Mia, this one's for you!", .number),
+            .say("Your friend falls over.", .question),
             .say("A: Laugh. B: Help them up. C: Keep playing.", .options),
             .cue(.think),
             .think(seconds: 8),
@@ -195,6 +196,20 @@ struct ListenScriptTests {
             .say("Helping shows you care.", .followUp),
             .wait(seconds: 2),
         ])
+    }
+
+    @Test func laterTurnsJustSayTheNameAndPause() {
+        let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
+        let steps = ListenScript.steps(for: Turn(number: 3, player: mia, presented: present(makeQuestion(text: "Capital?"))),
+                                       category: .knowledge, settings: ListenSettings(), addressPlayer: true,
+                                       firstTurnForPlayer: false)
+        #expect(Array(steps.prefix(4)) == [
+            .say("Question three.", .number),
+            .say("Mia.", .number),
+            .wait(seconds: 0.6),
+            .say("Capital?", .question),
+        ])
+        #expect(!steps.contains { if case .say(let text, _) = $0 { text.contains("for you") } else { false } })
     }
 
     @Test func talkAboutHasNoTimeLimit() {

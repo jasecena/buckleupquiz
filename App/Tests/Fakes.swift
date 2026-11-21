@@ -43,14 +43,19 @@ final class FakeAudioSession: AudioSessionControlling {
 @MainActor
 final class FakeListener: SpeechListening {
     var replies: [[String]]
+    var failure: (any Error)?
     private(set) var listens = 0
 
-    init(_ replies: [[String]]) { self.replies = replies }
+    init(_ replies: [[String]], failure: (any Error)? = nil) {
+        self.replies = replies
+        self.failure = failure
+    }
 
-    func listen(for seconds: Double, hints: [String]) async throws -> [String] {
+    func listen(for seconds: Double, hints: [String], isConclusive: ([String]) -> Bool) async throws -> [String] {
         listens += 1
         await Task.yield()
         try Task.checkCancellation()
+        if let failure { throw failure }
         return replies.isEmpty ? [] : replies.removeFirst()
     }
 }

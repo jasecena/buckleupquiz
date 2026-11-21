@@ -28,6 +28,15 @@ struct VoiceReplyTests {
         #expect(VoiceReply.interpret(["hmm let me think"], for: tasmania) == .garbled)
     }
 
+    @Test func chatterAndEchoAreNotWrongAnswers() {
+        #expect(VoiceReply.interpret(["Mum can we stop"], for: tasmania) == .garbled)
+        #expect(VoiceReply.interpret(["what is the capital of Tasmania"], for: tasmania) == .garbled)
+        #expect(VoiceReply.interpret(["Hobart or Darwin"], for: tasmania) == .garbled, "a hedge isn't a wrong answer")
+        #expect(!VoiceReply.garbled.isConclusive && !VoiceReply.silence.isConclusive)
+        #expect(VoiceReply.interpret(["Darwin"], for: tasmania).isConclusive)
+        #expect(VoiceReply.interpret(["next"], for: tasmania).isConclusive)
+    }
+
     @Test func trueFalseByVoice() {
         let q = present(makeQuestion(type: .trueFalse, text: "Koalas are bears.", answer: "False"))
         #expect(VoiceReply.interpret(["no"], for: q) == .answer(.correct, heard: "no"))

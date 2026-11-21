@@ -5,32 +5,37 @@ public enum VoiceReply: Equatable, Sendable {
     case command(VoiceCommand)
     /// An answer, judged against the question.
     case answer(AnswerOutcome, heard: String)
-    /// Something was heard, but only "um", "hmm" and the like. Worth asking again once.
+    /// Something was heard, but it didn't pick an option: "umm", chatter in the car, or the
+    /// car speakers' echo of the question. Not an answer, so listening carries on.
     case garbled
     /// Nothing was heard before the listening window closed.
     case silence
 
-    private static let fillers: Set<String> = [
-        "um", "umm", "uh", "uhh", "er", "erm", "hmm", "hm", "mm", "ah", "oh", "eh", "huh", "ok", "okay",
-        "wait", "let", "me", "think", "i", "dont", "know",
-    ]
+    /// True when the reply settles the turn (an answer or a command), so listening can stop.
+    /// Anything else keeps listening until the think time is up.
+    public var isConclusive: Bool {
+        switch self {
+        case .command, .answer: true
+        case .garbled, .silence: false
+        }
+    }
 
-    /// Interprets every alternative transcription of one reply.
+    /// Interprets every alternative transcription of one reply. A wrong answer has to name one
+    /// of the other options; random words never count against a child (ADR-0018).
     public static func interpret(
         _ transcriptions: [String], for presented: PresentedQuestion, matcher: AnswerMatcher = AnswerMatcher()
     ) -> VoiceReply {
         let heard = transcriptions.filter { !TextNormalizer.tokens($0).isEmpty }
         guard !heard.isEmpty else { return .silence }
         if let command = VoiceCommand.parse(heard) { return .command(command) }
-        switch matcher.match(transcriptions: heard, to: presented) {
-        case .correct(let text):
+        if case .correct(let text) = matcher.match(transcriptions: heard, to: presented) {
             return .answer(.correct, heard: text)
-        case .incorrect(let text):
-            let allFiller = heard.allSatisfy { TextNormalizer.tokens($0).allSatisfy(fillers.contains) }
-            return allFiller ? .garbled : .answer(.incorrect, heard: text)
-        case .noAnswer:
-            return .silence
         }
+        if let options = presented.options,
+           let picked = heard.first(where: { matcher.chosenOption($0, options: options, presented: presented) != nil }) {
+            return .answer(.incorrect, heard: picked)
+        }
+        return .garbled
     }
 
     /// Words worth biasing the recogniser towards for this question.

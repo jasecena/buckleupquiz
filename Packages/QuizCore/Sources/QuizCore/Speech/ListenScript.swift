@@ -58,7 +58,7 @@ public struct ListenSettings: Hashable, Sendable, Codable {
 public enum ListenScript {
     public static func steps(
         for turn: Turn, category: Topic.Category?, settings: ListenSettings, addressPlayer: Bool,
-        voiceAnswers: Bool = false
+        firstTurnForPlayer: Bool = true, voiceAnswers: Bool = false
     ) -> [SpeechStep] {
         let presented = turn.presented
         let q = presented.question
@@ -68,7 +68,16 @@ public enum ListenScript {
         case .sharedReview: steps.append(.say(Phrases.sharedReviewIntro, .number))
         case .new: break
         }
-        steps.append(.say(Phrases.addressed(q.question, to: addressPlayer ? turn.player : nil), .question))
+        // "Mia, this one's for you!" on a player's first turn, then just "Mia." and a pause.
+        if addressPlayer, !turn.player.name.isEmpty {
+            if firstTurnForPlayer {
+                steps.append(.say(Phrases.forYou(turn.player), .number))
+            } else {
+                steps.append(.say(Phrases.turnName(turn.player), .number))
+                steps.append(.wait(seconds: Phrases.pauseAfterName))
+            }
+        }
+        steps.append(.say(q.question, .question))
         // Every question is a choice, so the options are always read (ADR-0015).
         if let options = Phrases.options(presented) {
             steps.append(.say(options, .options))

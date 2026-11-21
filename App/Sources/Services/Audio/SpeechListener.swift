@@ -5,14 +5,22 @@ import Speech
 /// nothing is recorded, stored or sent anywhere.
 @MainActor
 protocol SpeechListening: AnyObject {
-    /// Listens until the speaker pauses (about 1.2 s after speech) or `seconds` pass with no
-    /// speech. Returns every alternative transcription, best first, or [] for silence.
-    /// Cancelling the calling task stops listening at once.
-    func listen(for seconds: Double, hints: [String]) async throws -> [String]
+    /// Listens for up to `seconds`. It stops early only when what's been heard `isConclusive`
+    /// (an answer or a command) and the speaker has paused for about 1.2 s. Chatter, echo
+    /// and mumbles keep it listening for the whole window. Returns every alternative
+    /// transcription, best first, or [] for silence. Throws when the microphone or the
+    /// recogniser can't be used at all. Cancelling the calling task stops listening at once.
+    func listen(for seconds: Double, hints: [String], isConclusive: ([String]) -> Bool) async throws -> [String]
 }
 
-enum SpeechListenerError: Error {
-    case unavailable
+enum SpeechListenerError: Error, LocalizedError {
+    case unavailable(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .unavailable(let reason): reason
+        }
+    }
 }
 
 /// `SFSpeechRecognizer` on an `AVAudioEngine` input tap.
@@ -23,15 +31,29 @@ final class SystemSpeechListener: SpeechListening {
     /// Extra time allowed to finish an answer that started near the end of the window.
     static let overrun = 4.0
 
-    private let recognizer: SFSpeechRecognizer
+    /// Why listening last failed, shown in Mic check so a parent can tell us.
+    private(set) static var lastProblem: String?
+
+    /// Every English recogniser that can run on the device, best first. One that fails is
+    /// moved to the back, so the next turn starts with one that works.
+    private var recognizers: [SFSpeechRecognizer]
 
     /// nil when on-device recognition isn't available (we never fall back to Apple's servers).
-    init?(preferredLocales: [Locale] = [Locale(identifier: "en-AU"), Locale(identifier: "en-US")]) {
-        guard let recognizer = preferredLocales.lazy
-            .compactMap({ SFSpeechRecognizer(locale: $0) })
-            .first(where: { $0.supportsOnDeviceRecognition })
-        else { return nil }
-        self.recognizer = recognizer
+    init?(preferredLocales: [Locale] = SystemSpeechListener.defaultLocales) {
+        var seen = Set<String>()
+        recognizers = preferredLocales
+            .compactMap { SFSpeechRecognizer(locale: $0) }
+            .filter { $0.supportsOnDeviceRecognition && seen.insert($0.locale.identifier).inserted }
+        guard !recognizers.isEmpty else {
+            Self.lastProblem = "This iPhone has no on-device English speech recognition."
+            return nil
+        }
+    }
+
+    static var defaultLocales: [Locale] {
+        var locales = [Locale.current, Locale(identifier: "en-AU")]
+        locales += ["en-US", "en-GB", "en-NZ", "en-IE", "en-CA", "en-IN", "en-ZA"].map(Locale.init(identifier:))
+        return locales.filter { $0.language.languageCode?.identifier == "en" }
     }
 
     /// Asks for speech-recognition and microphone permission (each prompt shows once).
@@ -52,63 +74,123 @@ final class SystemSpeechListener: SpeechListening {
             && AVAudioApplication.shared.recordPermission == .granted
     }
 
-    func listen(for seconds: Double, hints: [String]) async throws -> [String] {
-        guard recognizer.isAvailable else { throw SpeechListenerError.unavailable }
+    func listen(for seconds: Double, hints: [String], isConclusive: ([String]) -> Bool) async throws -> [String] {
+        let engine = AVAudioEngine()
+        let input = engine.inputNode
+        let format = input.outputFormat(forBus: 0)
+        guard format.sampleRate > 0, format.channelCount > 0 else {
+            throw fail("No microphone input is available (the audio route has no input).")
+        }
+        let feed = AudioFeed()
+        input.installTap(onBus: 0, bufferSize: 1024, format: format, block: Self.tapBlock(feeding: feed))
+        defer {
+            engine.stop()
+            input.removeTap(onBus: 0)
+            feed.set(nil)
+        }
+        engine.prepare()
+        do {
+            try engine.start()
+        } catch {
+            throw fail("The microphone didn't start: \(error.localizedDescription)")
+        }
+
+        let deadline = Date.now.addingTimeInterval(seconds)
+        var problems: [String] = []
+        var attempts = 0
+        var lastHeard: [String] = []
+        // Recognition can end before the window does (an error, or a final result). Start it
+        // again so the child still gets the whole think time.
+        while Date.now < deadline, attempts < recognizers.count + 5 {
+            attempts += 1
+            let recognizer = recognizers[0]
+            let passStart = Date.now
+            let pass = try await recognise(with: recognizer, feed: feed, hints: hints, until: deadline,
+                                           isConclusive: isConclusive)
+            if !pass.endedEarly || isConclusive(pass.heard) {
+                Self.lastProblem = nil
+                return pass.heard
+            }
+            lastHeard = pass.heard
+            // Ending at once with nothing heard means this recogniser doesn't work (for example
+            // its on-device model isn't installed): try the next one. Ending later is just a
+            // quiet car, so keep listening with the same one.
+            if pass.heard.isEmpty, Date.now.timeIntervalSince(passStart) < 2 {
+                problems.append("\(recognizer.locale.identifier): \(pass.problem ?? "recognition stopped")")
+                recognizers.append(recognizers.removeFirst())
+            }
+        }
+        if !problems.isEmpty, problems.count == attempts {
+            throw fail("Speech recognition stopped straight away (\(problems.joined(separator: "; "))).")
+        }
+        return lastHeard
+    }
+
+    private func fail(_ reason: String) -> SpeechListenerError {
+        Self.lastProblem = reason
+        return .unavailable(reason)
+    }
+
+    private struct Pass {
+        var heard: [String]
+        /// Recognition ended by itself before the window closed.
+        var endedEarly: Bool
+        var problem: String?
+    }
+
+    private func recognise(
+        with recognizer: SFSpeechRecognizer, feed: AudioFeed, hints: [String], until deadline: Date,
+        isConclusive: ([String]) -> Bool
+    ) async throws -> Pass {
         let request = SFSpeechAudioBufferRecognitionRequest()
         request.requiresOnDeviceRecognition = true
         request.shouldReportPartialResults = true
         request.taskHint = .search
         request.contextualStrings = hints
 
-        let engine = AVAudioEngine()
-        let input = engine.inputNode
-        let format = input.outputFormat(forBus: 0)
-        guard format.sampleRate > 0, format.channelCount > 0 else { throw SpeechListenerError.unavailable }
-        input.installTap(onBus: 0, bufferSize: 1024, format: format, block: Self.tapBlock(appendingTo: request))
-
         let (events, continuation) = AsyncStream<RecognitionEvent>.makeStream()
         let task = recognizer.recognitionTask(with: request, resultHandler: Self.resultHandler(continuation))
+        feed.set(request)
         let state = ListenState()
         let consumer = Task { @MainActor [events, state] in
             for await event in events { state.apply(event) }
         }
         defer {
-            engine.stop()
-            input.removeTap(onBus: 0)
+            feed.set(nil)
             task.cancel()
             continuation.finish()
             consumer.cancel()
         }
 
-        engine.prepare()
-        try engine.start()
-
-        let start = Date.now
         while !state.isFinal {
             try await Task.sleep(for: .milliseconds(100))
-            let elapsed = Date.now.timeIntervalSince(start)
-            if state.latest.isEmpty {
-                if elapsed >= seconds { break }
-            } else if Date.now.timeIntervalSince(state.lastChange) >= Self.endOfSpeechSilence
-                        || elapsed >= seconds + Self.overrun {
-                break
+            let pausedAfterSpeech = !state.latest.isEmpty
+                && Date.now.timeIntervalSince(state.lastChange) >= Self.endOfSpeechSilence
+            if pausedAfterSpeech, isConclusive(state.latest) { break }
+            if Date.now >= deadline {
+                // Let a child who's mid-answer finish.
+                let speaking = !state.latest.isEmpty && !pausedAfterSpeech
+                if !speaking || Date.now >= deadline.addingTimeInterval(Self.overrun) { break }
             }
         }
+        if state.isFinal {
+            return Pass(heard: state.latest, endedEarly: Date.now < deadline, problem: state.problem)
+        }
         // Let the recogniser finish the last words.
+        feed.set(nil)
         request.endAudio()
-        engine.stop()
         let finishBy = Date.now.addingTimeInterval(0.8)
         while !state.isFinal, Date.now < finishBy {
             try await Task.sleep(for: .milliseconds(50))
         }
-        return state.latest
+        return Pass(heard: state.latest, endedEarly: false, problem: nil)
     }
 
     // MARK: Callbacks off the main actor
 
     enum RecognitionEvent: Sendable {
         case heard([String], isFinal: Bool)
-        case ended
+        case ended(String)
     }
 
     @MainActor
@@ -116,6 +198,7 @@ final class SystemSpeechListener: SpeechListening {
         var latest: [String] = []
         var lastChange = Date.now
         var isFinal = false
+        var problem: String?
 
         func apply(_ event: RecognitionEvent) {
             switch event {
@@ -125,15 +208,30 @@ final class SystemSpeechListener: SpeechListening {
                     lastChange = .now
                 }
                 isFinal = isFinal || final
-            case .ended:
+            case .ended(let reason):
+                problem = reason
                 isFinal = true
             }
         }
     }
 
+    /// Hands audio buffers from the audio thread to whichever recognition request is current.
+    final class AudioFeed: @unchecked Sendable {
+        private let lock = NSLock()
+        private var request: SFSpeechAudioBufferRecognitionRequest?
+
+        func set(_ request: SFSpeechAudioBufferRecognitionRequest?) {
+            lock.withLock { self.request = request }
+        }
+
+        func append(_ buffer: AVAudioPCMBuffer) {
+            lock.withLock { request }?.append(buffer)
+        }
+    }
+
     // These run on audio and recogniser threads, so they're built outside the main actor.
-    private nonisolated static func tapBlock(appendingTo request: SFSpeechAudioBufferRecognitionRequest) -> AVAudioNodeTapBlock {
-        { buffer, _ in request.append(buffer) }
+    private nonisolated static func tapBlock(feeding feed: AudioFeed) -> AVAudioNodeTapBlock {
+        { buffer, _ in feed.append(buffer) }
     }
 
     private nonisolated static func resultHandler(
@@ -144,7 +242,10 @@ final class SystemSpeechListener: SpeechListening {
                 let texts = result.transcriptions.map(\.formattedString).filter { !$0.isEmpty }
                 continuation.yield(.heard(texts, isFinal: result.isFinal))
             }
-            if error != nil { continuation.yield(.ended) }
+            if let error {
+                let ns = error as NSError
+                continuation.yield(.ended("\(ns.localizedDescription) [\(ns.domain) \(ns.code)]"))
+            }
         }
     }
 }

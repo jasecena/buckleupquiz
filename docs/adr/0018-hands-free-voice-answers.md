@@ -26,12 +26,24 @@ mics.
   mic. A plugged-in kids' mic works with no code change. The screen shows "Using: <mic>".
   `.voiceChat` (from ADR-0008) was dropped: it made speech quieter on the phone speaker, and
   half-duplex already avoids echo.
-- **Per turn (half-duplex):** question and options → 300 ms → chime → listen. Listening ends
-  1.2 s after speech stops, or after the think time with no speech (plus up to 4 s to finish
-  an answer already started). The reply is judged by `VoiceReply` in QuizCore:
+- **Naming the player:** "Mia, this one's for you!" on each player's first turn of a game,
+  then just "Mia.", a short pause (0.6 s) and the question.
+- **Per turn (half-duplex):** question and options → 500 ms → chime → 500 ms → listen. The gaps
+  keep the mic from catching the question's tail or the chime through laggy Bluetooth
+  speakers. Listening only ends early on a **conclusive** reply (an answer that picks an
+  option, or a command) followed by a 1.2 s pause. Chatter, echo and mumbles keep it
+  listening for the whole think time (plus up to 4 s to finish an answer already started).
+- **Recogniser resilience** (v0.3.1, after the first device test answered at once): the app
+  tries every on-device English recogniser (the phone's language, en-AU, en-US, en-GB, …).
+  One that stops within 2 s with nothing heard (for example its model isn't installed) is
+  skipped and moved to the back. If none work, or the mic won't start, that turn finishes its
+  think time as a Listen-mode countdown and the game continues in Listen mode. The reason is
+  shown in Settings → Mic check.
+- The reply is judged by `VoiceReply` in QuizCore:
   - **command** ("skip"/"next", "repeat", "pause", "stop") → obeyed;
   - **answer** → `AnswerMatcher` (letters, option text, true/false words, every alternative
     transcription) → "Correct! Awesome!" plus a streak cheer from 3 in a row. A wrong answer
+    must name another option; random words never count as wrong. A wrong answer
     gets no comment: the app just shares it ("The answer is… B: Hobart!"), as Listen mode does;
   - **mumble or silence** → nothing is said about it. The answer is shared and the game moves
     on (see "Joy, not correction" below).

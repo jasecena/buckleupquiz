@@ -59,16 +59,18 @@ struct MicCheckView: View {
             }
         }
         guard let listener = SystemSpeechListener() else {
-            state = .failed("On-device speech recognition isn't available on this iPhone, so answers will be read out.")
+            state = .failed("On-device speech recognition isn't available on this iPhone, so answers will be read out."
+                + (SystemSpeechListener.lastProblem.map { "\n\n\($0)" } ?? ""))
             return
         }
         do {
             micName = try audio.activateForVoice(duckOthers: store.settings.duckOthers, mic: store.settings.micPreference)
             state = .listening
-            let heard = try await listener.listen(for: 5, hints: ["A", "B", "C", "true", "false"])
+            let heard = try await listener.listen(for: 5, hints: ["A", "B", "C", "true", "false"],
+                                                  isConclusive: { !$0.isEmpty })
             state = heard.first.map(CheckState.heard) ?? .nothing
         } catch {
-            state = .failed("Couldn't use the microphone. Is another app using it?")
+            state = .failed("Listening didn't work, so answers will be read out instead.\n\n\(error.localizedDescription)")
         }
         audio.deactivate()
     }

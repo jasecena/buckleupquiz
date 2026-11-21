@@ -108,6 +108,8 @@ final class ListenSessionModel {
     @ObservationIgnored private var welcomeBackPending = false
     @ObservationIgnored private var voiceTipPending = false
     @ObservationIgnored private var hasAttempts = false
+    /// Players who've already heard "this one's for you" this game.
+    @ObservationIgnored private var introducedPlayers: Set<String> = []
     @ObservationIgnored private var feedbackRNG = SystemRandomNumberGenerator()
     @ObservationIgnored private(set) var runner: Task<Void, Never>?
     @ObservationIgnored private var discussionTimer: Task<Void, Never>?
@@ -324,8 +326,10 @@ final class ListenSessionModel {
         followUp = nil
         thinkRemaining = 0
         category = bank.topic(id: next.presented.question.topic)?.category
+        let firstTurn = introducedPlayers.insert(next.player.id).inserted
         steps = ListenScript.steps(for: next, category: category, settings: settings,
-                                   addressPlayer: session.config.isTurnBased, voiceAnswers: isVoice)
+                                   addressPlayer: session.config.isTurnBased, firstTurnForPlayer: firstTurn,
+                                   voiceAnswers: isVoice)
         stepIndex = 0
         updateNowPlaying()
         return true
@@ -397,19 +401,30 @@ final class ListenSessionModel {
             try await countdown(seconds: seconds, ticking: true, generation: generation)
             return
         }
-        try await deps.sleeper.sleep(seconds: 0.3)
+        // Gaps either side of the chime, so the mic doesn't catch the end of the question or
+        // the chime itself (Bluetooth speakers lag behind the phone).
+        try await deps.sleeper.sleep(seconds: 0.5)
         deps.cues.play(.listening)
-        try await deps.sleeper.sleep(seconds: 0.4)
+        try await deps.sleeper.sleep(seconds: 0.5)
         isListening = true
+        let presented = turn.presented
+        let started = Date.now
         let transcriptions: [String]
         do {
-            transcriptions = try await listener.listen(for: seconds, hints: VoiceReply.hints(for: turn.presented))
+            transcriptions = try await listener.listen(
+                for: seconds, hints: VoiceReply.hints(for: presented),
+                isConclusive: { VoiceReply.interpret($0, for: presented).isConclusive })
         } catch is CancellationError {
             throw CancellationError()
         } catch {
-            // The recogniser broke (route change, no mic): quietly carry on reading answers out.
+            // The mic or recogniser can't be used: quietly carry on reading answers out, but
+            // still give the full think time. The reason shows in Settings → Mic check.
             isListening = false
             isVoice = false
+            let remaining = seconds - Date.now.timeIntervalSince(started)
+            if remaining >= 1 {
+                try await countdown(seconds: remaining.rounded(), ticking: true, generation: generation)
+            }
             return
         }
         isListening = false
@@ -496,7 +511,8 @@ final class ListenSessionModel {
             isListening = true
             let transcriptions: [String]
             do {
-                transcriptions = try await listener.listen(for: 30, hints: hints)
+                transcriptions = try await listener.listen(
+                    for: 30, hints: hints, isConclusive: { VoiceCommand.parse($0) != nil })
             } catch is CancellationError {
                 throw CancellationError()
             } catch {

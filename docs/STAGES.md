@@ -85,6 +85,9 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Voice audio session: `.playAndRecord`, HFP/CarPlay/headset/USB input preferred, "Using: <mic>" label
 - [x] Half-duplex speak → 300 ms → chime → listen (`.default` mode instead of `.voiceChat`, ADR-0018)
 - [x] Silence detection (1.2 s after speech), voice commands, hands-free Talk About
+- [x] "Mia, this one's for you!" on a player's first turn only, then "Mia." and a pause
+- [x] Listening waits the full think time unless an option or command is heard; recogniser
+      fallback across on-device English locales; Mic check shows why listening failed
 - [x] Joy, not correction: unheard turns aren't mentioned or scored; no "Not quite", no ✗, no zero-point announcements
 - [x] Fallbacks: recogniser error → quietly read answers out; permission refused → "Just listen"
 - [x] Mic check screen (Settings → Answers) with the HFP call-screen note

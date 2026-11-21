@@ -22,11 +22,18 @@ public enum Phrases {
         n == 1 ? intro : "Question \(NumberWords.spell(n))."
     }
 
-    /// "Mia, this one's for you: What is…"
-    public static func addressed(_ question: String, to player: Player?) -> String {
-        guard let name = player?.name, !name.isEmpty else { return question }
-        return "\(name), this one's for you: \(question)"
+    /// A player's first turn in a game: "Mia, this one's for you!"
+    public static func forYou(_ player: Player) -> String {
+        "\(player.name), this one's for you!"
     }
+
+    /// Every later turn: just "Mia.", then a short pause before the question.
+    public static func turnName(_ player: Player) -> String {
+        "\(player.name)."
+    }
+
+    /// The pause after a player's name, so it lands before the question starts.
+    public static let pauseAfterName = 0.6
 
     /// "A: laugh. B: help them up. C: keep playing."
     public static func options(_ presented: PresentedQuestion) -> String? {
