@@ -90,7 +90,7 @@ struct ReviewMixTests {
     @Test func sharedReviewsComeFromWhatTheOthersHadYesterday() {
         var leoRecord = LearningRecord()
         for id in ids(5) { leoRecord.record(.incorrect, for: id, on: 99) }
-        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(20))
+        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(10))
         var session = QuizSession(bank: sampleBank(perBand: 40), config: config, learning: ["leo": leoRecord],
                                   day: 100, rng: AnyRandomGenerator(seed: 6))
         var turns: [Turn] = []

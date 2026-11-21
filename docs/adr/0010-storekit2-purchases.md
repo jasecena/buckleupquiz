@@ -1,6 +1,6 @@
 # 0010. StoreKit 2 with on-device verification, lifetime pass first
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0022](0022-free-allowance-packs-and-basic-subscription.md)
 - **Date:** 2026-11-22
 
 ## Context

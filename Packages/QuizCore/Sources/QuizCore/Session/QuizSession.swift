@@ -1,19 +1,25 @@
-/// How long a session runs (FEATURES §2.2).
+/// How long a session runs (FEATURES §2.2): a number of questions **for each player**, so
+/// everyone gets the same number (product decision, 2026-11-22).
 public enum SessionLength: Hashable, Codable, Sendable {
     case questions(Int)
-    /// Paid tier only. Runs until the question pool is exhausted or the player stops.
+    /// Paid tier only. Runs until fresh questions run out (up to `endlessRounds`) or someone stops.
     case endless
 
-    public static let presets: [SessionLength] = [.questions(10), .questions(20), .questions(30), .endless]
+    public static let presets: [SessionLength] = [.questions(5), .questions(10), .questions(15), .endless]
+    /// The fewest questions each that makes a proper game.
+    public static let minimumEach = 5
+    /// Endless plans at most this many rounds.
+    public static let endlessRounds = 50
 
-    public var limit: Int? {
+    /// Questions for each player; nil for Endless.
+    public var perPlayer: Int? {
         if case .questions(let n) = self { return n }
         return nil
     }
 
     public var displayName: String {
         switch self {
-        case .questions(let n): "\(n) questions"
+        case .questions(let n): "\(n) questions each"
         case .endless: "Endless"
         }
     }
@@ -62,10 +68,22 @@ public struct Turn: Hashable, Sendable {
     }
 }
 
-/// The game state for one session: turn rotation, question selection, scoring and each
-/// player's Leitner boxes (ADR-0016). A value type with no I/O; the app persists `learning`
-/// afterwards.
+/// The game state for one session: the planned turns, scoring and each player's Leitner boxes
+/// (ADR-0016). A value type with no I/O; the app persists `learning` afterwards.
+///
+/// **Every turn is planned before the game starts** (product decision, 2026-11-22), so the
+/// app knows up front how many questions each player gets and can say so ("out of questions
+/// for today") before anyone starts. Turns go round the players in order, and every player gets
+/// the same number: if someone would run short, the last, incomplete round is dropped.
 public struct QuizSession: Sendable {
+    /// One planned turn.
+    public struct PlannedTurn: Sendable, Hashable {
+        public let player: Player
+        public let question: Question
+        public let kind: TurnKind
+        public let cost: FreshBudget.Source
+    }
+
     public let config: SessionConfig
     public private(set) var currentTurn: Turn?
     public private(set) var turnsPlayed = 0
@@ -81,87 +99,108 @@ public struct QuizSession: Sendable {
     /// nil means unanswered (e.g. skipped before the answer), which leaves the boxes alone.
     public private(set) var currentResult: ReviewResult?
 
+    /// Every turn of the game, in order.
+    public let plan: [PlannedTurn]
+    /// Questions each player asked for, and how many each will actually get.
+    public let requestedEach: Int
+    public let plannedEach: Int
+    /// What's left of the budget after planning (for replacing a skipped question).
+    public private(set) var budget: FreshBudget
+    /// What each question asked so far cost, by question id (the app charges these afterwards).
+    public private(set) var asked: [String: FreshBudget.Source] = [:]
+
     private var selector: QuestionSelector
-    /// Each player's own turn plan (`ReviewMix`), so everyone gets their share of new questions.
-    private var plans: [String: [TurnKind]] = [:]
     private var turnsTaken: [String: Int] = [:]
     private var rng: AnyRandomGenerator
-    private var nextPlayerIndex = 0
-    /// The last question each player was asked, so a repeat is never the same one twice running.
-    private var lastQuestion: [String: String] = [:]
-    /// The current turn is a repeat (same-day or same-session): it scores, but a right answer
-    /// doesn't move the Leitner box up again today.
-    private var currentIsRepeat = false
+    private var nextIndex = 0
     private var recordedCurrent = false
 
     public init(
         bank: QuestionBank, config: SessionConfig,
         learning: [String: LearningRecord] = [:], day: Int = LearningDay.number(),
-        rng: AnyRandomGenerator = .system()
+        budget: FreshBudget = .unlimited, rng: AnyRandomGenerator = .system()
     ) {
         self.config = config
-        self.selector = QuestionSelector(bank: bank, topics: config.topics, includeTalkAbout: config.includeTalkAbout)
         self.scores = ScoreKeeper(rules: config.rules)
         self.learning = learning
         self.day = day
+        var rng = rng
+        var selector = QuestionSelector(bank: bank, topics: config.topics, includeTalkAbout: config.includeTalkAbout)
+        var budget = budget
+        // Anything the family has already had is theirs: never charged again.
+        for record in learning.values { budget.unlocked.formUnion(record.cards.keys) }
+
+        let requested = config.length.perPlayer ?? SessionLength.endlessRounds
+        var kinds: [String: [TurnKind]] = [:]
+        for player in config.players { kinds[player.id] = ReviewMix.plan(turns: requested, using: &rng) }
+
+        var plan: [PlannedTurn] = []
+        rounds: for round in 0..<requested {
+            let before = (selector, budget)
+            var turns: [PlannedTurn] = []
+            for player in config.players {
+                guard let pick = selector.next(for: player, kind: kinds[player.id]![round], family: learning,
+                                               day: day, budget: &budget, using: &rng) else {
+                    // Someone has nothing left: drop this round so everyone stays equal.
+                    (selector, budget) = before
+                    break rounds
+                }
+                turns.append(PlannedTurn(player: player, question: pick.question, kind: pick.kind, cost: pick.cost))
+            }
+            plan += turns
+        }
         self.rng = rng
+        self.selector = selector
+        self.budget = budget
+        self.plan = plan
+        self.requestedEach = requested
+        self.plannedEach = plan.count / max(1, config.players.count)
     }
 
-    /// Moves to the next turn. Returns nil (and finishes) when the length is reached
-    /// or no player has questions left. An unrecorded current turn counts as skipped.
+    /// Moves to the next planned turn. Returns nil (and finishes) when the plan is done.
+    /// An unrecorded current turn counts as skipped.
     ///
     /// `samePlayer`: the current question was skipped before it was answered, so it's still
-    /// the same player's turn. They get another question with the same number, and the skipped
-    /// one doesn't use up a turn. If they have no questions left, play moves on as usual.
+    /// the same player's turn: they get another question with the same number, if there is one
+    /// to spare. If not, play carries on with the plan.
     @discardableResult
     public mutating func advance(samePlayer: Bool = false) -> Turn? {
         guard !isFinished else { return nil }
         let replaced = samePlayer ? currentTurn : nil
         if currentTurn != nil, !recordedCurrent { record(.skipped) }
         commitCurrent()
-        if let replaced, let index = config.players.firstIndex(where: { $0.id == replaced.player.id }) {
-            turnsPlayed -= 1
-            turnsTaken[replaced.player.id, default: 1] -= 1
-            nextPlayerIndex = index
+        if let replaced,
+           let pick = selector.next(for: replaced.player, kind: .new, family: learning, day: day,
+                                    budget: &budget, using: &rng) {
+            return begin(PlannedTurn(player: replaced.player, question: pick.question, kind: pick.kind, cost: pick.cost),
+                         number: replaced.number)
         }
-        if let limit = questionLimit, turnsPlayed >= limit { return finish() }
+        guard nextIndex < plan.count else { return finish() }
+        let planned = plan[nextIndex]
+        nextIndex += 1
+        turnsTaken[planned.player.id, default: 0] += 1
+        return begin(planned, number: nextIndex)
+    }
 
-        // Rotate through players, skipping anyone whose pool is empty.
-        for offset in 0..<config.players.count {
-            let index = (nextPlayerIndex + offset) % config.players.count
-            let player = config.players[index]
-            let taken = turnsTaken[player.id] ?? 0
-            while (plans[player.id]?.count ?? 0) <= taken {
-                plans[player.id, default: []] += ReviewMix.plan(turns: turnsPerPlayer, using: &rng)
-            }
-            // Fresh or due questions first. With several players, someone with none left gets a
-            // repeat (or the nearest age's questions), so everyone has the same number of turns.
-            // A solo game just ends when fresh questions run out.
-            var isRepeat = false
-            let choice = selector.next(
-                for: player, kind: plans[player.id]![taken], family: learning, day: day, using: &rng)
-                ?? {
-                    guard config.players.count > 1 else { return nil }
-                    isRepeat = true
-                    return selector.repeatQuestion(for: player, avoiding: lastQuestion[player.id], using: &rng)
-                }()
-            guard let (question, kind) = choice else { continue } // the topics have nothing at all for them
-            // Endless: repeats only finish the current round; a new round needs fresh questions.
-            if isRepeat, questionLimit == nil, turnsPlayed % config.players.count == 0 { return finish() }
-            lastQuestion[player.id] = question.id
-            currentIsRepeat = isRepeat
-            turnsTaken[player.id] = taken + 1
-            nextPlayerIndex = (index + 1) % config.players.count
-            turnsPlayed += 1
-            if question.type == .talkAbout { learning[player.id, default: LearningRecord()].noteTalkedAbout(question.id) }
-            let presented = PresentedQuestion(question: question, shuffleOptions: config.shuffleOptions, using: &rng)
-            let turn = Turn(number: turnsPlayed, player: player, presented: presented, kind: kind)
-            currentTurn = turn
-            currentResult = nil
-            recordedCurrent = false
-            return turn
+    private mutating func begin(_ planned: PlannedTurn, number: Int) -> Turn {
+        let question = planned.question
+        turnsPlayed = number
+        asked[question.id] = asked[question.id] ?? planned.cost
+        if question.type == .talkAbout {
+            learning[planned.player.id, default: LearningRecord()].noteTalkedAbout(question.id)
         }
-        return finish()
+        let presented = PresentedQuestion(question: question, shuffleOptions: config.shuffleOptions, using: &rng)
+        let turn = Turn(number: number, player: planned.player, presented: presented, kind: planned.kind)
+        currentTurn = turn
+        currentResult = nil
+        recordedCurrent = false
+        return turn
+    }
+
+    /// How many asked questions were paid from each source (the app charges `.shared` to packs
+    /// or the subscription's daily allowance).
+    public var charges: [FreshBudget.Source: Int] {
+        asked.values.reduce(into: [:]) { $0[$1, default: 0] += 1 }
     }
 
     /// Records the outcome of the current turn. Talk About prompts are always `notScored`.
@@ -179,12 +218,6 @@ public struct QuizSession: Sendable {
         return scores.record(effective, playerID: turn.player.id, topic: turn.presented.question.topic)
     }
 
-    /// Turns each player is expected to get, for planning their review share.
-    private var turnsPerPlayer: Int {
-        let total = questionLimit ?? ReviewMix.endlessBlock * config.players.count
-        return max(1, (total + config.players.count - 1) / config.players.count)
-    }
-
     /// Sets how the current turn went for its player's Leitner boxes, e.g. a parent tapping
     /// "Got it" / "Not yet". Can be changed until the turn ends. Ignored for Talk About.
     public mutating func mark(_ result: ReviewResult?) {
@@ -195,14 +228,8 @@ public struct QuizSession: Sendable {
     /// Ends the session early (e.g. "stop").
     public mutating func stop() { _ = finish() }
 
-    /// Questions in this game, rounded to a multiple of the players so everyone gets the same
-    /// number: 10 questions with 3 players is 3 each (9). nil = Endless.
-    public var questionLimit: Int? {
-        guard let limit = config.length.limit else { return nil }
-        let players = max(1, config.players.count)
-        let each = max(1, Int((Double(limit) / Double(players)).rounded()))
-        return each * players
-    }
+    /// Questions in this game (everyone gets `plannedEach`). nil for Endless.
+    public var questionLimit: Int? { config.length.perPlayer == nil ? nil : plan.count }
 
     /// Questions this player has been asked so far (skipped ones don't count).
     public func turns(for playerID: String) -> Int { turnsTaken[playerID] ?? 0 }
@@ -231,11 +258,6 @@ public struct QuizSession: Sendable {
     private mutating func commitCurrent() {
         guard let turn = currentTurn, turn.presented.question.type.isScored, let result = currentResult else { return }
         let question = turn.presented.question
-        // A repeat answered right doesn't move a box up twice in a day. Wrong still starts over.
-        if currentIsRepeat, result != .incorrect {
-            currentResult = nil
-            return
-        }
         learning[turn.player.id, default: LearningRecord()].record(result, for: question.id, on: day)
         if result != .incorrect {
             for other in config.players where other.id != turn.player.id && QuestionSelector.suits(question, other) {

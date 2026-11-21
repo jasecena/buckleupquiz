@@ -14,6 +14,7 @@ struct QuizView: View {
     /// Score correction after the game: whose score is being edited, and the new value.
     @State private var editingPlayer: String?
     @State private var draftPoints = 0
+    @State private var showPlans = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -245,10 +246,14 @@ struct QuizView: View {
                     } else {
                         Text("\(entry.points)").font(Theme.title).monospacedDigit()
                         Button {
-                            editingPlayer = entry.player.id
-                            draftPoints = entry.points
+                            if model.canFixScores {
+                                editingPlayer = entry.player.id
+                                draftPoints = entry.points
+                            } else {
+                                showPlans = true
+                            }
                         } label: {
-                            Image(systemName: "pencil.circle.fill").font(.title)
+                            Image(systemName: model.canFixScores ? "pencil.circle.fill" : "lock.circle.fill").font(.title)
                         }
                         .accessibilityLabel("Edit \(entry.player.name)'s score")
                         .disabled(editingPlayer != nil)
@@ -264,9 +269,13 @@ struct QuizView: View {
                     .font(Theme.headline)
                     .foregroundStyle(Theme.accent)
             }
-            Label("Missed an answer? Tap the pencil to fix a score.", systemImage: "pencil")
+            Label(model.canFixScores ? "Missed an answer? Tap the pencil to fix a score."
+                  : "Fixing scores comes with BuckleUp Basic.", systemImage: "pencil")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
+        }
+        .sheet(isPresented: $showPlans) {
+            GetMoreQuestionsSheet(reason: "Fixing scores after a game is part of BuckleUp Basic.")
         }
         .animation(.spring, value: model.scoreboard.map(\.points))
     }

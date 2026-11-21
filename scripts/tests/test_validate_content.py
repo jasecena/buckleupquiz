@@ -45,6 +45,14 @@ class ValidateContentTests(unittest.TestCase):
     def test_valid_question_passes(self):
         self.assertEqual(self.run_with([question()]).errors, [])
 
+    def test_options_must_stand_on_their_own(self):
+        vague = question(id="man-0001", topic="manners", question="A new kid is alone. What could you do?",
+                         options=["Invite them to join you", "Wait for someone else to do it", "Walk away"],
+                         answer="Invite them to join you", acceptedAnswers=[], explanation="Including helps.")
+        self.assertError(self.run_with([vague]), "doesn't stand on its own")
+        clear = dict(vague, options=["Invite them to join you", "Wait for someone else to invite them", "Walk away"])
+        self.assertNotIn(True, ["stand on its own" in e for e in self.run_with([clear]).errors])
+
     def test_duplicate_ids(self):
         self.assertError(self.run_with([question(), question()]), "duplicate id")
 

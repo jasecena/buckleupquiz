@@ -13,15 +13,19 @@ struct BuckleUpQuizApp: App {
                 .environment(environment.entitlements)
                 .environment(environment.players)
                 .environment(environment.telemetry)
+                .environment(environment.allowance)
+                .environment(environment.store)
                 .task {
                     await environment.entitlements.detectTestBuild()
                     await environment.loadContent()
+                    await environment.store.start()
                     await environment.telemetry.flush()
                 }
         }
         .onChange(of: scenePhase) { _, phase in
             // Queued error reports go out when the app is put away (ADR-0020).
             if phase == .background { Task { await environment.telemetry.flush() } }
+            if phase == .active { environment.refreshAllowance() }
         }
     }
 }

@@ -46,8 +46,8 @@ struct GameSetupView: View {
                                     .buttonStyle(.plain)
                             }
                         }
-                        if !entitlements.hasFamilyPass, playerStore.players.count > EntitlementStore.freePlayersPerGame {
-                            Label("Up to \(EntitlementStore.freePlayersPerGame) players per game for free. The Family Pass lets up to \(PlayerStore.maxPlayers) play together.",
+                        if !entitlements.hasBasic, playerStore.players.count > EntitlementStore.freePlayersPerGame {
+                            Label("Up to \(EntitlementStore.freePlayersPerGame) players per game for free. BuckleUp Basic lets up to \(PlayerStore.maxPlayers) play together.",
                                   systemImage: "person.3.fill")
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
@@ -57,7 +57,7 @@ struct GameSetupView: View {
                     section("How many questions?") {
                         ForEach(SessionLength.presets, id: \.self) { length in
                             let available = entitlements.isAvailable(length)
-                            choice(length.displayName, detail: available ? nil : "Family Pass",
+                            choice(length.displayName, detail: available ? nil : "BuckleUp Basic",
                                    selected: store.settings.lastSessionLength == length) {
                                 store.settings.lastSessionLength = length
                             }
@@ -88,10 +88,10 @@ struct GameSetupView: View {
                         .disabled(playerStore.players.isEmpty)
                 }
             }
-            .alert("Family Pass", isPresented: $showPlayerLimit) {
+            .alert("BuckleUp Basic", isPresented: $showPlayerLimit) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text("\(EntitlementStore.freePlayersPerGame) players can play together for free. The Family Pass lets up to \(PlayerStore.maxPlayers) players play together. Tap a player to swap them out.")
+                Text("\(EntitlementStore.freePlayersPerGame) players can play together for free. BuckleUp Basic lets up to \(PlayerStore.maxPlayers) players play together. Tap a player to swap them out.")
             }
             .sheet(isPresented: $managePlayers) { PlayersView() }
             .sheet(item: $editing) { target in
@@ -105,7 +105,7 @@ struct GameSetupView: View {
 
     private var selectedCount: Int { playerStore.players.filter(settingsStore.isSelected).count }
 
-    /// Free games have up to 2 players; the Family Pass allows up to 6.
+    /// Free games have up to 2 players; BuckleUp Basic allows up to 6.
     private func choose(_ profile: PlayerProfile) {
         if settingsStore.isSelected(profile) || selectedCount < entitlements.playersPerGame {
             settingsStore.toggle(profile)

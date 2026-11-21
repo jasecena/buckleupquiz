@@ -12,8 +12,6 @@ public struct QuestionSelector: Sendable {
     public let includeTalkAbout: Bool
     /// Question ids asked to anyone this session.
     public private(set) var askedThisSession: Set<String> = []
-    /// Question ids each player was asked this session.
-    private var askedBy: [String: Set<String>] = [:]
 
     public init(bank: QuestionBank, topics: [String], includeTalkAbout: Bool) {
         self.bank = bank
@@ -22,16 +20,34 @@ public struct QuestionSelector: Sendable {
     }
 
     /// Questions in `player`'s band and age not yet asked this session (before the boxes).
+    /// If the topics have nothing at all for the player's band, the nearest band's questions are
+    /// used instead (younger first), so every child can play every topic.
     public func pool(for player: Player) -> [Question] {
-        bank.questions(topics: topics, ageBand: player.ageBand).filter { q in
+        let band = contentBand(for: player)
+        return bank.questions(topics: topics, ageBand: band).filter { q in
             !askedThisSession.contains(q.id)
                 && (includeTalkAbout || q.type != .talkAbout)
-                && Self.suits(q, player)
+                && Self.ageAllows(q, player)
         }
     }
 
+    /// The player's own band, or the nearest one with content in these topics.
+    public func contentBand(for player: Player) -> AgeBand {
+        let order = AgeBand.allCases.sorted { a, b in
+            func rank(_ band: AgeBand) -> (Int, Int) {
+                band == player.ageBand ? (0, 0) : band < player.ageBand ? (1, -band.index) : (2, band.index)
+            }
+            return rank(a) < rank(b)
+        }
+        return order.first { !bank.questions(topics: topics, ageBand: $0).isEmpty } ?? player.ageBand
+    }
+
+    static func ageAllows(_ q: Question, _ player: Player) -> Bool {
+        q.minAge == nil || player.age == nil || player.age! >= q.minAge!
+    }
+
     static func suits(_ q: Question, _ player: Player) -> Bool {
-        q.ageBand == player.ageBand && (q.minAge == nil || player.age == nil || player.age! >= q.minAge!)
+        q.ageBand == player.ageBand && ageAllows(q, player)
     }
 
     /// How many questions `player` could still get today.
@@ -40,11 +56,23 @@ public struct QuestionSelector: Sendable {
         return Set((c.own + c.shared + c.fresh + c.talkAgain).map(\.id)).count
     }
 
+    /// A chosen question, the kind of turn it turned out to be, and what it cost.
+    public struct Pick: Sendable {
+        public let question: Question
+        public let kind: TurnKind
+        public let cost: FreshBudget.Source
+    }
+
+    /// The next question for `player`, paid for from `budget` if it's new to the family.
+    /// nil when nothing fresh, due or affordable is left.
     public mutating func next(
         for player: Player, kind: TurnKind, family: [String: LearningRecord], day: Int,
-        using rng: inout some RandomNumberGenerator
-    ) -> (Question, TurnKind)? {
-        let c = candidates(for: player, family: family, day: day)
+        budget: inout FreshBudget, using rng: inout some RandomNumberGenerator
+    ) -> Pick? {
+        var c = candidates(for: player, family: family, day: day)
+        let affordable = budget
+        c.freshForFamily = c.freshForFamily.filter(affordable.canAfford)
+        c.fresh = c.fresh.filter(affordable.canAfford)
         let order: [(TurnKind, [Question])] = switch kind {
         case .ownReview: [(.ownReview, c.own), (.sharedReview, c.shared), (.new, c.freshForFamily), (.new, c.fresh)]
         case .sharedReview: [(.sharedReview, c.shared), (.ownReview, c.own), (.new, c.freshForFamily), (.new, c.fresh)]
@@ -52,42 +80,10 @@ public struct QuestionSelector: Sendable {
                     (.new, c.talkAgain)]
         }
         guard let (actual, list) = order.first(where: { !$0.1.isEmpty }),
-              let pick = list.randomElement(using: &rng) else { return nil }
+              let pick = list.randomElement(using: &rng),
+              let cost = budget.spend(pick) else { return nil }
         askedThisSession.insert(pick.id)
-        askedBy[player.id, default: []].insert(pick.id)
-        return (pick, actual)
-    }
-
-    /// When `next` has nothing left (everything for this age was played today or this session),
-    /// a repeat keeps everyone's turns equal (product decision, 2026-11-22). It looks in the
-    /// player's own age band first, then younger bands, then older ones, and prefers questions
-    /// this player hasn't heard this session, never the one they were just asked. nil only when
-    /// the topics have nothing at all for this player.
-    public mutating func repeatQuestion(
-        for player: Player, avoiding recent: String?, using rng: inout some RandomNumberGenerator
-    ) -> (Question, TurnKind)? {
-        let bands = AgeBand.allCases.sorted { a, b in
-            func order(_ band: AgeBand) -> (Int, Int) {
-                // Own band, then younger (closest first), then older (closest first).
-                band == player.ageBand ? (0, 0) : band < player.ageBand ? (1, -band.index) : (2, band.index)
-            }
-            return order(a) < order(b)
-        }
-        let heard = askedBy[player.id] ?? []
-        for band in bands {
-            let all = bank.questions(topics: topics, ageBand: band).filter { q in
-                (includeTalkAbout || q.type != .talkAbout)
-                    && (q.minAge == nil || player.age == nil || player.age! >= q.minAge!)
-                    && q.id != recent
-            }
-            let unheard = all.filter { !heard.contains($0.id) }
-            guard let pick = (unheard.isEmpty ? all : unheard).randomElement(using: &rng) else { continue }
-            let kind: TurnKind = heard.contains(pick.id) ? .ownReview : .new
-            askedThisSession.insert(pick.id)
-            askedBy[player.id, default: []].insert(pick.id)
-            return (pick, kind)
-        }
-        return nil
+        return Pick(question: pick, kind: actual, cost: cost)
     }
 
     struct Candidates {

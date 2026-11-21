@@ -82,6 +82,6 @@ struct PlayerStoreTests {
 
     @Test @MainActor func freeGamesHaveTwoPlayersAndTheFamilyPassSix() {
         #expect(EntitlementStore().playersPerGame == 2)
-        #expect(EntitlementStore(hasFamilyPass: true).playersPerGame == 6)
+        #expect(EntitlementStore(hasBasic: true).playersPerGame == 6)
     }
 }

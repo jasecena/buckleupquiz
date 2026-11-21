@@ -14,7 +14,7 @@ accepted: to change a decision, add a new ADR that supersedes the old one.
 | [0007](0007-answer-matching.md) | Answer-matching rules | Accepted (open-answer parts amended by 0015) |
 | [0008](0008-audio-architecture.md) | Audio: one session mode per session, half-duplex, cue engine | Accepted |
 | [0009](0009-persistence.md) | SwiftData for players and stats, UserDefaults for settings | Accepted |
-| [0010](0010-storekit2-purchases.md) | StoreKit 2 with on-device verification, lifetime pass first | Accepted |
+| [0010](0010-storekit2-purchases.md) | StoreKit 2 with on-device verification, lifetime pass first | Superseded by 0022 |
 | [0011](0011-mvvm-observable-services.md) | MVVM with `@Observable` models and protocol-based services | Accepted |
 | [0012](0012-future-backend.md) | Future backend: Apple-native services first, AWS serverless as fallback | Proposed |
 | [0013](0013-ci-cd-github-actions.md) | CI/CD on GitHub Actions: Linux for logic, macOS for the app | Accepted |
@@ -28,3 +28,4 @@ accepted: to change a decision, add a new ADR that supersedes the old one.
 | [0021](0021-aws-infrastructure-terraform.md) | AWS infrastructure with Terraform: domain, content CDN and error reports | Accepted |
 
 New ADR: copy [template.md](template.md) to the next number.
+| [0022](0022-free-allowance-packs-and-basic-subscription.md) | Free allowance, question packs and the BuckleUp Basic subscription | Accepted |

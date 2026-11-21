@@ -20,6 +20,11 @@ public struct QuestionBank: Sendable {
         byTopicAndBand[Key(topic: topic, band: ageBand)] ?? []
     }
 
+    /// Every question in a topic, all age bands.
+    public func questions(topic: String) -> [Question] {
+        AgeBand.allCases.flatMap { questions(topic: topic, ageBand: $0) }
+    }
+
     public func questions(topics: some Sequence<String>, ageBand: AgeBand) -> [Question] {
         topics.flatMap { questions(topic: $0, ageBand: ageBand) }
     }

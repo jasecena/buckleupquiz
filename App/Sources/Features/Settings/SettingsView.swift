@@ -7,6 +7,8 @@ struct SettingsView: View {
     @Environment(SettingsStore.self) private var store
     @Environment(Telemetry.self) private var telemetry
     @Environment(EntitlementStore.self) private var entitlements
+    @Environment(AllowanceStore.self) private var allowance
+    @State private var showPlans = false
     @Environment(\.dismiss) private var dismiss
     private let voices = SystemSpeechOutput.availableVoices()
 
@@ -98,13 +100,31 @@ struct SettingsView: View {
                     Text("BuckleUp Quiz plays through your car's Bluetooth or CarPlay audio. With background play on, it keeps going when the screen is locked or you switch apps; off, the game pauses until you come back.")
                 }
 
+                Section {
+                    LabeledContent("Plan", value: entitlements.hasBasic ? "BuckleUp Basic" : "Free")
+                    if entitlements.hasBasic {
+                        LabeledContent("New questions left today",
+                                       value: "\(allowance.basicLeft(on: LearningDay.number()))")
+                    }
+                    if allowance.state.packCredits > 0 {
+                        LabeledContent("Bought questions left", value: "\(allowance.state.packCredits)")
+                    }
+                    Button("Get more questions") { showPlans = true }
+                } header: {
+                    Text("Plan")
+                } footer: {
+                    Text(entitlements.hasBasic
+                         ? "\(AllowanceStore.basicDaily) new questions every day, in every topic. Questions you've had come back as reviews for free."
+                         : "Free: \(AllowanceStore.starterPerTopic) questions in each free topic plus \(AllowanceStore.dailyTopUp) more each day you play, and \(AllowanceStore.starterValues) in Manners & Friendship. Questions you've had come back as reviews for free.")
+                }
+
                 if entitlements.isTestBuild {
                     Section {
-                        Toggle("Family Pass (testing)", isOn: $entitlements.testerUnlock)
+                        Toggle("BuckleUp Basic (testing)", isOn: $entitlements.testerUnlock)
                     } header: {
                         Text("Testing")
                     } footer: {
-                        Text("TestFlight only, until purchases are added. Unlocks every topic, Endless mode and games with up to \(PlayerStore.maxPlayers) players.")
+                        Text("TestFlight only, until purchases are added. Unlocks every topic, 40 new questions a day, Endless mode, fixing scores and games with up to \(PlayerStore.maxPlayers) players.")
                     }
                 }
 
@@ -118,6 +138,7 @@ struct SettingsView: View {
                     Text("No ads, no tracking and no accounts. Error reports help us fix problems like a microphone that won't start. They hold the app version, iPhone model and what went wrong. Never names, ages, answers, recordings or anything that identifies you.")
                 }
             }
+            .sheet(isPresented: $showPlans) { GetMoreQuestionsSheet() }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -10,11 +10,26 @@ struct HomeView: View {
     @Environment(EntitlementStore.self) private var entitlements
     @Environment(PlayerStore.self) private var playerStore
     @Environment(SettingsStore.self) private var settingsStore
-    @State private var lockedTopic: Topic?
     @State private var showSettings = false
     @State private var setup: SetupRequest?
     @State private var activeSession: ListenSessionModel?
     @State private var notice: String?
+    /// Fewer questions left today than the game asked for (ADR-0022).
+    @State private var shortGame: ShortGame?
+    @State private var getMore: GetMore?
+
+    private struct ShortGame: Identifiable {
+        let id = UUID()
+        let topic: Topic
+        let each: Int
+        /// 0–2 each: the game can't start today.
+        var blocked: Bool { each <= 2 }
+    }
+
+    private struct GetMore: Identifiable {
+        let id = UUID()
+        let reason: String?
+    }
     /// Set when setup's "Let's go!" is tapped; the game starts once the sheet has closed.
     @State private var startAfterSetup: Topic??
 
@@ -45,7 +60,11 @@ struct HomeView: View {
                     ForEach(topics) { topic in
                         let unlocked = entitlements.isUnlocked(topic)
                         Button {
-                            if unlocked { play(topic) } else { lockedTopic = topic }
+                            if unlocked {
+                                play(topic)
+                            } else {
+                                getMore = GetMore(reason: "\(topic.name) is part of BuckleUp Basic.")
+                            }
                         } label: {
                             TopicTile(topic: topic, questionCount: bank.questionCount(topic: topic.id),
                                       isLocked: !unlocked)
@@ -67,7 +86,7 @@ struct HomeView: View {
             }
         }
         .onAppear(perform: normaliseSelection)
-        .onChange(of: entitlements.hasFamilyPass) { normaliseSelection() }
+        .onChange(of: entitlements.hasBasic) { normaliseSelection() }
         .sheet(isPresented: $showSettings) { SettingsView() }
         .sheet(item: $setup, onDismiss: {
             if let topic = startAfterSetup {
@@ -79,9 +98,25 @@ struct HomeView: View {
                 startAfterSetup = request.startTopic
             }
         }
-        .sheet(item: $lockedTopic) { topic in
-            FamilyPassTeaser(topic: topic)
-                .presentationDetents([.medium])
+        .sheet(item: $getMore) { request in
+            GetMoreQuestionsSheet(reason: request.reason)
+        }
+        .alert(shortGame?.blocked == true ? "You're out of questions for today" : "Almost out of questions for today",
+               isPresented: Binding(get: { shortGame != nil }, set: { if !$0 { shortGame = nil } }),
+               presenting: shortGame) { short in
+            if short.blocked {
+                Button("OK", role: .cancel) {}
+            } else {
+                Button("Play \(short.each) each") { start(short.topic) }
+                Button("Not now", role: .cancel) {}
+            }
+            Button("Get more questions") {
+                getMore = GetMore(reason: short.blocked ? "You're out of \(short.topic.name) questions for today." : nil)
+            }
+        } message: { short in
+            Text(short.blocked
+                 ? "New \(short.topic.name) questions come back tomorrow. Or get more now."
+                 : "There are \(short.each) new \(short.topic.name) questions each left for today.")
         }
         .fullScreenCover(item: $activeSession) { model in
             QuizView(model: model)
@@ -132,45 +167,45 @@ struct HomeView: View {
     // MARK: Starting a game
 
     /// Starts straight away when players are already chosen; otherwise asks once first.
+    /// Every game is planned before it starts (ADR-0022): if there aren't enough new questions
+    /// left today, the family is told before anyone starts.
     private func play(_ topic: Topic?) {
         guard !selected.isEmpty else {
             setup = SetupRequest(startTopic: .some(topic))
             return
         }
-        let family = playerStore.learning(for: playerStore.players)
-        let day = LearningDay.number()
-        func playable(_ topic: Topic) -> [PlayerProfile] {
-            let selector = QuestionSelector(bank: bank, topics: [topic.id],
-                                            includeTalkAbout: settingsStore.settings.includeTalkAbout)
-            return selected.filter { selector.availableCount(for: $0.quizPlayer, family: family, day: day) > 0 }
+        let length = settingsStore.settings.lastSessionLength
+        func plan(_ topic: Topic) -> (planned: Int, requested: Int) {
+            environment.plannedEach(topics: [topic.id], profiles: selected, length: length) ?? (0, 0)
         }
-
         let chosen: Topic
         if let topic {
             chosen = topic
         } else {
-            // A random topic where everyone has something to play, else where anyone does.
-            let open = topics.filter(entitlements.isUnlocked)
-            let forAll = open.filter { playable($0).count == selected.count }
-            guard let pick = (forAll.isEmpty ? open.filter { !playable($0).isEmpty } : forAll).randomElement() else {
-                notice = "That's everything for today. Come back tomorrow for more!"
-                return
-            }
-            chosen = pick
+            // A random topic with a full game today, else the one with the most left.
+            let planned = topics.filter(entitlements.isUnlocked).map { ($0, plan($0)) }
+            let full = planned.filter { $0.1.planned >= min($0.1.requested, SessionLength.minimumEach) }
+            guard let pick = full.randomElement() ?? planned.max(by: { $0.1.planned < $1.1.planned }) else { return }
+            chosen = pick.0
         }
-        let players = playable(chosen)
-        guard !players.isEmpty else {
-            notice = "No more \(chosen.name) questions today for \(ListFormatter.localizedString(byJoining: selected.map(\.name))). Try another topic!"
-            return
+        let (each, requested) = plan(chosen)
+        if each < requested, each < SessionLength.minimumEach {
+            shortGame = ShortGame(topic: chosen, each: each)
+        } else {
+            start(chosen)
         }
+    }
+
+    private func start(_ topic: Topic) {
         let length = settingsStore.settings.lastSessionLength
+        let players = selected
         Task {
             // Voice answers ask for the microphone once, the first time they're used (ADR-0018).
             if settingsStore.settings.answerMode == .voice, !SystemSpeechListener.hasPermission,
                !(await SystemSpeechListener.requestPermission()) {
                 settingsStore.settings.answerMode = .listen
             }
-            activeSession = environment.makeListenSession(topics: [chosen.id], profiles: players, length: length)
+            activeSession = environment.makeListenSession(topics: [topic.id], profiles: players, length: length)
         }
     }
 
@@ -185,33 +220,11 @@ struct HomeView: View {
             let keep = Set(selected.prefix(entitlements.playersPerGame))
             settingsStore.settings.selectedPlayerIDs.removeAll { !keep.contains($0) }
         }
-        if !entitlements.isAvailable(settingsStore.settings.lastSessionLength) {
-            settingsStore.settings.lastSessionLength = .questions(10)
+        // Lengths are questions each now (ADR-0022): anything else goes back to 5 each.
+        let length = settingsStore.settings.lastSessionLength
+        if !entitlements.isAvailable(length) || !SessionLength.presets.contains(length) {
+            settingsStore.settings.lastSessionLength = .questions(5)
         }
-    }
-}
-
-/// Placeholder until the StoreKit paywall lands in M6.
-private struct FamilyPassTeaser: View {
-    let topic: Topic
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "lock.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(Theme.accent)
-            Text("\(topic.name) is part of the Family Pass")
-                .font(Theme.title)
-                .multilineTextAlignment(.center)
-            Text("The Family Pass unlocks every topic, Endless mode, players and voice answers.")
-                .font(Theme.body)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-            Button("OK") { dismiss() }
-                .buttonStyle(BigButtonStyle())
-        }
-        .padding(32)
     }
 }
 
@@ -226,5 +239,7 @@ private struct FamilyPassTeaser: View {
     .environment(environment.players)
     .environment(environment.settings)
     .environment(environment.telemetry)
+    .environment(environment.allowance)
+    .environment(environment.store)
 }
 #endif

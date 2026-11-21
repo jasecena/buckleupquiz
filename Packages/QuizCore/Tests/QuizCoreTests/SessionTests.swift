@@ -55,7 +55,7 @@ struct SessionTests {
     @Test func skippingKeepsTheTurnWithTheSamePlayer() {
         let mia = Player(id: "mia", name: "Mia", age: 7)
         let leo = Player(id: "leo", name: "Leo", age: 7)
-        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(2))
+        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(1))
         var session = QuizSession(bank: sampleBank(), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
         let first = session.advance()
         let replacement = session.advance(samePlayer: true)
@@ -67,33 +67,38 @@ struct SessionTests {
         #expect(session.learning["mia"]?.card(first!.presented.question.id) == nil, "skipping leaves the boxes alone")
     }
 
-    @Test func everyoneGetsTheSameNumberOfQuestions() {
+    @Test func lengthIsQuestionsEachAndPlannedUpFront() {
         let players = ["a", "b", "c"].map { Player(id: $0, name: $0.uppercased(), age: 7) }
-        let config = SessionConfig(topics: ["geography"], players: players, length: .questions(10))
+        let config = SessionConfig(topics: ["geography"], players: players, length: .questions(3))
         var session = QuizSession(bank: sampleBank(perBand: 10), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
-        #expect(session.questionLimit == 9, "10 with 3 players is 3 each")
+        #expect(session.plannedEach == 3 && session.questionLimit == 9, "known before the game starts")
+        #expect(session.plan.map(\.player.id) == ["a", "b", "c", "a", "b", "c", "a", "b", "c"])
         while session.advance() != nil {}
         #expect(players.map { session.turns(for: $0.id) } == [3, 3, 3])
-        #expect(QuizSession(bank: sampleBank(), config: SessionConfig(topics: ["geography"], players: players,
-                                                                       length: .questions(20)),
-                            day: 10).questionLimit == 21)
     }
 
-    @Test func runningOutUsesRepeatsSoEveryoneGetsTheSameNumber() {
+    @Test func aShortRoundIsDroppedSoEveryoneStaysEqual() {
         let mia = Player(id: "mia", name: "Mia", age: 7)
         let leo = Player(id: "leo", name: "Leo", age: 7)
-        // Only 3 questions for their age, but 10 turns: repeats fill in, no turn twice in a row.
-        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(10))
-        var session = QuizSession(bank: sampleBank(perBand: 3), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
-        var lastFor: [String: String] = [:]
-        while let turn = session.advance() {
-            #expect(lastFor[turn.player.id] != turn.presented.question.id, "never the same question twice running")
-            lastFor[turn.player.id] = turn.presented.question.id
-            session.record(.correct)
-        }
-        #expect(session.turns(for: "mia") == 5 && session.turns(for: "leo") == 5)
-        let boxes = session.learning["mia"]?.cards.values.map(\.box) ?? []
-        #expect(boxes.allSatisfy { $0 <= 2 }, "a repeat doesn't move a box up twice in one day")
+        // 5 questions for their age and nothing twice a day: 2 full rounds, the 3rd can't finish.
+        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(5))
+        let session = QuizSession(bank: sampleBank(perBand: 5), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
+        #expect(session.requestedEach == 5)
+        #expect(session.plannedEach == 2)
+        #expect(session.plan.count == 4)
+    }
+
+    @Test func theFreshBudgetLimitsNewQuestionsButNotReviews() {
+        let mia = Player(id: "mia", name: "Mia", age: 7)
+        var record = LearningRecord()
+        record.record(.incorrect, for: "geography-6-8-0", on: 9) // due again: a free review
+        let config = SessionConfig(topics: ["geography"], players: [mia], length: .questions(10))
+        var session = QuizSession(bank: sampleBank(perBand: 10), config: config, learning: ["mia": record], day: 10,
+                                  budget: FreshBudget(perTopic: ["geography": 2], shared: 1),
+                                  rng: AnyRandomGenerator(seed: 5))
+        #expect(session.plannedEach == 4, "1 review + 2 from the topic + 1 shared")
+        while session.advance() != nil { session.record(.correct) }
+        #expect(session.charges[.topic] == 2 && session.charges[.shared] == 1 && session.charges[.free] == 1)
     }
 
     @Test func aTopicWithNothingForThisAgeUsesTheNearestAge() {
@@ -143,7 +148,7 @@ struct SessionTests {
     @Test func rotatesPlayersWithTheirOwnAgeBand() {
         let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
         let leo = Player(id: "leo", name: "Leo", ageBand: .elevenToTwelve)
-        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(6))
+        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(3))
         var session = QuizSession(bank: sampleBank(perBand: 5), config: config, rng: AnyRandomGenerator(seed: 9))
         var turns: [Turn] = []
         while let t = session.advance() { turns.append(t) }

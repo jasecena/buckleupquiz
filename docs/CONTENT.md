@@ -28,6 +28,12 @@ Questions live in `Content/questions/<topic>.json`, one JSON array per topic. To
 - True/false questions end with "True or false?"
 - Read it aloud yourself. If you stumble, a kid will too.
 
+## Every option stands on its own
+Options are read out by themselves ("The best choice is… B: …"), often in a moving car, so
+each one must make sense without the question. Name the action: "Wait for someone else to
+invite them", not "Wait for someone else to do it". The validator rejects "do it/that/this"
+and "it first/around/again".
+
 ## Values & safety topics (FEATURES §4.3, §4.5, §4.6)
 - Reward the kind choice; never shame. Wrong options are *plausible* kid behaviour, never cruel
   or silly.

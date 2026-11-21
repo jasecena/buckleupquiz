@@ -8,7 +8,7 @@
     "options": [
       "Laugh",
       "Help them up and ask if they're okay",
-      "Keep playing"
+      "Keep playing and ignore them"
     ],
     "answer": "Help them up and ask if they're okay",
     "acceptedAnswers": [],
@@ -39,7 +39,7 @@
     "question": "Someone gives you a present you don't really like. What could you say?",
     "options": [
       "Thank you, that was kind of you",
-      "I don't like it",
+      "I don't like this present",
       "Say nothing"
     ],
     "answer": "Thank you, that was kind of you",
@@ -70,7 +70,7 @@
     "question": "You and another kid both want the window seat. What's a fair thing to do?",
     "options": [
       "Take turns",
-      "Grab it first",
+      "Grab the window seat first",
       "Sulk the whole trip"
     ],
     "answer": "Take turns",
@@ -88,7 +88,7 @@
     "question": "A new kid is standing alone at lunch. What could you do?",
     "options": [
       "Invite them to join you",
-      "Wait for someone else to do it",
+      "Wait for someone else to invite them",
       "Pretend you didn't see them"
     ],
     "answer": "Invite them to join you",
@@ -134,7 +134,7 @@
     "options": [
       "Don't join in, and tell a trusted adult",
       "Add a laughing emoji",
-      "Share it around"
+      "Share the photo around"
     ],
     "answer": "Don't join in, and tell a trusted adult",
     "acceptedAnswers": [],

@@ -114,10 +114,14 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 
 **Exit:** acceptance criterion 8 passes.
 
-## M6 — Paywall & parental gate ⬜
-- [ ] StoreKit 2 Family Pass (lifetime), `.storekit` config, restore, Family Sharing (ADR-0010)
-- [ ] `EntitlementStore` backed by `Transaction.currentEntitlements`
-- [ ] Parental gate before purchases, settings, links and support email
+## M6 — Paywall & parental gate 🟡 ([ADR-0022](adr/0022-free-allowance-packs-and-basic-subscription.md))
+- [x] Free allowance (30 per free topic + 2 a day opened; Manners 10), question packs (50 for A$0.99),
+      BuckleUp Basic (A$4.99/month: all topics, 40 new a day, 6 players, Endless, fix scores)
+- [x] Games planned up front; 0–2 each blocks, 3–4 warns, 5 each minimum; lengths are questions each
+- [x] StoreKit 2 store (products, purchase, restore, Transaction.updates), plans screen, parental gate
+- [ ] Create the products in App Store Connect; Paid Applications agreement (account holder)
+- [ ] Move pack credits to iCloud key-value storage (consumables can't be restored)
+- [ ] Parental gate before settings, links and support email
 - [ ] Locked topics, Endless mode and custom mixes enforced
 - [x] Free games: up to 2 players; Family Pass: up to 6 (Game setup note + alert). TestFlight-only "Family Pass (testing)" switch until purchases land
 

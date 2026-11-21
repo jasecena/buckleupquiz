@@ -16,6 +16,8 @@ struct SessionSummary {
     var learning: [String: LearningRecord]
     /// This session's scores per player id (voice answers only).
     var stats: [String: PlayerStats]
+    /// What each question asked cost (ADR-0022), for charging the family's allowance.
+    var asked: [String: FreshBudget.Source] = [:]
 }
 
 /// A badge someone earned this session.
@@ -100,7 +102,7 @@ final class ListenSessionModel {
 
     /// A grown-up's correction on the final scoreboard ("we missed Mia's answer").
     func setPoints(_ points: Int, for playerID: String) {
-        guard status == .finished else { return }
+        guard status == .finished, canFixScores else { return }
         let before = session.scores.stats(for: playerID).points
         session.setPoints(points, for: playerID)
         let after = session.scores.stats(for: playerID).points
@@ -113,6 +115,9 @@ final class ListenSessionModel {
     private(set) var voiceOffHint: String?
 
     var questionCount: Int? { session.questionLimit }
+    /// Questions each player asked for, and how many each gets (planned before the game).
+    var requestedEach: Int { session.requestedEach }
+    var plannedEach: Int { session.plannedEach }
 
     /// Whether turns are addressed to named players.
     var isTurnBased: Bool { session.config.isTurnBased }
@@ -126,6 +131,8 @@ final class ListenSessionModel {
     private let answerMode: AnswerMode
     /// Settings → Scoreboard: show the scores on screen and read them out at the end.
     let showScoreboard: Bool
+    /// Fixing scores after the game is part of BuckleUp Basic (ADR-0022).
+    let canFixScores: Bool
     private let mic: MicPreference
     private let lifetimeStats: [String: PlayerStats]
     private let deps: Dependencies
@@ -158,10 +165,12 @@ final class ListenSessionModel {
          dependencies: Dependencies, answerMode: AnswerMode = .listen, mic: MicPreference = .automatic,
          learning: [String: LearningRecord] = [:], lifetimeStats: [String: PlayerStats] = [:],
          day: Int = LearningDay.number(), playerColors: [String: String] = [:], showScoreboard: Bool = true,
+         canFixScores: Bool = true, budget: FreshBudget = .unlimited,
          rng: AnyRandomGenerator = .system()) {
         self.showScoreboard = showScoreboard
         self.bank = bank
-        self.session = QuizSession(bank: bank, config: config, learning: learning, day: day, rng: rng)
+        self.session = QuizSession(bank: bank, config: config, learning: learning, day: day, budget: budget, rng: rng)
+        self.canFixScores = canFixScores
         self.playerColors = playerColors
         self.settings = settings
         self.duckOthers = duckOthers
@@ -657,7 +666,7 @@ final class ListenSessionModel {
             closingMessage = Phrases.listenOutro(players: session.config.players)
         }
         // Voice detection can miss answers: say how to fix the scores, so nobody argues.
-        if showsFinalScores, let ending = closingMessage {
+        if showsFinalScores, canFixScores, let ending = closingMessage {
             closingMessage = ending + " " + Phrases.scoreFixNote
         }
         if let closingMessage { try await deps.speech.speak(closingMessage) }
@@ -684,7 +693,7 @@ final class ListenSessionModel {
         isListening = false
         if hasAttempts { scoreboard = session.scoreboard }
         reportSummary()
-        onFinish?(SessionSummary(learning: session.learning, stats: session.scores.stats))
+        onFinish?(SessionSummary(learning: session.learning, stats: session.scores.stats, asked: session.asked))
         onFinish = nil
         turn = nil
         if closingMessage == nil { closingMessage = Phrases.outroPrefix }

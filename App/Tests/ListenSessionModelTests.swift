@@ -70,7 +70,7 @@ struct ListenSessionModelTests {
     @Test func namedPlayersTakeTurnsWithTheirOwnAgeQuestions() async {
         let mia = Player(id: "mia", name: "Mia", age: 7)
         let leo = Player(id: "leo", name: "Leo", age: 11)
-        let config = SessionConfig(topics: ["animals"], players: [mia, leo], length: .questions(4))
+        let config = SessionConfig(topics: ["animals"], players: [mia, leo], length: .questions(2))
         var learned: [String: LearningRecord] = [:]
         let model = ListenSessionModel(
             bank: makeBank(questions: 3, olderCount: 3), config: config, settings: ListenSettings(), duckOthers: true,
@@ -228,7 +228,7 @@ struct ListenSessionModelTests {
         let listener = FakeListener([["skip"], ["answer 1"], []])
         let model = ListenSessionModel(
             bank: makeBank(questions: 3, olderCount: 3), config: SessionConfig(topics: ["animals"], players: [mia, leo],
-                                                                                length: .questions(2)),
+                                                                                length: .questions(1)),
             settings: ListenSettings(), duckOthers: true,
             dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
                                 listener: listener),
@@ -248,7 +248,7 @@ struct ListenSessionModelTests {
         let leo = Player(id: "leo", name: "Leo", age: 11)
         let model = ListenSessionModel(
             bank: makeBank(questions: 3, olderCount: 3), config: SessionConfig(topics: ["animals"], players: [mia, leo],
-                                                                                length: .questions(2)),
+                                                                                length: .questions(1)),
             settings: ListenSettings(), duckOthers: true,
             dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio),
             rng: AnyRandomGenerator(seed: 2))

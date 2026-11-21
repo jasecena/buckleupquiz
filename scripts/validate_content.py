@@ -47,6 +47,10 @@ BANNED_IN_VALUES = ("stupid", "idiot", "dumb", "loser", "stranger danger", "ugly
 ARTICLES = {"the", "a", "an"}
 
 
+# Options that lean on the question ("Wait for someone else to do it": do what?).
+VAGUE_OPTION = re.compile(r"\b(do|does|did|doing) (it|that|this|so)\b|\b(it|that) (first|around|again)\b", re.IGNORECASE)
+
+
 def normalise(text: str) -> str:
     """Rough mirror of TextNormalizer.normalize (without number-word conversion)."""
     text = unicodedata.normalize("NFKD", text)
@@ -185,6 +189,10 @@ def validate_question(q, where: str, topics: dict[str, dict], report: Report) ->
                 report.error(where, "don't put option letters in acceptedAnswers; options are shuffled")
             category = (topics.get(q.get("topic")) or {}).get("category")
             for o in options:
+                # Each option is read out on its own ("The best choice is… B: …"), so it must
+                # make sense without the question: name the action, not "do it".
+                if VAGUE_OPTION.search(o):
+                    report.error(where, f"option '{o}' doesn't stand on its own; say what to do instead of 'do it'")
                 # Values/safety options describe an action, so they may be a short phrase.
                 if category == "knowledge" and word_count(o) > MAX_ANSWER_WORDS:
                     report.warn(where, f"option '{o}' has more than {MAX_ANSWER_WORDS} words; keep options easy to say")
