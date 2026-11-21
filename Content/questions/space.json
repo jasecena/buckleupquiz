@@ -69,6 +69,179 @@
     "region": null
   },
   {
+    "id": "spc-0005",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do we call a person who travels into space?",
+    "options": [
+      "Astronaut",
+      "Pilot",
+      "Scientist"
+    ],
+    "answer": "Astronaut",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0006",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which planet do we live on?",
+    "options": [
+      "Earth",
+      "Mars",
+      "Venus"
+    ],
+    "answer": "Earth",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0007",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "The Sun is a star. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0008",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What shape is the Earth?",
+    "options": [
+      "Sphere",
+      "Cube",
+      "Cylinder"
+    ],
+    "answer": "Sphere",
+    "acceptedAnswers": [
+      "round",
+      "a ball",
+      "ball"
+    ],
+    "funFact": "From space, the Earth looks like a blue marble.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0009",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What twinkles in the night sky?",
+    "options": [
+      "Stars",
+      "Clouds",
+      "Rainbows"
+    ],
+    "answer": "Stars",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0010",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What goes around the Earth about once a month?",
+    "options": [
+      "The Moon",
+      "The Sun",
+      "Mars"
+    ],
+    "answer": "The Moon",
+    "acceptedAnswers": [
+      "moon"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0011",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "There is air to breathe on the Moon. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Astronauts bring their air with them in their spacesuits.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0012",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do we call a group of stars that makes a picture in the sky?",
+    "options": [
+      "Constellation",
+      "Galaxy",
+      "Comet"
+    ],
+    "answer": "Constellation",
+    "acceptedAnswers": [],
+    "funFact": "The Southern Cross is on Australia's flag.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0013",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do astronauts wear to stay safe outside a spaceship?",
+    "options": [
+      "Spacesuit",
+      "Raincoat",
+      "Wetsuit"
+    ],
+    "answer": "Spacesuit",
+    "acceptedAnswers": [
+      "space suit"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0014",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which planet is closest to the Sun?",
+    "options": [
+      "Mercury",
+      "Venus",
+      "Earth"
+    ],
+    "answer": "Mercury",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
     "id": "spc-0101",
     "topic": "space",
     "ageBand": "9-10",
@@ -122,6 +295,183 @@
     "region": null
   },
   {
+    "id": "spc-0104",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which planet has a giant storm called the Great Red Spot?",
+    "options": [
+      "Jupiter",
+      "Mars",
+      "Saturn"
+    ],
+    "answer": "Jupiter",
+    "acceptedAnswers": [],
+    "funFact": "The storm is bigger than the whole Earth.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0105",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is a shooting star really?",
+    "options": [
+      "A meteor",
+      "A planet",
+      "A satellite"
+    ],
+    "answer": "A meteor",
+    "acceptedAnswers": [
+      "meteor",
+      "space rock"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0106",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "A day on Venus is longer than its year. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0107",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which planet is farthest from the Sun?",
+    "options": [
+      "Neptune",
+      "Uranus",
+      "Saturn"
+    ],
+    "answer": "Neptune",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0108",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What force keeps us on the ground?",
+    "options": [
+      "Gravity",
+      "Magnetism",
+      "Friction"
+    ],
+    "answer": "Gravity",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0109",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which country sent the first person into space?",
+    "options": [
+      "Soviet Union",
+      "United States",
+      "China"
+    ],
+    "answer": "Soviet Union",
+    "acceptedAnswers": [
+      "the soviet union",
+      "russia",
+      "ussr"
+    ],
+    "funFact": "Yuri Gagarin flew into space in 1961.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0110",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "How long does the Earth take to go around the Sun?",
+    "options": [
+      "One year",
+      "One month",
+      "One day"
+    ],
+    "answer": "One year",
+    "acceptedAnswers": [
+      "a year",
+      "365 days"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0111",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Saturn is the only planet with rings. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Jupiter, Uranus and Neptune have faint rings too.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0112",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What covers the Moon's surface?",
+    "options": [
+      "Craters",
+      "Oceans",
+      "Forests"
+    ],
+    "answer": "Craters",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0113",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which group of stars is on Australia's flag?",
+    "options": [
+      "Southern Cross",
+      "Big Dipper",
+      "Orion"
+    ],
+    "answer": "Southern Cross",
+    "acceptedAnswers": [
+      "the southern cross"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
     "id": "spc-0201",
     "topic": "space",
     "ageBand": "11-12",
@@ -170,6 +520,178 @@
     "answer": "True",
     "acceptedAnswers": [],
     "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0204",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What does a light-year measure?",
+    "options": [
+      "Distance",
+      "Time",
+      "Brightness"
+    ],
+    "answer": "Distance",
+    "acceptedAnswers": [],
+    "funFact": "It's how far light travels in one year.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0205",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which planet spins on its side?",
+    "options": [
+      "Uranus",
+      "Neptune",
+      "Venus"
+    ],
+    "answer": "Uranus",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0206",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "The Sun is mostly made of hydrogen. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0207",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What do we call a huge star explosion?",
+    "options": [
+      "Supernova",
+      "Black hole",
+      "Nebula"
+    ],
+    "answer": "Supernova",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0208",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which space telescope launched in 2021 to see the early universe?",
+    "options": [
+      "James Webb",
+      "Hubble",
+      "Kepler"
+    ],
+    "answer": "James Webb",
+    "acceptedAnswers": [
+      "webb",
+      "james webb space telescope"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0209",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the edge of a black hole called, where nothing can escape?",
+    "options": [
+      "Event horizon",
+      "Asteroid belt",
+      "Orbit"
+    ],
+    "answer": "Event horizon",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0210",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "The main asteroid belt is between which two planets?",
+    "options": [
+      "Mars and Jupiter",
+      "Earth and Mars",
+      "Jupiter and Saturn"
+    ],
+    "answer": "Mars and Jupiter",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0211",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "There is no sound in space because there is no air. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0212",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which mission first landed people on the Moon?",
+    "options": [
+      "Apollo 11",
+      "Apollo 13",
+      "Gemini 4"
+    ],
+    "answer": "Apollo 11",
+    "acceptedAnswers": [
+      "apollo eleven"
+    ],
+    "funFact": "It landed in July 1969.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0213",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Pluto is now called what kind of planet?",
+    "options": [
+      "Dwarf planet",
+      "Gas giant",
+      "Ice giant"
+    ],
+    "answer": "Dwarf planet",
+    "acceptedAnswers": [
+      "a dwarf planet",
+      "dwarf"
+    ],
+    "difficulty": 3,
     "minAge": null,
     "region": null
   }

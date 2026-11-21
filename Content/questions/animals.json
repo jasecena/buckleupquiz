@@ -110,6 +110,180 @@
     "region": "AU"
   },
   {
+    "id": "ani-0007",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which animal is the tallest in the world?",
+    "options": [
+      "Giraffe",
+      "Elephant",
+      "Camel"
+    ],
+    "answer": "Giraffe",
+    "acceptedAnswers": [],
+    "funFact": "A giraffe's tongue can be about half a metre long.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0008",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do caterpillars turn into?",
+    "options": [
+      "Butterflies",
+      "Bees",
+      "Spiders"
+    ],
+    "answer": "Butterflies",
+    "acceptedAnswers": [
+      "butterfly"
+    ],
+    "funFact": "Some caterpillars turn into moths instead.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0009",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which animal is called the king of the jungle?",
+    "options": [
+      "Lion",
+      "Tiger",
+      "Bear"
+    ],
+    "answer": "Lion",
+    "acceptedAnswers": [],
+    "funFact": "Lions actually live on grassy plains, not in jungles.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0010",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Penguins can fly. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Penguins use their wings like flippers to swim.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0011",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is a baby dog called?",
+    "options": [
+      "Puppy",
+      "Kitten",
+      "Calf"
+    ],
+    "answer": "Puppy",
+    "acceptedAnswers": [
+      "pup"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0012",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which big Australian bird can't fly?",
+    "options": [
+      "Emu",
+      "Kookaburra",
+      "Cockatoo"
+    ],
+    "answer": "Emu",
+    "acceptedAnswers": [],
+    "funFact": "Emus can run at about fifty kilometres an hour.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0013",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "How many legs does an insect have?",
+    "options": [
+      "4",
+      "6",
+      "8"
+    ],
+    "answer": "6",
+    "acceptedAnswers": [],
+    "funFact": "Ants, bees and beetles all have six legs.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0014",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "A dolphin is a fish. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Dolphins are mammals, so they breathe air.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0015",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do bees make?",
+    "options": [
+      "Honey",
+      "Milk",
+      "Silk"
+    ],
+    "answer": "Honey",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0016",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which animal has black and white stripes?",
+    "options": [
+      "Zebra",
+      "Leopard",
+      "Panda"
+    ],
+    "answer": "Zebra",
+    "acceptedAnswers": [],
+    "funFact": "No two zebras have exactly the same stripes.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
     "id": "ani-0101",
     "topic": "animals",
     "ageBand": "9-10",
@@ -201,6 +375,176 @@
     "region": null
   },
   {
+    "id": "ani-0106",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is a group of fish called?",
+    "options": [
+      "School",
+      "Herd",
+      "Flock"
+    ],
+    "answer": "School",
+    "acceptedAnswers": [
+      "a school"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0107",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which Australian animal can sleep up to twenty hours a day?",
+    "options": [
+      "Koala",
+      "Echidna",
+      "Wallaby"
+    ],
+    "answer": "Koala",
+    "acceptedAnswers": [],
+    "funFact": "Gum leaves give koalas very little energy, so they rest a lot.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0108",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is the fastest land animal?",
+    "options": [
+      "Cheetah",
+      "Lion",
+      "Horse"
+    ],
+    "answer": "Cheetah",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0109",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Snakes have eyelids. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Snakes have a clear scale over each eye instead.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0110",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which of these animals is a marsupial?",
+    "options": [
+      "Wombat",
+      "Platypus",
+      "Dingo"
+    ],
+    "answer": "Wombat",
+    "acceptedAnswers": [],
+    "funFact": "A wombat's pouch faces backwards, so it doesn't fill with dirt.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0111",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What do tadpoles grow into?",
+    "options": [
+      "Frogs",
+      "Fish",
+      "Lizards"
+    ],
+    "answer": "Frogs",
+    "acceptedAnswers": [
+      "frog"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0112",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which sea creature has eight arms?",
+    "options": [
+      "Octopus",
+      "Starfish",
+      "Jellyfish"
+    ],
+    "answer": "Octopus",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0113",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Echidnas are covered in spines. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0114",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which Australian bird is famous for copying sounds?",
+    "options": [
+      "Lyrebird",
+      "Pelican",
+      "Emu"
+    ],
+    "answer": "Lyrebird",
+    "acceptedAnswers": [],
+    "funFact": "Lyrebirds can copy camera clicks and car alarms.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0115",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What do we call an animal that eats plants and meat?",
+    "options": [
+      "Omnivore",
+      "Herbivore",
+      "Carnivore"
+    ],
+    "answer": "Omnivore",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
     "id": "ani-0201",
     "topic": "animals",
     "ageBand": "11-12",
@@ -266,6 +610,177 @@
       "herbivore"
     ],
     "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0205",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which is the largest living bird?",
+    "options": [
+      "Ostrich",
+      "Emu",
+      "Albatross"
+    ],
+    "answer": "Ostrich",
+    "acceptedAnswers": [],
+    "funFact": "The emu is the second tallest.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0206",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is a young swan called?",
+    "options": [
+      "Cygnet",
+      "Gosling",
+      "Duckling"
+    ],
+    "answer": "Cygnet",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0207",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Bats are blind. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "All bats can see, and many also use echolocation.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0208",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which animal is pregnant for the longest, almost two years?",
+    "options": [
+      "Elephant",
+      "Blue whale",
+      "Giraffe"
+    ],
+    "answer": "Elephant",
+    "acceptedAnswers": [
+      "african elephant"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0209",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Lizards and snakes belong to which group of animals?",
+    "options": [
+      "Reptiles",
+      "Amphibians",
+      "Mammals"
+    ],
+    "answer": "Reptiles",
+    "acceptedAnswers": [
+      "reptile"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0210",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is Australia's largest lizard?",
+    "options": [
+      "Perentie",
+      "Frill-neck lizard",
+      "Blue-tongue lizard"
+    ],
+    "answer": "Perentie",
+    "acceptedAnswers": [],
+    "funFact": "Perenties can grow longer than two metres.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0211",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which animal uses echolocation to find food in the dark?",
+    "options": [
+      "Bat",
+      "Owl",
+      "Possum"
+    ],
+    "answer": "Bat",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0212",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "A cassowary has three toes on each foot. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "Its inner toe has a long, sharp claw.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0213",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the world's largest fish?",
+    "options": [
+      "Whale shark",
+      "Great white shark",
+      "Blue whale"
+    ],
+    "answer": "Whale shark",
+    "acceptedAnswers": [],
+    "funFact": "A blue whale is bigger, but it's a mammal, not a fish.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0214",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is a scientist who studies animals called?",
+    "options": [
+      "Zoologist",
+      "Botanist",
+      "Astronomer"
+    ],
+    "answer": "Zoologist",
+    "acceptedAnswers": [],
+    "difficulty": 3,
     "minAge": null,
     "region": null
   }

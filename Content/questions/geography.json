@@ -89,6 +89,175 @@
     "region": "AU"
   },
   {
+    "id": "geo-0006",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is the capital city of New South Wales?",
+    "options": [
+      "Sydney",
+      "Newcastle",
+      "Canberra"
+    ],
+    "answer": "Sydney",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0007",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "How many states does Australia have?",
+    "options": [
+      "4",
+      "6",
+      "8"
+    ],
+    "answer": "6",
+    "acceptedAnswers": [],
+    "funFact": "Australia also has two mainland territories.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0008",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "The Sun rises in the east. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "It sets in the west.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0009",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is the capital city of Victoria?",
+    "options": [
+      "Melbourne",
+      "Geelong",
+      "Ballarat"
+    ],
+    "answer": "Melbourne",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0010",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do we call a big, dry area with very little rain?",
+    "options": [
+      "Desert",
+      "Rainforest",
+      "Swamp"
+    ],
+    "answer": "Desert",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0011",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which ocean is to the west of Australia?",
+    "options": [
+      "Indian",
+      "Pacific",
+      "Arctic"
+    ],
+    "answer": "Indian",
+    "acceptedAnswers": [
+      "indian ocean"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0012",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Tasmania is an island. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0013",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is the capital city of Queensland?",
+    "options": [
+      "Brisbane",
+      "Cairns",
+      "Gold Coast"
+    ],
+    "answer": "Brisbane",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0014",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which country is home to the Eiffel Tower?",
+    "options": [
+      "France",
+      "Italy",
+      "Spain"
+    ],
+    "answer": "France",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0015",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which famous Sydney building has roofs that look like sails?",
+    "options": [
+      "Opera House",
+      "Harbour Bridge",
+      "Town Hall"
+    ],
+    "answer": "Opera House",
+    "acceptedAnswers": [
+      "sydney opera house",
+      "the opera house"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
     "id": "geo-0101",
     "topic": "geography",
     "ageBand": "9-10",
@@ -161,6 +330,176 @@
     "region": null
   },
   {
+    "id": "geo-0105",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is the capital city of South Australia?",
+    "options": [
+      "Adelaide",
+      "Darwin",
+      "Perth"
+    ],
+    "answer": "Adelaide",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0106",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which is the largest continent?",
+    "options": [
+      "Asia",
+      "Africa",
+      "Europe"
+    ],
+    "answer": "Asia",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0107",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is the capital city of the Northern Territory?",
+    "options": [
+      "Darwin",
+      "Alice Springs",
+      "Katherine"
+    ],
+    "answer": "Darwin",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0108",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Australia has more than ten thousand beaches. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "You could visit a new beach every day for about twenty-nine years.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0109",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which country is just north of Australia, across the Torres Strait?",
+    "options": [
+      "Papua New Guinea",
+      "Indonesia",
+      "New Zealand"
+    ],
+    "answer": "Papua New Guinea",
+    "acceptedAnswers": [
+      "png"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0110",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is the capital city of New Zealand?",
+    "options": [
+      "Wellington",
+      "Auckland",
+      "Christchurch"
+    ],
+    "answer": "Wellington",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0111",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which imaginary line passes through Rockhampton in Queensland?",
+    "options": [
+      "Tropic of Capricorn",
+      "Equator",
+      "Tropic of Cancer"
+    ],
+    "answer": "Tropic of Capricorn",
+    "acceptedAnswers": [
+      "capricorn"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0112",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "The Murray River reaches the sea in South Australia. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0113",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In which country are the pyramids of Giza?",
+    "options": [
+      "Egypt",
+      "Mexico",
+      "Peru"
+    ],
+    "answer": "Egypt",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0114",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which Australian state is the largest?",
+    "options": [
+      "Western Australia",
+      "Queensland",
+      "New South Wales"
+    ],
+    "answer": "Western Australia",
+    "acceptedAnswers": [
+      "wa"
+    ],
+    "funFact": "It covers about a third of Australia.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
     "id": "geo-0201",
     "topic": "geography",
     "ageBand": "11-12",
@@ -229,5 +568,176 @@
     "difficulty": 1,
     "minAge": null,
     "region": "AU"
+  },
+  {
+    "id": "geo-0205",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the largest desert in Australia?",
+    "options": [
+      "Great Victoria Desert",
+      "Simpson Desert",
+      "Tanami Desert"
+    ],
+    "answer": "Great Victoria Desert",
+    "acceptedAnswers": [
+      "great victoria"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0206",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the capital city of Canada?",
+    "options": [
+      "Ottawa",
+      "Toronto",
+      "Vancouver"
+    ],
+    "answer": "Ottawa",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0207",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Mount Everest is the tallest mountain above sea level. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0208",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which is the smallest continent?",
+    "options": [
+      "Australia",
+      "Europe",
+      "Antarctica"
+    ],
+    "answer": "Australia",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0209",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which line runs through Greenwich in London?",
+    "options": [
+      "Prime Meridian",
+      "Equator",
+      "Tropic of Cancer"
+    ],
+    "answer": "Prime Meridian",
+    "acceptedAnswers": [
+      "the prime meridian"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0210",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the capital city of Brazil?",
+    "options": [
+      "Brasília",
+      "Rio de Janeiro",
+      "São Paulo"
+    ],
+    "answer": "Brasília",
+    "acceptedAnswers": [
+      "brasilia"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0211",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Kati Thanda–Lake Eyre is Australia's largest lake. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "It's usually dry, and only fills every few years.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0212",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which mountains run down the east of Australia?",
+    "options": [
+      "Great Dividing Range",
+      "Flinders Ranges",
+      "MacDonnell Ranges"
+    ],
+    "answer": "Great Dividing Range",
+    "acceptedAnswers": [
+      "great dividing"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0213",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the capital city of Germany?",
+    "options": [
+      "Berlin",
+      "Munich",
+      "Frankfurt"
+    ],
+    "answer": "Berlin",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0214",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the capital city of Italy?",
+    "options": [
+      "Rome",
+      "Milan",
+      "Venice"
+    ],
+    "answer": "Rome",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
   }
 ]

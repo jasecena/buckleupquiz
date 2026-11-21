@@ -81,6 +81,173 @@
     "region": null
   },
   {
+    "id": "man-0006",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Someone holds the door open for you. What could you say?",
+    "options": [
+      "Say thank you",
+      "Say hurry up",
+      "Say nothing"
+    ],
+    "answer": "Say thank you",
+    "acceptedAnswers": [],
+    "explanation": "A thank you lets people know you noticed their kindness.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0007",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Someone is on the swing you want. What could you do?",
+    "options": [
+      "Ask nicely for the next turn",
+      "Stand there and keep asking",
+      "Tell everyone it's unfair"
+    ],
+    "answer": "Ask nicely for the next turn",
+    "acceptedAnswers": [],
+    "explanation": "Asking nicely and waiting shows you respect other people's turns.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0008",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "It's polite to say please when you ask for something. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "Please shows you're asking, not telling.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0009",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "You bump into someone by accident. What's a kind thing to say?",
+    "options": [
+      "Sorry, are you okay?",
+      "Watch where you're going",
+      "Nothing, just walk off"
+    ],
+    "answer": "Sorry, are you okay?",
+    "acceptedAnswers": [],
+    "explanation": "Saying sorry and checking on them shows you care.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0010",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Your friend is sad because they lost their toy. What could you do?",
+    "options": [
+      "Help them look for the toy",
+      "Tell them it's only a toy",
+      "Keep playing by yourself"
+    ],
+    "answer": "Help them look for the toy",
+    "acceptedAnswers": [],
+    "explanation": "Helping a sad friend can make them feel better.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0011",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Interrupting someone while they're talking is good manners. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "explanation": "Waiting for your turn to talk shows you're listening.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0012",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Grandma made you a drawing. What could you say?",
+    "options": [
+      "Thank you, I love it!",
+      "I can draw better than this",
+      "Put it away without looking"
+    ],
+    "answer": "Thank you, I love it!",
+    "acceptedAnswers": [],
+    "explanation": "A thank you makes people glad they did something kind.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0013",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Your little brother knocks your blocks over by accident. What's a kind thing to do?",
+    "options": [
+      "Stay calm and rebuild together",
+      "Knock over his toys too",
+      "Shout at him"
+    ],
+    "answer": "Stay calm and rebuild together",
+    "acceptedAnswers": [],
+    "explanation": "Accidents happen, and staying calm helps everyone feel okay.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0014",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "At dinner, someone passes you the salad. What do you say?",
+    "options": [
+      "Say thank you",
+      "Say give me more",
+      "Say yuck"
+    ],
+    "answer": "Say thank you",
+    "acceptedAnswers": [],
+    "explanation": "Saying thank you at the table is good manners everywhere.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0015",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "talkAbout",
+    "question": "What's one way you could help at home this week?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
     "id": "man-0101",
     "topic": "manners",
     "ageBand": "9-10",
@@ -126,6 +293,173 @@
     "region": null
   },
   {
+    "id": "man-0104",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "A classmate gets an answer wrong in class. What's kind?",
+    "options": [
+      "Don't laugh",
+      "Laugh with the others",
+      "Call it a silly answer"
+    ],
+    "answer": "Don't laugh",
+    "acceptedAnswers": [],
+    "explanation": "Everyone gets things wrong sometimes, and kindness helps people keep trying.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0105",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Your team loses a game. What does a good sport do?",
+    "options": [
+      "Shake hands and say good game",
+      "Say the other team cheated",
+      "Walk off without a word"
+    ],
+    "answer": "Shake hands and say good game",
+    "acceptedAnswers": [],
+    "explanation": "Good sports make games fun for everyone, win or lose.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0106",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "It's okay to borrow something without asking if you give it back. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "explanation": "Asking first shows respect for other people's things.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0107",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "A friend tells you a secret that's just a bit embarrassing. What should you do?",
+    "options": [
+      "Keep the secret",
+      "Tell the whole class",
+      "Post it online"
+    ],
+    "answer": "Keep the secret",
+    "acceptedAnswers": [],
+    "explanation": "Keeping a friend's secret shows they can trust you. If a secret means someone could get hurt, tell a trusted adult.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0108",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "You're on a video call with family. What's good manners?",
+    "options": [
+      "Look at the screen and listen",
+      "Play a game while they talk",
+      "Leave without saying goodbye"
+    ],
+    "answer": "Look at the screen and listen",
+    "acceptedAnswers": [],
+    "explanation": "Paying attention shows the people you love that they matter.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0109",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Someone new joins your sports team. What could you do?",
+    "options": [
+      "Say hi and show them around",
+      "Ignore them until they're good",
+      "Only pass to your friends"
+    ],
+    "answer": "Say hi and show them around",
+    "acceptedAnswers": [],
+    "explanation": "Being welcomed makes a new place feel less scary.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0110",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Saying excuse me is a polite way to get past someone. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "Excuse me lets people know you'd like to get by, without pushing.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0111",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "You get a present you already have. What could you say?",
+    "options": [
+      "Thank you, that's so kind",
+      "I already have this one",
+      "Can I swap it for something?"
+    ],
+    "answer": "Thank you, that's so kind",
+    "acceptedAnswers": [],
+    "explanation": "Thanking someone for the thought matters more than the present.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0112",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Your friend is telling a long story. What's polite?",
+    "options": [
+      "Listen and ask a question",
+      "Yawn loudly",
+      "Change the subject straight away"
+    ],
+    "answer": "Listen and ask a question",
+    "acceptedAnswers": [],
+    "explanation": "Asking a question shows you're interested in what they say.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0113",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "talkAbout",
+    "question": "When did someone make you feel welcome, and what did they do?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
     "id": "man-0201",
     "topic": "manners",
     "ageBand": "11-12",
@@ -167,6 +501,173 @@
     "answer": null,
     "acceptedAnswers": [],
     "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0204",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "A friend messages you while you're at dinner with family. What's polite?",
+    "options": [
+      "Reply after dinner",
+      "Text under the table",
+      "Leave the table to reply"
+    ],
+    "answer": "Reply after dinner",
+    "acceptedAnswers": [],
+    "explanation": "Giving the people in front of you your attention is a kind habit.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0205",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Someone in your group has a different opinion. What's respectful?",
+    "options": [
+      "Listen and share your view kindly",
+      "Tell them they're wrong",
+      "Roll your eyes"
+    ],
+    "answer": "Listen and share your view kindly",
+    "acceptedAnswers": [],
+    "explanation": "People can disagree and still respect each other.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0206",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "A real apology says what you did wrong. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "Naming what you did shows you understand how it affected them.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0207",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Someone drops money without noticing. What should you do?",
+    "options": [
+      "Give the money back to them",
+      "Keep the money",
+      "Leave the money on the ground"
+    ],
+    "answer": "Give the money back to them",
+    "acceptedAnswers": [],
+    "explanation": "Being honest when nobody is watching builds trust.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0208",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "A younger kid asks for help with their homework. What could you do?",
+    "options": [
+      "Help them work it out",
+      "Just tell them the answers",
+      "Say you're too busy"
+    ],
+    "answer": "Help them work it out",
+    "acceptedAnswers": [],
+    "explanation": "Helping them understand means they can do it themselves next time.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0209",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "You're winning easily against a younger player. What does a good sport do?",
+    "options": [
+      "Play fairly and encourage them",
+      "Show off and celebrate loudly",
+      "Quit because it's too easy"
+    ],
+    "answer": "Play fairly and encourage them",
+    "acceptedAnswers": [],
+    "explanation": "Encouraging others makes games fun for everyone.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0210",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "It's polite to put your phone away when someone is talking to you. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "It shows the person they have your full attention.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0211",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Your friend makes a mistake and feels embarrassed. What could you say?",
+    "options": [
+      "Everyone makes mistakes",
+      "That was so embarrassing",
+      "I'd never make that mistake"
+    ],
+    "answer": "Everyone makes mistakes",
+    "acceptedAnswers": [],
+    "explanation": "Kind words help a friend feel better and try again.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0212",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "You disagree with your group's plan for a project. What's a good way to say so?",
+    "options": [
+      "Share your idea calmly",
+      "Refuse to help",
+      "Complain to everyone else"
+    ],
+    "answer": "Share your idea calmly",
+    "acceptedAnswers": [],
+    "explanation": "Calmly sharing ideas helps the whole group find the best plan.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0213",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "talkAbout",
+    "question": "What does being a good friend online look like?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 3,
     "minAge": null,
     "region": null
   }

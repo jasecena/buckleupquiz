@@ -64,6 +64,168 @@
     "region": null
   },
   {
+    "id": "mat-0005",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is nine plus six?",
+    "options": [
+      "14",
+      "15",
+      "16"
+    ],
+    "answer": "15",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0006",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "How many days are in a week?",
+    "options": [
+      "5",
+      "7",
+      "10"
+    ],
+    "answer": "7",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0007",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which number comes after nineteen?",
+    "options": [
+      "18",
+      "20",
+      "21"
+    ],
+    "answer": "20",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0008",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Seven is an odd number. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0009",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "How many sides does a square have?",
+    "options": [
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": "4",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0010",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is double five?",
+    "options": [
+      "10",
+      "15",
+      "25"
+    ],
+    "answer": "10",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0011",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is twenty take away seven?",
+    "options": [
+      "12",
+      "13",
+      "14"
+    ],
+    "answer": "13",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0012",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "A circle has corners. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0013",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "How many legs do two dogs have altogether?",
+    "options": [
+      "6",
+      "8",
+      "10"
+    ],
+    "answer": "8",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0014",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is three plus four plus one?",
+    "options": [
+      "7",
+      "8",
+      "9"
+    ],
+    "answer": "8",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
     "id": "mat-0101",
     "topic": "maths",
     "ageBand": "9-10",
@@ -134,6 +296,169 @@
     "region": null
   },
   {
+    "id": "mat-0105",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is nine times six?",
+    "options": [
+      "54",
+      "56",
+      "63"
+    ],
+    "answer": "54",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0106",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "How many centimetres are in a metre?",
+    "options": [
+      "10",
+      "100",
+      "1000"
+    ],
+    "answer": "100",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0107",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is one hundred divided by four?",
+    "options": [
+      "20",
+      "25",
+      "40"
+    ],
+    "answer": "25",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0108",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "A rectangle has four right angles. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0109",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What comes next: two, four, eight, sixteen?",
+    "options": [
+      "20",
+      "24",
+      "32"
+    ],
+    "answer": "32",
+    "acceptedAnswers": [],
+    "funFact": "Each number is double the one before.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0110",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "How many seconds are in a minute?",
+    "options": [
+      "30",
+      "60",
+      "100"
+    ],
+    "answer": "60",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0111",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is a quarter of twenty?",
+    "options": [
+      "4",
+      "5",
+      "10"
+    ],
+    "answer": "5",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0112",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Zero is an even number. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0113",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is eleven times three?",
+    "options": [
+      "30",
+      "33",
+      "36"
+    ],
+    "answer": "33",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0114",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "How many grams are in a kilogram?",
+    "options": [
+      "100",
+      "1000",
+      "10000"
+    ],
+    "answer": "1000",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
     "id": "mat-0201",
     "topic": "maths",
     "ageBand": "11-12",
@@ -194,6 +519,172 @@
     "answer": "False",
     "acceptedAnswers": [],
     "funFact": "Two is a prime number, and it's even!",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0205",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the square root of eighty-one?",
+    "options": [
+      "7",
+      "8",
+      "9"
+    ],
+    "answer": "9",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0206",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is fifteen percent of two hundred?",
+    "options": [
+      "15",
+      "30",
+      "45"
+    ],
+    "answer": "30",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0207",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "How many sides does an octagon have?",
+    "options": [
+      "6",
+      "8",
+      "10"
+    ],
+    "answer": "8",
+    "acceptedAnswers": [],
+    "funFact": "Stop signs are octagons.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0208",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "The angles in a triangle add up to one hundred and eighty degrees. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0209",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is seven squared?",
+    "options": [
+      "14",
+      "49",
+      "77"
+    ],
+    "answer": "49",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0210",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Three quarters is what percent?",
+    "options": [
+      "25",
+      "50",
+      "75"
+    ],
+    "answer": "75",
+    "acceptedAnswers": [
+      "75 percent"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0211",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the next prime number after seven?",
+    "options": [
+      "9",
+      "11",
+      "13"
+    ],
+    "answer": "11",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0212",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "One kilometre is one thousand metres. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0213",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "A square has sides of five centimetres. What is its perimeter in centimetres?",
+    "options": [
+      "10",
+      "20",
+      "25"
+    ],
+    "answer": "20",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0214",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is twelve divided by one half?",
+    "options": [
+      "6",
+      "12",
+      "24"
+    ],
+    "answer": "24",
+    "acceptedAnswers": [],
+    "funFact": "Dividing by a half is the same as doubling.",
     "difficulty": 3,
     "minAge": null,
     "region": null
