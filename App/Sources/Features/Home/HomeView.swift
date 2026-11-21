@@ -84,6 +84,7 @@ private struct FamilyPassTeaser: View {
     }
 }
 
+#if DEBUG
 #Preview {
     NavigationStack {
         HomeView(bank: .preview)
@@ -91,3 +92,4 @@ private struct FamilyPassTeaser: View {
     .environment(EntitlementStore())
     .environment(SettingsStore(defaults: UserDefaults(suiteName: "preview")!))
 }
+#endif

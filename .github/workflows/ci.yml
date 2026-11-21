@@ -68,6 +68,18 @@ jobs:
             -resultBundlePath build/TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify --renderer github-actions
+      # Releases archive in Release; catch Release-only compile errors
+      # (e.g. code behind #if DEBUG) here instead of in a release run.
+      - name: Build Release configuration
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project BuckleUpQuiz.xcodeproj \
+            -scheme BuckleUpQuiz \
+            -configuration Release \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify --renderer github-actions
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v7
