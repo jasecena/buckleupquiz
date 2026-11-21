@@ -212,10 +212,22 @@ struct ListenScriptTests {
         #expect(!steps.contains { if case .say(let text, _) = $0 { text.contains("for you") } else { false } })
     }
 
-    @Test func talkAboutHasNoTimeLimit() {
+    @Test func talkAboutDefaultsTo30SecondsAndOffersNoLimit() throws {
+        #expect(ListenSettings().talkTime == 30, "nobody waits forever by default")
+        var noLimit = ListenSettings()
+        noLimit.talkTime = nil
+        let saved = try JSONDecoder().decode(ListenSettings.self, from: JSONEncoder().encode(noLimit))
+        #expect(saved.talkTime == nil, "a chosen No limit is remembered")
+        let older = try JSONDecoder().decode(ListenSettings.self, from: Data(#"{"thinkTime": 6}"#.utf8))
+        #expect(older.talkTime == 30)
+    }
+
+    @Test func talkAboutCanHaveNoTimeLimit() {
         let q = makeQuestion(type: .talkAbout, text: "What made you smile today?", answer: nil)
+        var settings = ListenSettings()
+        settings.talkTime = nil
         let steps = ListenScript.steps(for: Turn(number: 3, player: .listener(ageBand: .sixToEight), presented: present(q)),
-                                       category: .values, settings: ListenSettings(), addressPlayer: false)
+                                       category: .values, settings: settings, addressPlayer: false)
         #expect(!steps.contains { if case .think = $0 { true } else { false } })
         #expect(!steps.contains(.cue(.think)))
         let discuss = steps.firstIndex(of: .discuss(seconds: nil))

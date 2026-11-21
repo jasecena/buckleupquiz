@@ -5,7 +5,7 @@
 > **Changes since this spec was written** (see [ADR-0015](adr/0015-choice-questions-and-named-players.md)):
 > - Every quiz question is a single choice: **3 options**, or true/false. "Scenario" is merged into multiple choice. Open discussion questions stay as **Talk About** prompts (Parent mode, off by default) with **no time limit**: the app waits until the family presses Next.
 > - Families add players with a name and age. Sessions start with "Who's playing?" instead of an age-band picker, and each child gets questions for their own age.
-> - Parent mode has its own Settings section and a **separate talk timer** (default: no limit).
+> - Parent mode has its own Settings section and a **separate talk timer** (default 30 seconds; No limit is an option). Parent mode itself is off by default.
 > - Questions repeat per player with **Leitner boxes**: today, tomorrow, then after 2, 4, 8 and 16 days. A wrong answer starts over, for that player only. Reviews are about 20% of a session (10% own, 10% from what the others had), nothing repeats on the same day, and the rest is new ([ADR-0016](adr/0016-leitner-spaced-repetition.md)).
 > - **Hands-free voice answers** are the default: after a beep, whoever's turn it is says the answer, and the app judges it, keeps score and reads the scoreboard at the end. If nobody is heard it falls back to reading answers out ([ADR-0018](adr/0018-hands-free-voice-answers.md)).
 > - **One tap to play:** who's playing and the length are remembered. Home has a big **Play** button (random topic), and tapping a topic starts it straight away. Setup appears only before the first game or via **Change** ([ADR-0017](adr/0017-one-tap-start.md)).
@@ -189,7 +189,7 @@ Teaches kindness, manners, friendship and feelings through everyday situations.
 **Question styles**
 - **Scenario (scored):** "Your friend falls over at the park. What's the kind thing to do? A: laugh, B: help them up and ask if they're okay, C: keep playing." Then the answer, plus the `explanation`: "Helping shows you care, and they'd do the same for you."
 - **True/false (scored):** "It's okay to feel angry, as long as we don't hurt anyone. True or false?"
-- **Talk About (not scored):** "What's something kind someone did for you this week?" There is no timer: the app says "Take your time and talk it over" and waits until someone presses Next (on screen or the car's next-track button), then says "Great chat!" and moves on. In the paid tier, it's addressed to the player whose turn it is but **awards no points**.
+- **Talk About (not scored):** "What's something kind someone did for you this week?" Parent mode's own timer (default 30 seconds, or no limit): the app says "Take your time and talk it over" and waits until the timer ends or someone presses Next (on screen or the car's next-track button), then says "Great chat!" and moves on. In the paid tier, it's addressed to the player whose turn it is but **awards no points**.
 
 **Content rules**
 - Positive framing: reward the kind choice and never shame a wrong answer. A wrong answer gets "Good try! A kinder choice might be…", never "Wrong!"

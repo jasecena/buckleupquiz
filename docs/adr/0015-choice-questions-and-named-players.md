@@ -25,12 +25,13 @@ Product decision (2026-11-22):
     type.
   - **trueFalse** has no options; the answer is "True" or "False".
   - **talkAbout** is an open discussion with no score. Parent mode has its **own section in
-    Settings** with a **separate talk timer**: No limit (default), 30 s, 1, 2, 3 or 5 min. It is
+    Settings** with a **separate talk timer**: 30 s (default, so nobody waits forever), 1, 2, 3, 5 min or No limit. It is
     not tied to think time. The app says "Take your time and talk it over. Press next when
     you're ready." then waits (`SpeechStep.discuss(seconds:)`) until someone taps **We're done**
     / Next, presses the car's next-track button, or the timer runs out. Then it says "Great
     chat!". Parent mode is off by default.
-    *(Amended 2026-11-22: an earlier draft gave it 2 × think time.)*
+    *(Amended 2026-11-22: an earlier draft gave it 2 × think time; the default changed from
+    No limit to 30 s the same day.)*
   
   The validator rejects `open` and `scenario` with a pointer to this ADR. Options are always
   read aloud, so the "read options" setting is gone.

@@ -74,7 +74,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Parent mode")
                 } footer: {
-                    Text("Talk About prompts are open questions to chat about together, with no right answer and no score. They have their own timer, separate from think time. With no limit, the quiz waits until you tap \"We're done\" or press next on the car or headphones. Off by default; turn it on when a grown-up is joining in.")
+                    Text("Talk About prompts are open questions to chat about together, with no right answer and no score. They have their own timer, separate from think time: 30 seconds unless you change it. Tap \"We're done\" or press next on the car or headphones to move on sooner. With No limit, the quiz waits for that. Off by default; turn it on when a grown-up is joining in.")
                 }
 
                 Section {

@@ -32,8 +32,9 @@ public struct ListenSettings: Hashable, Sendable, Codable {
 
     /// Think time for quiz questions.
     public var thinkTime: Double = 8
-    /// Parent mode's own timer for Talk About prompts. nil = no limit (the default).
-    public var talkTime: Double?
+    /// Parent mode's own timer for Talk About prompts. nil = no limit. Defaults to 30 s so
+    /// nobody waits forever if Talk About is turned on without looking at the timer.
+    public var talkTime: Double? = 30
     public static let talkTimePresets: [Double?] = [nil, 30, 60, 120, 180, 300]
     public var funFacts = true
     public var pauseAfterAnswer: Double = 2
@@ -47,9 +48,19 @@ public struct ListenSettings: Hashable, Sendable, Codable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let d = ListenSettings()
         thinkTime = try c.decodeIfPresent(Double.self, forKey: .thinkTime) ?? d.thinkTime
-        talkTime = try c.decodeIfPresent(Double.self, forKey: .talkTime)
+        // 0 is a saved "No limit"; a missing key means never chosen, so the default applies.
+        let savedTalkTime = try c.decodeIfPresent(Double.self, forKey: .talkTime)
+        talkTime = savedTalkTime.map { $0 > 0 ? $0 : nil } ?? d.talkTime
         funFacts = try c.decodeIfPresent(Bool.self, forKey: .funFacts) ?? d.funFacts
         pauseAfterAnswer = try c.decodeIfPresent(Double.self, forKey: .pauseAfterAnswer) ?? d.pauseAfterAnswer
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(thinkTime, forKey: .thinkTime)
+        try c.encode(talkTime ?? 0, forKey: .talkTime)
+        try c.encode(funFacts, forKey: .funFacts)
+        try c.encode(pauseAfterAnswer, forKey: .pauseAfterAnswer)
     }
 }
 

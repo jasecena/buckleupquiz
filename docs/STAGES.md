@@ -63,7 +63,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 ## M3 — UI 🟡
 - [x] Home topic grid (icon, name, count, lock), topic setup (age band, length), quiz screen
       (question, countdown ring, answer reveal, big Pause/Skip/Repeat), settings
-- [x] Quiz questions are 3-option multiple choice or true/false; Talk About (Parent mode, off by default) with its own timer, default no limit (ADR-0015)
+- [x] Quiz questions are 3-option multiple choice or true/false; Talk About (Parent mode, off by default) with its own timer, default 30 s, No limit optional (ADR-0015)
 - [x] Players: add/edit/remove with name, age and colour; "Who's playing?" replaces the age picker;
       turns per player with age-appropriate questions (ADR-0015)
 - [x] Leitner boxes per player (today, 1, 2, 4, 8, 16 days; wrong → start over), "Got it" / "Not yet"
