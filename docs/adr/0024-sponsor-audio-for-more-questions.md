@@ -1,6 +1,6 @@
 # 0024. More free questions for listening to a sponsor message
 
-- **Status:** Proposed (product idea, 2026-11-22; not built)
+- **Status:** Accepted (direction agreed by the product owner, 2026-11-22; build after sponsors and a legal/App Review check)
 - **Date:** 2026-11-22
 - **Relates to:** [ADR-0022](0022-free-allowance-packs-and-basic-subscription.md) (allowance), [ADR-0004](0004-privacy-no-network-no-sdks.md) (no third-party SDKs), [ADR-0021](0021-aws-infrastructure-terraform.md) (CDN)
 
@@ -20,7 +20,7 @@ kids:
 - **ADR-0004:** no third-party runtime SDKs. An ad network SDK would break the privacy label and
   the product's promise to parents.
 
-## Proposed decision
+## Decision
 **First-party sponsor audio, no ad network:**
 - Short (15–30 s) family-friendly sponsor messages, chosen and **reviewed by us**. They're
   stored on our CDN like voice packs (`api.buckleupquiz.com/sponsors/…`). There's no SDK, no

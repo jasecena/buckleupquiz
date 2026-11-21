@@ -19,6 +19,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 | M9 | Backend (cloud data, content packs) | ⬜ (ADR-0012 proposed) |
 | M10 | Natural voice packs (ElevenLabs) | ⬜ (ADR-0019; plans and costs agreed) |
 | M11 | Progress for parents (Leitner view) | ⬜ |
+| M12 | Sponsor messages for more free questions | ⬜ (ADR-0024) |
 
 ---
 
@@ -163,6 +164,13 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [ ] A screen per child showing their Leitner boxes: questions learned for good (past the 16-day
       box), on the way, and coming back for review, per topic, over time
 - [ ] "What Mia knows now": the learned questions with their answers, to celebrate progress
+
+## M12 — Sponsor messages (later) ⬜ ([ADR-0024](adr/0024-sponsor-audio-for-more-questions.md))
+- [ ] Find family-friendly sponsors; legal check (AANA children's code, COPPA/CARU) and an App Review pre-check
+- [ ] Sponsor audio on the CDN (`/sponsors/`), reviewed by us; anonymous play counts only
+- [ ] Parent opt-in behind the parental gate; messages between games, clearly announced
+- [ ] Rewards: daily top-up 5 instead of 2 with messages on; +2 questions per extra message, daily cap
+- [ ] Never in BuckleUp Basic
 
 ## M9 — Backend (later) ⬜
 - [ ] Accept ADR-0012 (CloudKit sync + remote content packs; AWS only if needed)

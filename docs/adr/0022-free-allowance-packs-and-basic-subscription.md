@@ -43,7 +43,7 @@ same subscription group so families can move between them.
 **No free trial** (product decision, 2026-11-22): the free allowance, with new questions added
 every day, already lets families try everything, and they can wait for more. Early families can
 be kept on a lower launch price by raising the price later with "keep current price for
-existing subscribers". Earning more free questions through sponsor messages is proposed in
+existing subscribers". Earning more free questions through sponsor messages is agreed in
 [ADR-0024](0024-sponsor-audio-for-more-questions.md).
 
 ### Games are planned before they start
