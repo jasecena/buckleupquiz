@@ -91,6 +91,9 @@ public enum Phrases {
         return "\(outroPrefix) Great job, \(listJoined(names))!"
     }
 
+    /// Said after the scores: voice detection can miss answers, so the kids know it can be fixed.
+    public static let scoreFixNote = "If we missed anyone's answer, a grown-up can fix the scores with the edit button."
+
     /// End-of-session announcement, e.g. "Mia wins with 80 points! Leo got 60 points!"
     /// Nobody is ever announced with zero points: they get "Great listening" instead.
     public static func scoreAnnouncement(_ entries: [ScoreboardEntry]) -> String {

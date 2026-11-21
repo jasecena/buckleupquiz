@@ -110,6 +110,15 @@ final class PlayerStore {
         save()
     }
 
+    /// A grown-up's score correction after a game, added to the lifetime points.
+    func adjustPoints(for playerID: String, by change: Int) {
+        guard let profile = players.first(where: { $0.id.uuidString == playerID }) else { return }
+        var stats = profile.stats
+        stats.points = max(0, stats.points + change)
+        profile.stats = stats
+        save()
+    }
+
     private func save() {
         try? context.save()
         reload()

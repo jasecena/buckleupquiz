@@ -17,6 +17,10 @@ enum SpeechListenerError: Error, LocalizedError {
     case unavailable(String)
     /// Apple's speech recognition needs Dictation (or Siri) to be on (kLSRErrorDomain 201).
     case dictationOff
+    /// The microphone couldn't start (in use by a call or another app, or no input).
+    case micBusy(String)
+    /// The on-device speech model is downloading (one time).
+    case preparing
 
     static let dictationOffHelp = "Dictation is turned off on this iPhone, and spoken answers need it. "
         + "Turn it on in Settings → General → Keyboard → Enable Dictation. Siri can stay off."
@@ -24,7 +28,9 @@ enum SpeechListenerError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unavailable(let reason): reason
-        case .dictationOff: Self.dictationOffHelp
+        case .dictationOff: "Siri and Dictation are disabled [kLSRErrorDomain 201]"
+        case .micBusy(let detail): "The microphone didn't start. \(detail)"
+        case .preparing: "Getting speech recognition ready (a one-time download)."
         }
     }
 
@@ -123,7 +129,7 @@ final class SystemSpeechListener: SpeechListening {
         } catch SpeechAnalyzerListener.Problem.downloading {
             // The model is on its way (keep this analyzer so the download isn't started twice).
             Self.lastProblem = SpeechAnalyzerListener.Problem.downloading.localizedDescription
-            throw SpeechListenerError.unavailable(SpeechAnalyzerListener.Problem.downloading.localizedDescription)
+            throw SpeechListenerError.preparing
         } catch {
             telemetry?.record("voice.speechAnalyzerFailed", ["error": error.localizedDescription,
                                                              "type": String(describing: type(of: error))])
@@ -140,8 +146,8 @@ final class SystemSpeechListener: SpeechListening {
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
         guard format.sampleRate > 0, format.channelCount > 0 else {
-            throw fail("No microphone input is available (the audio route has no input, "
-                + "\(format.sampleRate) Hz, \(format.channelCount) channels).")
+            Self.lastProblem = "No microphone input (\(format.sampleRate) Hz, \(format.channelCount) channels)."
+            throw SpeechListenerError.micBusy(Self.lastProblem ?? "")
         }
         let feed = AudioFeed()
         input.installTap(onBus: 0, bufferSize: 1024, format: format, block: Self.tapBlock(feeding: feed))
@@ -154,7 +160,8 @@ final class SystemSpeechListener: SpeechListening {
         do {
             try engine.start()
         } catch {
-            throw fail("The microphone didn't start: \(error.localizedDescription)")
+            Self.lastProblem = error.localizedDescription
+            throw SpeechListenerError.micBusy(error.localizedDescription)
         }
 
         let deadline = Date.now.addingTimeInterval(seconds)

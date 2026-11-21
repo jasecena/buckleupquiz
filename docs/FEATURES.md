@@ -47,6 +47,7 @@
 - **The free tier unlocks 3 topics**, and the rest show a lock icon. Consider making Manners & Friendship one of the free topics, because it's a strong selling point for parents.
 - Each tile shows an icon, the topic name and the question count.
 - User picks a topic, then **who's playing** (named players with ages; each gets questions for their own age band: 6–8, 9–10 or 11–12). *(Changed by ADR-0015: originally an age-band picker.)*
+- **Everyone gets the same number of questions.** The game length is rounded to a multiple of the players (10 questions with 3 players = 3 each). A skipped question doesn't count. If someone runs out of questions mid-game, the game ends there.
 - **Up to 2 players per game for free.** Games with 3–6 players need the Family Pass (product decision, 2026-11-22). Anyone can create up to 6 player profiles.
 
 ### 2.2 Listen mode (no voice input)
@@ -105,6 +106,7 @@ Goal: kids answer through the **car's built-in microphone**, and the app talks t
 ### 3.1 Players
 - Create up to 6 player profiles, each with a **name**, **age band** and **avatar/colour**. Up to 6 can play together with the Family Pass (2 for free).
 - A **live scoreboard** sits at the top of the screen during every question, for every player, from the first question. Scores are kept per game and added to each player's lifetime points. **Settings → Scoreboard** turns it off (on by default): no scores on screen or read out, but points still count towards badges.
+- **Fixing scores:** after the scores are read out, the app says "If we missed anyone's answer, a grown-up can fix the scores with the edit button." Each row on the final scoreboard has a pencil: − / + in steps of 10, between 0 and the most that player could have scored, then Save. The change is saved to their lifetime points.
 - While listening, the **microphone and the countdown show side by side**, so it's clear the app is still listening while the clock runs. If listening isn't running, a small note says answers are being read out.
 - **Background play** (Settings → Audio) is a choice. The first time a game goes to the background it keeps playing (so a car trip isn't interrupted), and the parent is asked "Keep playing in the background?" when they're back in the app. The answer is remembered. Off: the game pauses until they return.
 - Before a session, pick who's playing.

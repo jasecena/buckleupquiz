@@ -102,6 +102,9 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Player profiles (up to 6: name, age, colour), pick players per session (done early, in M3)
 - [x] Turn-based voice sessions using `QuizSession` rotation; whoever's turn it is gets the score (ADR-0018)
 - [x] Scoreboard visible from the first question for named players; in Listen mode "Got it" scores
+- [x] Equal questions per player (length rounded to a multiple of players; runs-out ends the game)
+- [x] Fix scores after the game (pencil, − / + by 10, capped), announced after the scores
+- [x] Fix guides for known mic/speech errors (Mic check + in-game note)
 - [x] Settings: Show the scoreboard (default on); Keep playing in the background (asked once, the first time)
 - [x] Listening view shows the microphone and the countdown side by side; "Not listening" note when voice is off
 - [x] Live on-screen scoreboard, spoken end-of-game scores, streak cheers, new-badge announcements

@@ -82,6 +82,11 @@ public struct ScoreKeeper: Sendable {
 
     public func stats(for playerID: String) -> PlayerStats { stats[playerID] ?? PlayerStats() }
 
+    /// A grown-up's correction after the game ("we missed Mia's answer"). Points only.
+    public mutating func setPoints(_ points: Int, for playerID: String) {
+        stats[playerID, default: PlayerStats()].points = max(0, points)
+    }
+
     @discardableResult
     public mutating func record(_ outcome: AnswerOutcome, playerID: String, topic: String) -> ScoreEvent {
         var s = stats(for: playerID)

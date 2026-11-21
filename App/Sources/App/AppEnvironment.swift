@@ -112,6 +112,7 @@ final class AppEnvironment {
             playerColors: Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.colorHex) }),
             showScoreboard: s.showScoreboard)
         model.onFinish = { [weak players] summary in players?.record(summary) }
+        model.onScoreAdjusted = { [weak players] playerID, change in players?.adjustPoints(for: playerID, by: change) }
         return model
     }
 }

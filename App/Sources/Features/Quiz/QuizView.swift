@@ -11,6 +11,9 @@ struct QuizView: View {
     /// interrupted), and the question is asked as soon as the app is back on screen.
     @State private var askAboutBackground = false
     @State private var wentToBackground = false
+    /// Score correction after the game: whose score is being edited, and the new value.
+    @State private var editingPlayer: String?
+    @State private var draftPoints = 0
 
     var body: some View {
         VStack(spacing: 24) {
@@ -233,11 +236,23 @@ struct QuizView: View {
     private var finalScores: some View {
         VStack(spacing: 12) {
             ForEach(model.scoreboard, id: \.player.id) { entry in
-                HStack {
-                    Text(entry.rank == 1 ? "🏆" : "\(entry.rank).").frame(width: 36)
+                HStack(spacing: 12) {
+                    Text(entry.rank == 1 && entry.points > 0 ? "🏆" : "\(entry.rank).").frame(width: 36)
                     Text(entry.player.name.isEmpty ? "You" : entry.player.name).font(Theme.title)
                     Spacer()
-                    Text("\(entry.points)").font(Theme.title).monospacedDigit()
+                    if editingPlayer == entry.player.id {
+                        scoreEditor(for: entry)
+                    } else {
+                        Text("\(entry.points)").font(Theme.title).monospacedDigit()
+                        Button {
+                            editingPlayer = entry.player.id
+                            draftPoints = entry.points
+                        } label: {
+                            Image(systemName: "pencil.circle.fill").font(.title)
+                        }
+                        .accessibilityLabel("Edit \(entry.player.name)'s score")
+                        .disabled(editingPlayer != nil)
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
@@ -249,6 +264,33 @@ struct QuizView: View {
                     .font(Theme.headline)
                     .foregroundStyle(Theme.accent)
             }
+            Label("Missed an answer? Tap the pencil to fix a score.", systemImage: "pencil")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .animation(.spring, value: model.scoreboard.map(\.points))
+    }
+
+    /// − / + in steps of one answer (10 points), between 0 and the most this player could score.
+    private func scoreEditor(for entry: ScoreboardEntry) -> some View {
+        let maximum = model.maxPoints(for: entry.player.id)
+        return HStack(spacing: 10) {
+            Button { draftPoints = max(0, draftPoints - 10) } label: {
+                Image(systemName: "minus.circle.fill").font(.title)
+            }
+            .disabled(draftPoints <= 0)
+            .accessibilityLabel("Less")
+            Text("\(draftPoints)").font(Theme.title).monospacedDigit().frame(minWidth: 48)
+            Button { draftPoints = min(maximum, draftPoints + 10) } label: {
+                Image(systemName: "plus.circle.fill").font(.title)
+            }
+            .disabled(draftPoints >= maximum)
+            .accessibilityLabel("More")
+            Button("Save") {
+                model.setPoints(draftPoints, for: entry.player.id)
+                editingPlayer = nil
+            }
+            .buttonStyle(.borderedProminent)
         }
     }
 

@@ -47,6 +47,14 @@ mics.
   (also on-device), downloading the English model once through `AssetInventory` if needed.
   Telemetry records `voice.trySpeechAnalyzer` / `voice.speechAnalyzerFailed`, so we can see
   whether the fallback works with Dictation off.
+- **Fix guides:** known problems map to a short fix (`FixGuide`): Dictation off → "Settings ›
+  General › Keyboard › Enable Dictation"; permission off → "Settings › Apps › BuckleUp Quiz";
+  mic busy; model downloading; no offline English. Mic check shows the problem name, the fix
+  path and an Open Settings button, with the raw error in small print. Unknown errors are shown
+  as they are. The in-game note uses the same mapping.
+- **Scores can be fixed:** detection can miss answers, so after the scores are read out the app
+  says a grown-up can fix them. The final scoreboard has a pencil per player (− / + by 10,
+  within 0...the most they could score), and corrections go into lifetime points.
 - The reply is judged by `VoiceReply` in QuizCore:
   - **command** ("skip"/"next", "repeat", "pause", "stop") → obeyed. Skipping before the
     answer keeps the turn with the same player: "Here's another one.", same question number,

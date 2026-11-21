@@ -116,9 +116,10 @@ public struct QuizSession: Sendable {
         commitCurrent()
         if let replaced, let index = config.players.firstIndex(where: { $0.id == replaced.player.id }) {
             turnsPlayed -= 1
+            turnsTaken[replaced.player.id, default: 1] -= 1
             nextPlayerIndex = index
         }
-        if let limit = config.length.limit, turnsPlayed >= limit { return finish() }
+        if let limit = questionLimit, turnsPlayed >= limit { return finish() }
 
         // Rotate through players, skipping anyone whose pool is empty.
         for offset in 0..<config.players.count {
@@ -129,7 +130,12 @@ public struct QuizSession: Sendable {
                 plans[player.id, default: []] += ReviewMix.plan(turns: turnsPerPlayer, using: &rng)
             }
             guard let (question, kind) = selector.next(
-                for: player, kind: plans[player.id]![taken], family: learning, day: day, using: &rng) else { continue }
+                for: player, kind: plans[player.id]![taken], family: learning, day: day, using: &rng) else {
+                // Someone who never had a turn (nothing for their age here) sits out. Someone who
+                // ran out mid-game ends it, so nobody ends up with more questions than the others.
+                if taken == 0 { continue }
+                return finish()
+            }
             turnsTaken[player.id] = taken + 1
             nextPlayerIndex = (index + 1) % config.players.count
             turnsPlayed += 1
@@ -161,7 +167,7 @@ public struct QuizSession: Sendable {
 
     /// Turns each player is expected to get, for planning their review share.
     private var turnsPerPlayer: Int {
-        let total = config.length.limit ?? ReviewMix.endlessBlock * config.players.count
+        let total = questionLimit ?? ReviewMix.endlessBlock * config.players.count
         return max(1, (total + config.players.count - 1) / config.players.count)
     }
 
@@ -174,6 +180,31 @@ public struct QuizSession: Sendable {
 
     /// Ends the session early (e.g. "stop").
     public mutating func stop() { _ = finish() }
+
+    /// Questions in this game, rounded to a multiple of the players so everyone gets the same
+    /// number: 10 questions with 3 players is 3 each (9). nil = Endless.
+    public var questionLimit: Int? {
+        guard let limit = config.length.limit else { return nil }
+        let players = max(1, config.players.count)
+        let each = max(1, Int((Double(limit) / Double(players)).rounded()))
+        return each * players
+    }
+
+    /// Questions this player has been asked so far (skipped ones don't count).
+    public func turns(for playerID: String) -> Int { turnsTaken[playerID] ?? 0 }
+
+    /// The most points a player could have from their turns (every answer right, streak bonuses
+    /// included): the upper bound for a grown-up's score correction.
+    public func maxPoints(for playerID: String) -> Int {
+        let turns = turns(for: playerID)
+        guard turns > 0 else { return 0 }
+        return (1...turns).reduce(0) { $0 + config.rules.points(forStreak: $1) }
+    }
+
+    /// A grown-up fixes a score after the game, within 0...maxPoints.
+    public mutating func setPoints(_ points: Int, for playerID: String) {
+        scores.setPoints(min(max(0, points), maxPoints(for: playerID)), for: playerID)
+    }
 
     /// True once the current turn's outcome has been recorded.
     public var isCurrentRecorded: Bool { currentTurn == nil || recordedCurrent }

@@ -67,6 +67,42 @@ struct SessionTests {
         #expect(session.learning["mia"]?.card(first!.presented.question.id) == nil, "skipping leaves the boxes alone")
     }
 
+    @Test func everyoneGetsTheSameNumberOfQuestions() {
+        let players = ["a", "b", "c"].map { Player(id: $0, name: $0.uppercased(), age: 7) }
+        let config = SessionConfig(topics: ["geography"], players: players, length: .questions(10))
+        var session = QuizSession(bank: sampleBank(perBand: 10), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
+        #expect(session.questionLimit == 9, "10 with 3 players is 3 each")
+        while session.advance() != nil {}
+        #expect(players.map { session.turns(for: $0.id) } == [3, 3, 3])
+        #expect(QuizSession(bank: sampleBank(), config: SessionConfig(topics: ["geography"], players: players,
+                                                                       length: .questions(20)),
+                            day: 10).questionLimit == 21)
+    }
+
+    @Test func runningOutMidGameEndsItEvenly() {
+        let mia = Player(id: "mia", name: "Mia", age: 7)
+        let leo = Player(id: "leo", name: "Leo", age: 7)
+        // 5 questions for the band, shared: Mia and Leo can't both get 3 different ones.
+        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(10))
+        var session = QuizSession(bank: sampleBank(perBand: 5), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
+        while session.advance() != nil {}
+        #expect(abs(session.turns(for: "mia") - session.turns(for: "leo")) <= 1)
+    }
+
+    @Test func aGrownUpCanFixAScoreWithinRange() {
+        let mia = Player(id: "mia", name: "Mia", age: 7)
+        let config = SessionConfig(topics: ["geography"], players: [mia], length: .questions(3))
+        var session = QuizSession(bank: sampleBank(), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
+        while session.advance() != nil { session.record(.unheard) }
+        #expect(session.maxPoints(for: "mia") == 35, "10 + 10 + 15")
+        session.setPoints(20, for: "mia")
+        #expect(session.scoreboard.first?.points == 20)
+        session.setPoints(500, for: "mia")
+        #expect(session.scoreboard.first?.points == 35)
+        session.setPoints(-10, for: "mia")
+        #expect(session.scoreboard.first?.points == 0)
+    }
+
     @Test func unheardAnswerChangesNothing() {
         let player = Player(id: "mia", name: "Mia", age: 7)
         let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(3))

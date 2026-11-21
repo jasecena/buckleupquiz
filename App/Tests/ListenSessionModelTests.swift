@@ -83,7 +83,8 @@ struct ListenSessionModelTests {
         let addressed = speech.spoken.filter { $0.contains("this one's for you") }
         #expect(addressed == ["Mia, this one's for you!", "Leo, this one's for you!"], "only on each player's first turn")
         #expect(speech.spoken.filter { $0 == "Mia." || $0 == "Leo." } == ["Mia.", "Leo."])
-        #expect(speech.spoken.last == "That's the end of the ride! Great job, Mia and Leo!")
+        #expect(speech.spoken.last?.hasPrefix("That's the end of the ride! Great job, Mia and Leo!") == true)
+        #expect(speech.spoken.last?.hasSuffix(Phrases.scoreFixNote) == true)
         let miaCards = learned["mia"]?.cards ?? [:]
         let leoCards = learned["leo"]?.cards ?? [:]
         #expect(miaCards.count == 2)
@@ -262,6 +263,15 @@ struct ListenSessionModelTests {
         #expect(model.scoreboard.first { $0.player.id == "leo" }?.points == 0)
         #expect(model.showsFinalScores)
         #expect(speech.spoken.last?.contains("Mia got 10 points") == true || speech.spoken.last?.contains("Mia wins") == true)
+        #expect(speech.spoken.last?.hasSuffix(Phrases.scoreFixNote) == true, "kids hear that scores can be fixed")
+
+        // A grown-up fixes Leo's score: he did get his answer right.
+        var adjusted: [(String, Int)] = []
+        model.onScoreAdjusted = { adjusted.append(($0, $1)) }
+        #expect(model.maxPoints(for: "leo") == 10)
+        model.setPoints(50, for: "leo")
+        #expect(model.scoreboard.first { $0.player.id == "leo" }?.points == 10, "capped at what one question allows")
+        #expect(adjusted.count == 1 && adjusted[0].0 == "leo" && adjusted[0].1 == 10)
     }
 
     @Test func dictationOffGivesTheGrownUpsTheFix() async {

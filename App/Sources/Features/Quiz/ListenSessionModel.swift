@@ -89,14 +89,30 @@ final class ListenSessionModel {
     /// Scores are shown once anyone has answered out loud.
     /// Named players always see the scoreboard, from the first question (everyone starts at 0).
     var showsScores: Bool { showScoreboard && (isTurnBased || scoreboard.contains { $0.points > 0 } || hasAttempts) }
-    /// The trophy screen only when someone scored; otherwise just "Great job, everyone".
-    var showsFinalScores: Bool { showScoreboard && scoreboard.contains { $0.points > 0 } }
+    /// The final scoreboard (with the pencil to fix scores) for named players, even if nobody
+    /// was heard: detection can miss answers, and a grown-up can put the scores right.
+    var showsFinalScores: Bool { showScoreboard && (isTurnBased || scoreboard.contains { $0.points > 0 }) }
+
+    /// Called when a grown-up fixes a score after the game: player id and the change in points.
+    @ObservationIgnored var onScoreAdjusted: ((String, Int) -> Void)?
+
+    func maxPoints(for playerID: String) -> Int { session.maxPoints(for: playerID) }
+
+    /// A grown-up's correction on the final scoreboard ("we missed Mia's answer").
+    func setPoints(_ points: Int, for playerID: String) {
+        guard status == .finished else { return }
+        let before = session.scores.stats(for: playerID).points
+        session.setPoints(points, for: playerID)
+        let after = session.scores.stats(for: playerID).points
+        scoreboard = session.scoreboard
+        if after != before { onScoreAdjusted?(playerID, after - before) }
+    }
     /// Voice answers were asked for but aren't running (no mic, or it stopped working).
     var isVoiceOff: Bool { answerMode == .voice && !isVoice }
     /// For the grown-ups, when listening stopped for a reason they can fix.
     private(set) var voiceOffHint: String?
 
-    var questionCount: Int? { session.config.length.limit }
+    var questionCount: Int? { session.questionLimit }
 
     /// Whether turns are addressed to named players.
     var isTurnBased: Bool { session.config.isTurnBased }
@@ -492,8 +508,8 @@ final class ListenSessionModel {
             // still give the full think time. The reason shows in Settings → Mic check.
             isListening = false
             isVoice = false
-            if case SpeechListenerError.dictationOff = error {
-                voiceOffHint = "Not listening: turn on Dictation in Settings → General → Keyboard."
+            if let guide = FixGuide.guide(for: error) {
+                voiceOffHint = "Not listening. \(guide.problem): \(guide.path)"
             }
             voiceCounts["failed", default: 0] += 1
             var fields = Self.describe(error)
@@ -637,7 +653,12 @@ final class ListenSessionModel {
             closingMessage = ([ending] + earnedBadges.map { Phrases.badgeEarned($0.badge, by: $0.player) })
                 .joined(separator: " ")
         } else {
+            scoreboard = session.scoreboard
             closingMessage = Phrases.listenOutro(players: session.config.players)
+        }
+        // Voice detection can miss answers: say how to fix the scores, so nobody argues.
+        if showsFinalScores, let ending = closingMessage {
+            closingMessage = ending + " " + Phrases.scoreFixNote
         }
         if let closingMessage { try await deps.speech.speak(closingMessage) }
         tearDown()
