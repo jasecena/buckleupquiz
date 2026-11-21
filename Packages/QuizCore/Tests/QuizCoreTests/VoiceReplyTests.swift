@@ -48,7 +48,9 @@ struct VoiceReplyTests {
         let turn = Turn(number: 2, player: .listener(ageBand: .sixToEight), presented: tasmania)
         let steps = ListenScript.steps(for: turn, category: .knowledge, settings: ListenSettings(), addressPlayer: false,
                                        voiceAnswers: true)
-        let listen = steps.firstIndex(of: .listen(seconds: 6))
+        let listen = steps.firstIndex(of: .listen(seconds: 6, options: "A: Hobart. B: Launceston. C: Darwin."))
+        #expect(!steps.contains { if case .say(_, .options) = $0 { true } else { false } },
+                "options are read inside the listening step, so early answers are heard")
         let feedback = steps.firstIndex(of: .feedback)
         #expect(listen != nil && feedback != nil && listen! < feedback!)
         #expect(!steps.contains { if case .think = $0 { true } else { false } })

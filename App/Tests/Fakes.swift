@@ -51,7 +51,8 @@ final class FakeListener: SpeechListening {
         self.failure = failure
     }
 
-    func listen(for seconds: Double, hints: [String], isConclusive: ([String]) -> Bool) async throws -> [String] {
+    func listen(until deadline: @escaping @MainActor () -> Date, hints: [String],
+                isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String] {
         listens += 1
         await Task.yield()
         try Task.checkCancellation()

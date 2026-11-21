@@ -428,8 +428,8 @@ final class ListenSessionModel {
             deps.cues.play(.listening)
         case .think(let seconds):
             try await countdown(seconds: seconds, ticking: true, generation: generation)
-        case .listen(let seconds):
-            try await listenForAnswer(seconds: seconds, generation: generation)
+        case .listen(let seconds, let options):
+            try await listenForAnswer(seconds: seconds, options: options, generation: generation)
         case .feedback:
             try await giveFeedback()
         case .discuss(let seconds):
@@ -472,23 +472,38 @@ final class ListenSessionModel {
 
     /// Half-duplex: speech has finished → short gap → chime → listen, once. If nothing clear is
     /// heard, nothing is said about it: the answer is shared and the game moves on (ADR-0018).
-    private func listenForAnswer(seconds: Double, generation: Int) async throws {
+    /// When the think time ends; open-ended while the options are still being read.
+    @MainActor
+    final class AnswerWindow {
+        var deadline = Date.distantFuture
+    }
+
+    /// Full duplex (ADR-0018 amendment): the mic opens as soon as the question is read, and
+    /// stays open while the options are read, because excited kids answer early. Then comes the
+    /// think time with the tick and the countdown. What the app itself said is taken out of what
+    /// was heard (`EchoFilter`), so it never mistakes its own voice for an answer.
+    private func listenForAnswer(seconds: Double, options: String?, generation: Int) async throws {
         guard isVoice, let listener = deps.listener, let turn else {
             // Voice is off (or the recogniser broke): behave like Listen mode.
+            if let options { try await deps.speech.speak(options) }
             try await countdown(seconds: seconds, ticking: true, generation: generation)
             return
         }
-        // Gaps either side of the chime, so the mic doesn't catch the end of the question or
-        // the chime itself (Bluetooth speakers lag behind the phone).
-        try await deps.sleeper.sleep(seconds: 0.5)
-        deps.cues.play(.listening)
-        try await deps.sleeper.sleep(seconds: 0.5)
-        isListening = true
         let presented = turn.presented
+        let echo = [presented.question.question, options].compactMap { $0 }.joined(separator: " ")
+        let window = AnswerWindow()
+        isListening = true
+        let listening = Task { [listener] in
+            try await listener.listen(
+                until: { window.deadline }, hints: VoiceReply.hints(for: presented),
+                isConclusive: { VoiceReply.interpret(EchoFilter.remove(echo, from: $0), for: presented).isConclusive })
+        }
+        defer { listening.cancel() }
+        if let options { try await deps.speech.speak(options) }
+
+        // Think time: the tick ("ding, ding, ding") and the countdown beside the microphone.
         let started = Date.now
-        let transcriptions: [String]
-        // The think tick runs while we listen, so everyone hears the clock ("ding, ding, ding"),
-        // and the countdown shows beside the microphone.
+        window.deadline = started.addingTimeInterval(seconds)
         deps.cues.startThinking()
         thinkTotal = seconds
         thinkRemaining = seconds
@@ -503,10 +518,13 @@ final class ListenSessionModel {
             clock.cancel()
             if !isThinking { thinkRemaining = 0 }
         }
+        let raw: [String]
         do {
-            transcriptions = try await listener.listen(
-                for: seconds, hints: VoiceReply.hints(for: presented),
-                isConclusive: { VoiceReply.interpret($0, for: presented).isConclusive })
+            raw = try await withTaskCancellationHandler {
+                try await listening.value
+            } onCancel: {
+                listening.cancel()
+            }
             deps.cues.stopThinking()
         } catch is CancellationError {
             deps.cues.stopThinking()
@@ -532,6 +550,7 @@ final class ListenSessionModel {
         }
         isListening = false
         guard generation == self.generation else { return }
+        let transcriptions = EchoFilter.remove(echo, from: raw)
 
         switch VoiceReply.interpret(transcriptions, for: turn.presented) {
         case .command(let command):

@@ -53,7 +53,8 @@ final class SpeechAnalyzerListener {
     }
 
     /// Same contract as `SpeechListening.listen`.
-    func listen(for seconds: Double, locales: [Locale], isConclusive: ([String]) -> Bool) async throws -> [String] {
+    func listen(until deadline: @escaping @MainActor () -> Date, locales: [Locale],
+                isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String] {
         let locale = try await prepare(locales: locales)
         let transcriber = Self.makeTranscriber(locale)
         let analyzer = SpeechAnalyzer(modules: [transcriber])
@@ -91,16 +92,16 @@ final class SpeechAnalyzerListener {
         engine.prepare()
         try engine.start()
 
-        let deadline = Date.now.addingTimeInterval(seconds)
         while !state.ended {
             try await Task.sleep(for: .milliseconds(100))
             let heard = state.text.isEmpty ? [] : [state.text]
             let paused = !heard.isEmpty
                 && Date.now.timeIntervalSince(state.lastChange) >= SystemSpeechListener.endOfSpeechSilence
             if paused, isConclusive(heard) { break }
-            if Date.now >= deadline {
+            let end = deadline()
+            if Date.now >= end {
                 let speaking = !heard.isEmpty && !paused
-                if !speaking || Date.now >= deadline.addingTimeInterval(SystemSpeechListener.overrun) { break }
+                if !speaking || Date.now >= end.addingTimeInterval(SystemSpeechListener.overrun) { break }
             }
         }
         engine.stop()

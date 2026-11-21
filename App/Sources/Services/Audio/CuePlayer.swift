@@ -31,6 +31,8 @@ final class EngineCuePlayer: CuePlaying {
         return Float(sin(2 * .pi * freq * t) * envelope * 0.25)
     }
     private var isRunning = false
+    /// Whether the tick should be playing, so it comes back after the engine restarts.
+    private var isTicking = false
     private var configObserver: NSObjectProtocol?
 
     init() {
@@ -40,23 +42,32 @@ final class EngineCuePlayer: CuePlaying {
 
     func startSession() {
         guard !isRunning else { return }
-        do {
-            try engine.start()
-            isRunning = true
-            loop(silence)
-            player.play()
-        } catch {
-            isRunning = false
-        }
-        // Route changes (e.g. Bluetooth connects) stop the engine; restart it.
+        start()
+        // Route changes (Bluetooth connecting) and the microphone switching on reconfigure the
+        // audio hardware, which stops this engine: restart it, ticking again if it was.
+        guard configObserver == nil else { return }
         configObserver = NotificationCenter.default.addObserver(
             forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self, self.isRunning else { return }
                 self.isRunning = false
-                self.startSession()
+                self.start()
             }
+        }
+    }
+
+    private func start() {
+        do {
+            if !engine.isRunning {
+                engine.connect(player, to: engine.mainMixerNode, format: format)
+                try engine.start()
+            }
+            isRunning = true
+            loop(isTicking ? tick : silence)
+            player.play()
+        } catch {
+            isRunning = false
         }
     }
 
@@ -66,10 +77,18 @@ final class EngineCuePlayer: CuePlaying {
         player.stop()
         engine.stop()
         isRunning = false
+        isTicking = false
     }
 
-    func startThinking() { if isRunning { loop(tick) } }
-    func stopThinking() { if isRunning { loop(silence) } }
+    func startThinking() {
+        isTicking = true
+        if isRunning { loop(tick) }
+    }
+
+    func stopThinking() {
+        isTicking = false
+        if isRunning { loop(silence) }
+    }
 
     func play(_ cue: CueSound) {
         guard isRunning else { return }
