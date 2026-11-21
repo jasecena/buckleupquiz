@@ -254,11 +254,13 @@ struct ListenSessionModelTests {
             dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio),
             rng: AnyRandomGenerator(seed: 2))
         #expect(model.showsScores, "named players see the scoreboard before anyone answers")
+        speech.holdWhen = { _ in model.canMark } // stop on Mia's answer reveal
         model.start()
-        for _ in 0..<20000 where !model.canMark { await Task.yield() }
+        for _ in 0..<20000 where !speech.isHolding { await Task.yield() }
         #expect(model.turn?.player.id == "mia")
         model.mark(.correct)
         #expect(model.scoreboard.first { $0.player.id == "mia" }?.points == 10, "shows straight away")
+        speech.release()
         await model.runner?.value
         #expect(model.scoreboard.first { $0.player.id == "mia" }?.points == 10)
         #expect(model.scoreboard.first { $0.player.id == "leo" }?.points == 0)

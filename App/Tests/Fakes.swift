@@ -5,12 +5,26 @@ import QuizCore
 @MainActor
 final class FakeSpeech: SpeechOutput {
     private(set) var spoken: [String] = []
+    /// Pauses on the first line this matches until `release()`, so a test can act at an exact
+    /// moment instead of racing the runner with `Task.yield()`.
+    var holdWhen: (@MainActor (String) -> Bool)?
+    private var held: CheckedContinuation<Void, Never>?
+    var isHolding: Bool { held != nil }
 
     func speak(_ text: String) async throws {
         try Task.checkCancellation()
         spoken.append(text)
+        if let holdWhen, holdWhen(text) {
+            self.holdWhen = nil
+            await withCheckedContinuation { held = $0 }
+        }
         await Task.yield()
         try Task.checkCancellation()
+    }
+
+    func release() {
+        held?.resume()
+        held = nil
     }
 
     func stop() {}
