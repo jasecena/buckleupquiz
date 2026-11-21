@@ -43,7 +43,10 @@ mics.
   on-device, fails at once with "Siri and Dictation are disabled" (kLSRErrorDomain 201) when
   both are off. The app detects that and tells the grown-ups the fix (Settings → General →
   Keyboard → Enable Dictation; Siri can stay off) in Mic check and as a small in-game note,
-  never out loud. A fallback to iOS 26's `SpeechAnalyzer` is being evaluated.
+  never out loud. On iOS 26 the app then falls back to `SpeechAnalyzer` + `SpeechTranscriber`
+  (also on-device), downloading the English model once through `AssetInventory` if needed.
+  Telemetry records `voice.trySpeechAnalyzer` / `voice.speechAnalyzerFailed`, so we can see
+  whether the fallback works with Dictation off.
 - The reply is judged by `VoiceReply` in QuizCore:
   - **command** ("skip"/"next", "repeat", "pause", "stop") → obeyed. Skipping before the
     answer keeps the turn with the same player: "Here's another one.", same question number,

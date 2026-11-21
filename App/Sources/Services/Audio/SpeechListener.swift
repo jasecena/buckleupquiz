@@ -89,7 +89,53 @@ final class SystemSpeechListener: SpeechListening {
             && AVAudioApplication.shared.recordPermission == .granted
     }
 
+    /// iOS 26's SpeechAnalyzer, used once SFSpeechRecognizer has said Dictation is off.
+    private var analyzer: AnyObject?
+    private var analyzerFailed = false
+
     func listen(for seconds: Double, hints: [String], isConclusive: ([String]) -> Bool) async throws -> [String] {
+        if #available(iOS 26.0, *), let analyzer = analyzer as? SpeechAnalyzerListener {
+            return try await listen(with: analyzer, for: seconds, isConclusive: isConclusive)
+        }
+        let started = Date.now
+        do {
+            return try await listenWithRecognizer(for: seconds, hints: hints, isConclusive: isConclusive)
+        } catch SpeechListenerError.dictationOff {
+            // Siri and Dictation are off. iOS 26 has a newer on-device recogniser that may still work.
+            guard #available(iOS 26.0, *), !analyzerFailed else { throw SpeechListenerError.dictationOff }
+            let analyzer = SpeechAnalyzerListener()
+            self.analyzer = analyzer
+            telemetry?.record("voice.trySpeechAnalyzer", [:])
+            let remaining = max(2, seconds - Date.now.timeIntervalSince(started))
+            return try await listen(with: analyzer, for: remaining, isConclusive: isConclusive)
+        }
+    }
+
+    @available(iOS 26.0, *)
+    private func listen(with analyzer: SpeechAnalyzerListener, for seconds: Double,
+                        isConclusive: ([String]) -> Bool) async throws -> [String] {
+        do {
+            let heard = try await analyzer.listen(for: seconds, locales: Self.defaultLocales, isConclusive: isConclusive)
+            Self.lastProblem = nil
+            return heard
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch SpeechAnalyzerListener.Problem.downloading {
+            // The model is on its way (keep this analyzer so the download isn't started twice).
+            Self.lastProblem = SpeechAnalyzerListener.Problem.downloading.localizedDescription
+            throw SpeechListenerError.unavailable(SpeechAnalyzerListener.Problem.downloading.localizedDescription)
+        } catch {
+            telemetry?.record("voice.speechAnalyzerFailed", ["error": error.localizedDescription,
+                                                             "type": String(describing: type(of: error))])
+            analyzerFailed = true
+            self.analyzer = nil
+            Self.lastProblem = SpeechListenerError.dictationOffHelp
+            throw SpeechListenerError.dictationOff
+        }
+    }
+
+    private func listenWithRecognizer(for seconds: Double, hints: [String],
+                                      isConclusive: ([String]) -> Bool) async throws -> [String] {
         let engine = AVAudioEngine()
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
