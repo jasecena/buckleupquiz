@@ -139,15 +139,18 @@ resource "aws_acm_certificate" "main" {
   }
 }
 
+locals {
+  validation = { for o in aws_acm_certificate.main.domain_validation_options : o.domain_name => o }
+}
+
 resource "aws_route53_record" "certificate_validation" {
-  # The apex and the wildcard share one validation record.
-  for_each = {
-    for o in aws_acm_certificate.main.domain_validation_options : o.resource_record_name => o...
-  }
+  # The apex and the wildcard share one validation record, so one record keyed by the (known)
+  # domain name covers both and Terraform can plan it before the certificate exists.
+  for_each        = toset([var.domain_name])
   zone_id         = local.zone_id
-  name            = each.key
-  type            = each.value[0].resource_record_type
-  records         = [each.value[0].resource_record_value]
+  name            = local.validation[each.key].resource_record_name
+  type            = local.validation[each.key].resource_record_type
+  records         = [local.validation[each.key].resource_record_value]
   ttl             = 300
   allow_overwrite = true
 }
