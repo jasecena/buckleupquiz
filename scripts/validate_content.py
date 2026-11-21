@@ -24,7 +24,8 @@ from pathlib import Path
 
 AGE_BANDS = ("6-8", "9-10", "11-12")
 BAND_AGES = {"6-8": (6, 8), "9-10": (9, 10), "11-12": (11, 12)}
-TYPES = ("multipleChoice", "trueFalse", "scenario", "talkAbout")  # no free answers (ADR-0015)
+TYPES = ("multipleChoice", "trueFalse", "talkAbout")  # quiz questions are a choice (ADR-0015)
+CHOICE_OPTIONS = 3  # every multiple-choice question has exactly three options
 CATEGORIES = ("knowledge", "values", "safety")
 ID_PATTERN = re.compile(r"^[a-z]{3}-\d{4}$")
 HEX_COLOUR = re.compile(r"^#[0-9A-Fa-f]{6}$")
@@ -125,8 +126,11 @@ def validate_question(q, where: str, topics: dict[str, dict], report: Report) ->
     if isinstance(qid, str) and not ID_PATTERN.match(qid):
         report.error(where, "id must look like 'abc-0001'")
     if qtype == "open":
-        report.error(where, "open questions are not allowed; every question is a choice (ADR-0015). "
-                            "Use multipleChoice with 3-4 options, or trueFalse")
+        report.error(where, "open quiz questions are not allowed (ADR-0015). Use multipleChoice with "
+                            "3 options or trueFalse; open discussion questions are talkAbout")
+        return
+    if qtype == "scenario":
+        report.error(where, "'scenario' was merged into multipleChoice (ADR-0015); change the type")
         return
     if qtype not in TYPES:
         report.error(where, f"type must be one of {TYPES}")
@@ -167,11 +171,10 @@ def validate_question(q, where: str, topics: dict[str, dict], report: Report) ->
         if not isinstance(answer, str) or not answer.strip():
             report.error(where, "answer is required for scored questions")
             return
-    if qtype in ("multipleChoice", "scenario"):
-        low, high = (3, 4) if qtype == "multipleChoice" else (2, 4)
-        if not isinstance(options, list) or not low <= len(options) <= high \
+    if qtype == "multipleChoice":
+        if not isinstance(options, list) or len(options) != CHOICE_OPTIONS \
                 or not all(isinstance(o, str) and o.strip() for o in options):
-            report.error(where, f"{qtype} needs {low}-{high} non-empty options")
+            report.error(where, f"multipleChoice needs exactly {CHOICE_OPTIONS} non-empty options")
         else:
             normalised = [normalise(o) for o in options]
             if len(set(normalised)) != len(normalised):
@@ -180,10 +183,11 @@ def validate_question(q, where: str, topics: dict[str, dict], report: Report) ->
                 report.error(where, "answer must be one of the options")
             if any(len(normalise(a)) == 1 for a in accepted):
                 report.error(where, "don't put option letters in acceptedAnswers; options are shuffled")
-            if qtype == "multipleChoice":
-                for o in options:
-                    if word_count(o) > MAX_ANSWER_WORDS:
-                        report.warn(where, f"option '{o}' has more than {MAX_ANSWER_WORDS} words; keep options easy to say")
+            category = (topics.get(q.get("topic")) or {}).get("category")
+            for o in options:
+                # Values/safety options describe an action, so they may be a short phrase.
+                if category == "knowledge" and word_count(o) > MAX_ANSWER_WORDS:
+                    report.warn(where, f"option '{o}' has more than {MAX_ANSWER_WORDS} words; keep options easy to say")
     elif qtype == "trueFalse":
         if options is not None:
             report.error(where, "trueFalse questions must not set options")
@@ -203,7 +207,7 @@ def validate_question(q, where: str, topics: dict[str, dict], report: Report) ->
         for word in BANNED_IN_VALUES:
             if re.search(rf"\b{re.escape(word)}\b", text):
                 report.error(where, f"contains '{word}', which values/safety content must avoid")
-        if qtype in ("scenario", "trueFalse") and not q.get("explanation"):
+        if qtype in ("multipleChoice", "trueFalse") and not q.get("explanation"):
             report.warn(where, "values questions should have a kind 'explanation'")
 
 

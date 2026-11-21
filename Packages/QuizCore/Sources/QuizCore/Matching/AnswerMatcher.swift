@@ -38,7 +38,7 @@ public struct AnswerMatcher: Sendable {
         switch q.type {
         case .talkAbout:
             return false
-        case .multipleChoice, .scenario, .trueFalse:
+        case .multipleChoice, .trueFalse:
             guard let options = presented.options, let correct = presented.correctOptionIndex else { return false }
             return chosenOption(transcript, options: options, presented: presented) == correct
         }
@@ -105,7 +105,7 @@ public struct AnswerMatcher: Sendable {
             return lengths[0].n > lengths[1].n ? lengths[0].i : nil
         }
 
-        // 4. Key-word overlap for long scenario options ("help them up" for
+        // 4. Key-word overlap for long options ("help them up" for
         //    "Help them up and ask if they're okay").
         let heardWords = Set(TextNormalizer.normalizedTokens(transcript)).subtracting(Self.stopWords)
         guard !heardWords.isEmpty else { return nil }

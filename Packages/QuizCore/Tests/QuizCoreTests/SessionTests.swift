@@ -146,8 +146,8 @@ struct ListenScriptTests {
         ])
     }
 
-    @Test func scenarioReadsOptionsAndExplanation() {
-        var q = makeQuestion(topic: "manners", type: .scenario, text: "Your friend falls over.",
+    @Test func valuesQuestionReadsOptionsAndExplanation() {
+        var q = makeQuestion(topic: "manners", type: .multipleChoice, text: "Your friend falls over.",
                              options: ["Laugh", "Help them up", "Keep playing"], answer: "Help them up")
         q.explanation = "Helping shows you care."
         let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
@@ -167,11 +167,14 @@ struct ListenScriptTests {
         ])
     }
 
-    @Test func talkAboutUsesLongThinkTime() {
+    @Test func talkAboutGetsDoubleThinkTime() {
         let q = makeQuestion(type: .talkAbout, text: "What made you smile today?", answer: nil)
+        var settings = ListenSettings()
+        settings.thinkTime = 10
         let steps = ListenScript.steps(for: Turn(number: 3, player: .listener(ageBand: .sixToEight), presented: present(q)),
-                                       category: .values, settings: ListenSettings(), addressPlayer: false)
-        #expect(steps.contains(.think(seconds: 30)))
+                                       category: .values, settings: settings, addressPlayer: false)
+        #expect(steps.contains(.think(seconds: 20)))
+        #expect(!steps.contains { if case .say(_, .options) = $0 { true } else { false } })
         #expect(steps.contains(.say("Great chat!", .answer)))
     }
 
@@ -185,7 +188,7 @@ struct ListenScriptTests {
 
     @Test func gentleFeedbackForValuesTopics() {
         var rng = SeededGenerator(seed: 1)
-        let p = present(makeQuestion(type: .scenario, options: ["Laugh", "Help"], answer: "Help"))
+        let p = present(makeQuestion(options: ["Laugh", "Help", "Run off"], answer: "Help"))
         #expect(Phrases.feedback(.incorrect, presented: p, category: .values, using: &rng)
             == "Good try! A kinder choice might be… B: Help.")
         #expect(Phrases.feedback(.incorrect, presented: present(makeQuestion(answer: "Hobart")),

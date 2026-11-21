@@ -48,17 +48,21 @@ class ValidateContentTests(unittest.TestCase):
 
     def test_open_questions_are_rejected(self):
         q = question(type="open", options=None)
-        self.assertError(self.run_with([q]), "open questions are not allowed")
+        self.assertError(self.run_with([q]), "open quiz questions are not allowed")
 
-    def test_multiple_choice_needs_three_or_four_options(self):
-        self.assertError(self.run_with([question(options=["Hobart", "Darwin"])]), "needs 3-4")
+    def test_multiple_choice_needs_exactly_three_options(self):
+        self.assertError(self.run_with([question(options=["Hobart", "Darwin"])]), "exactly 3")
+        self.assertError(self.run_with([question(options=["Hobart", "Darwin", "Perth", "Sydney"])]), "exactly 3")
+
+    def test_scenario_type_points_to_multiple_choice(self):
+        self.assertError(self.run_with([question(type="scenario")]), "merged into multipleChoice")
 
     def test_unknown_topic_and_band(self):
         self.assertError(self.run_with([question(topic="nope")]), "unknown topic")
         self.assertError(self.run_with([question(id="spc-0001", topic="space", ageBand="9-10")]), "no 9-10 band")
 
     def test_answer_must_be_an_option(self):
-        q = question(type="multipleChoice", options=["Indian", "Atlantic", "Arctic"], answer="Pacific")
+        q = question(options=["Indian", "Atlantic", "Arctic"], answer="Pacific")
         self.assertError(self.run_with([q]), "answer must be one of the options")
 
     def test_option_letters_not_allowed_in_accepted(self):

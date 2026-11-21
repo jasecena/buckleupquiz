@@ -7,21 +7,30 @@
 ## Context
 Product decision (2026-11-22):
 
-1. **All questions are single choice between several answers.** True/false is fine too.
-   Free-answer ("open") questions are dropped.
+1. **All quiz questions are a single choice between three answers.** True/false is fine too.
+   Free-answer quiz questions are dropped. "Scenario" was the same thing as multiple choice,
+   and having both was confusing, so they are merged.
+   **Talk About** prompts, the open discussion questions turned on by Parent mode, stay, and
+   get **double the think time** so the family can talk.
 2. **Families add their kids once, with name and age.** Each session starts with "Who's
    playing?", and the family picks names. There is no age-band picker: the app already knows
    each child's age, so each child gets questions for their own age. The names are used later
    too: turns, scores and voice mode.
 
 ## Decision
-- `QuestionType` is now `multipleChoice | trueFalse | scenario | talkAbout`. The validator
-  rejects `open` with a pointer to this ADR. Multiple choice needs 3–4 options; scenarios need
-  2–4. Options are always read aloud, so the "read options" setting is gone.
+- `QuestionType` is now `multipleChoice | trueFalse | talkAbout`.
+  - **multipleChoice** has **exactly 3 options**, one correct. Values and safety topics use it
+    for everyday situations. Their gentle wording ("The best choice is…", "Good try! A kinder
+    choice might be…") and `explanation` come from the topic's category, not from a separate
+    type.
+  - **trueFalse** has no options; the answer is "True" or "False".
+  - **talkAbout** is an open discussion with no score. It lasts **2 × think time** (16 s at the
+    default 8 s) and is only included when Parent mode is on.
+  
+  The validator rejects `open` and `scenario` with a pointer to this ADR. Options are always
+  read aloud, so the "read options" setting is gone.
   `acceptedAnswers` stays optional, as extra ways to say the *correct option*
   ("gum" for "Gum leaves").
-- Talk About prompts stay. They are unscored chats rather than quiz questions, and are
-  controlled by Parent mode.
 - **Players** (`PlayerProfile`, SwiftData, CloudKit-ready per ADR-0009) have a name, an age
   (4–14), a colour, and the question ids they've heard. The age is stored with the date it was
   set, and the current age adds the years since, so kids move up a band on their own.
@@ -36,6 +45,6 @@ Product decision (2026-11-22):
 ## Consequences
 - Voice matching gets easier and more reliable. The child says a letter or an option, so there
   are no free-text answers to fuzzy-match (ADR-0007's option rules still apply).
-- Content work changes: every question needs 2–3 *plausible* wrong options.
+- Content work changes: every multiple-choice question needs 2 *plausible* wrong options.
 - Players are now part of the free experience. Whether the free tier should limit the
   number of players is an open M6 (paywall) question.

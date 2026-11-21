@@ -1,4 +1,4 @@
 [
-  {"id": "man-0001", "topic": "manners", "ageBand": "6-8", "type": "scenario", "question": "Your friend falls over at the park. What's the kind thing to do?", "options": ["Laugh", "Help them up and ask if they're okay", "Keep playing"], "answer": "Help them up and ask if they're okay", "acceptedAnswers": [], "explanation": "Helping shows you care, and they'd do the same for you.", "difficulty": 1},
+  {"id": "man-0001", "topic": "manners", "ageBand": "6-8", "type": "multipleChoice", "question": "Your friend falls over at the park. What's the kind thing to do?", "options": ["Laugh", "Help them up and ask if they're okay", "Keep playing"], "answer": "Help them up and ask if they're okay", "acceptedAnswers": [], "explanation": "Helping shows you care, and they'd do the same for you.", "difficulty": 1},
   {"id": "man-0002", "topic": "manners", "ageBand": "6-8", "type": "talkAbout", "question": "What's something kind someone did for you this week?", "answer": null, "difficulty": 1}
 ]

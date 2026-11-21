@@ -3,7 +3,7 @@
     "id": "man-0001",
     "topic": "manners",
     "ageBand": "6-8",
-    "type": "scenario",
+    "type": "multipleChoice",
     "question": "Your friend falls over at the park. What's the kind thing to do?",
     "options": [
       "Laugh",
@@ -35,7 +35,7 @@
     "id": "man-0003",
     "topic": "manners",
     "ageBand": "6-8",
-    "type": "scenario",
+    "type": "multipleChoice",
     "question": "Someone gives you a present you don't really like. What could you say?",
     "options": [
       "Thank you, that was kind of you",
@@ -66,7 +66,7 @@
     "id": "man-0005",
     "topic": "manners",
     "ageBand": "6-8",
-    "type": "scenario",
+    "type": "multipleChoice",
     "question": "You and another kid both want the window seat. What's a fair thing to do?",
     "options": [
       "Take turns",
@@ -84,7 +84,7 @@
     "id": "man-0101",
     "topic": "manners",
     "ageBand": "9-10",
-    "type": "scenario",
+    "type": "multipleChoice",
     "question": "A new kid is standing alone at lunch. What could you do?",
     "options": [
       "Invite them to join you",
@@ -129,7 +129,7 @@
     "id": "man-0201",
     "topic": "manners",
     "ageBand": "11-12",
-    "type": "scenario",
+    "type": "multipleChoice",
     "question": "Your group chat starts making fun of someone's photo. What could you do?",
     "options": [
       "Don't join in, and tell a trusted adult",

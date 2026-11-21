@@ -93,7 +93,7 @@ struct AnswerMatcherTests {
 
     var kindness: Question {
         makeQuestion(
-            topic: "manners", type: .scenario,
+            topic: "manners", type: .multipleChoice,
             options: ["Laugh", "Help them up and ask if they're okay", "Keep playing"],
             answer: "Help them up and ask if they're okay")
     }

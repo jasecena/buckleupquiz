@@ -3,7 +3,7 @@
 > **BuckleUp Quiz** — a hands-free, voice-first educational quiz for kids aged 6–12, built for car trips and home. The app reads a question aloud, waits, then reveals the answer. The paid tier listens for spoken answers, takes turns between named players and keeps score.
 
 > **Changes since this spec was written** (see [ADR-0015](adr/0015-choice-questions-and-named-players.md)):
-> - Every question is a single choice between options (multiple choice, scenario, or true/false). Open questions are dropped.
+> - Every quiz question is a single choice: **3 options**, or true/false. "Scenario" is merged into multiple choice. Open discussion questions stay as **Talk About** prompts (Parent mode) with **double** the think time.
 > - Families add players with a name and age. Sessions start with "Who's playing?" instead of an age-band picker, and each child gets questions for their own age.
 
 ---
@@ -163,7 +163,7 @@ After the question is read:
   "region": "AU"
 }
 ```
-- `type`: `multipleChoice` | `trueFalse` | `scenario` | `talkAbout`. *(`open` was removed by ADR-0015: every question is a choice.)*
+- `type`: `multipleChoice` (3 options) | `trueFalse` | `talkAbout`. *(ADR-0015 removed `open` and merged `scenario` into `multipleChoice`.)*
   - `scenario`: a short social situation with 3 spoken options. Scored like multiple choice.
   - `talkAbout`: an open discussion prompt with **no scoring** and no right answer (see 4.3).
 - Optional field `explanation`: one kind sentence explaining *why* the answer is the good choice. It's read aloud after the answer in place of `funFact`.

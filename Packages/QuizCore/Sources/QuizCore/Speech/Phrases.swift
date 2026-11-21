@@ -36,7 +36,7 @@ public enum Phrases {
     /// "The answer is… Hobart!"
     public static func answerReveal(_ presented: PresentedQuestion, category: Topic.Category?) -> String {
         guard let answer = presented.answerText else { return greatChat }
-        let lead = (category == .values || category == .safety || presented.question.type == .scenario)
+        let lead = (category == .values || category == .safety)
             ? "The best choice is…" : "The answer is…"
         return "\(lead) \(answer.trimmedSentence)!"
     }

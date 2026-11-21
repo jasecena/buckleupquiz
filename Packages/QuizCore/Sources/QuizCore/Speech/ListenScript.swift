@@ -23,20 +23,20 @@ public struct ListenSettings: Hashable, Sendable, Codable {
     public static let thinkTimeRange: ClosedRange<Double> = 3...20
 
     public var thinkTime: Double = 8
-    public var talkAboutThinkTime: Double = 30
+    /// Talk About prompts get double the think time, so the family can chat.
+    public static let talkAboutMultiplier = 2.0
     public var funFacts = true
     public var pauseAfterAnswer: Double = 2
 
     public init() {}
 
     // Decoded key by key so settings saved by older builds (missing or extra keys) still load.
-    private enum CodingKeys: String, CodingKey { case thinkTime, talkAboutThinkTime, funFacts, pauseAfterAnswer }
+    private enum CodingKeys: String, CodingKey { case thinkTime, funFacts, pauseAfterAnswer }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let d = ListenSettings()
         thinkTime = try c.decodeIfPresent(Double.self, forKey: .thinkTime) ?? d.thinkTime
-        talkAboutThinkTime = try c.decodeIfPresent(Double.self, forKey: .talkAboutThinkTime) ?? d.talkAboutThinkTime
         funFacts = try c.decodeIfPresent(Bool.self, forKey: .funFacts) ?? d.funFacts
         pauseAfterAnswer = try c.decodeIfPresent(Double.self, forKey: .pauseAfterAnswer) ?? d.pauseAfterAnswer
     }
@@ -60,11 +60,12 @@ public enum ListenScript {
         }
         steps.append(.cue(.think))
 
+        let thinkTime = settings.thinkTime.clamped(to: ListenSettings.thinkTimeRange)
         if q.type == .talkAbout {
-            steps.append(.think(seconds: settings.talkAboutThinkTime))
+            steps.append(.think(seconds: thinkTime * ListenSettings.talkAboutMultiplier))
             steps.append(.say(Phrases.greatChat, .answer))
         } else {
-            steps.append(.think(seconds: settings.thinkTime.clamped(to: ListenSettings.thinkTimeRange)))
+            steps.append(.think(seconds: thinkTime))
             steps.append(.say(Phrases.answerReveal(presented, category: category), .answer))
             // Explanations teach the "why" of values questions, so they are always read.
             if let explanation = q.explanation {

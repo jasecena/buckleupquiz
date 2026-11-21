@@ -40,7 +40,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Questions")
                 } footer: {
-                    Text("Talk About prompts are open chats with no right answer. Turn them off when kids play alone.")
+                    Text("Talk About prompts are open questions to chat about, with no right answer. They get double the think time. Turn them off when kids play alone.")
                 }
 
                 Section {

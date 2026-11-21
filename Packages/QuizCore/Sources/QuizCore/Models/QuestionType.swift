@@ -1,13 +1,14 @@
 /// How a question is asked and judged (FEATURES §4.1, ADR-0015).
-/// Every scored question is a single choice between options; there are no free-answer questions.
+///
+/// Quiz questions are always a single choice: three options, or true/false.
+/// Talk About prompts are the open questions: a chat with no right answer.
 public enum QuestionType: String, Codable, CaseIterable, Sendable, Hashable {
-    /// 3–4 options, one correct.
+    /// Exactly three options, one correct. Values and safety topics use it for
+    /// everyday situations ("Your friend falls over. What's the kind thing to do?").
     case multipleChoice
     /// Answer is "True" or "False".
     case trueFalse
-    /// A short social situation with spoken options. Scored like multiple choice.
-    case scenario
-    /// Open discussion prompt. Never scored, no options.
+    /// Open discussion prompt (Parent mode). Never scored, no options, double think time.
     case talkAbout
 
     /// Whether answering this question can earn points.

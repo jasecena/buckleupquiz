@@ -62,7 +62,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 ## M3 — UI 🟡
 - [x] Home topic grid (icon, name, count, lock), topic setup (age band, length), quiz screen
       (question, countdown ring, answer reveal, big Pause/Skip/Repeat), settings
-- [x] Choice-only questions; content converted (ADR-0015)
+- [x] Quiz questions are 3-option multiple choice or true/false; Talk About (Parent mode) gets double think time (ADR-0015)
 - [x] Players: add/edit/remove with name, age and colour; "Who's playing?" replaces the age picker;
       turns per player with age-appropriate questions; seen questions remembered (ADR-0015)
 - [ ] Onboarding (FEATURES §6): welcome, 3-question demo, add the first player
