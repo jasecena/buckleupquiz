@@ -23,6 +23,31 @@ struct AnswerMatcherTests {
         #expect(judge([heard], tasmania) == .incorrect(heard: heard))
     }
 
+    // MARK: The letter alone or the answer alone is enough
+
+    /// "Which state is Perth in?" with Western Australia as option B.
+    var perth: PresentedQuestion {
+        PresentedQuestion(
+            question: makeQuestion(text: "Which state is Perth in?", options: ["Queensland", "Western Australia", "Victoria"],
+                                   answer: "Western Australia", accepted: ["wa"]),
+            options: ["Queensland", "Western Australia", "Victoria"], correctOptionIndex: 1)
+    }
+
+    @Test(arguments: [
+        "B", "b", "B.", "Bee", "Be", "Bea", "Option B", "It's B", "I said B", "B!", "Yeah B",
+        "Western Australia", "western australia", "Western Australia.", "It's Western Australia",
+        "Western Australian", "West Australia", "WA", "W.A.", "W A",
+        "B Western Australia", "B, Western Australia", "Western Australia B",
+    ])
+    func letterOrAnswerAloneIsEnough(heard: String) {
+        #expect(matcher.match(transcriptions: [heard], to: perth) == .correct(heard: heard))
+    }
+
+    @Test(arguments: ["A", "Queensland", "C", "Victoria", "South Australia"])
+    func otherStatesAreNotWesternAustralia(heard: String) {
+        #expect(matcher.match(transcriptions: [heard], to: perth) != .correct(heard: heard))
+    }
+
     @Test func numbersMatchWordsAndDigits() {
         let q = makeQuestion(options: ["20", "21", "22"], answer: "21")
         for heard in ["twenty one", "twenty-one", "21", "B"] {

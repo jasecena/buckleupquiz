@@ -47,15 +47,16 @@ public struct AnswerMatcher: Sendable {
     // MARK: - Choice questions
 
     private static let letterSounds: [[String]] = [
-        ["a", "ay", "eh"],
-        ["b", "be", "bee"],
-        ["c", "see", "sea", "si"],
+        ["a", "ay", "eh", "aye", "hey"],
+        ["b", "be", "bee", "bea", "bi"],
+        ["c", "see", "sea", "si", "cee"],
         ["d", "dee"],
         ["e"],
         ["f", "ef", "eff"],
     ]
     private static let letterFillers: Set<String> = [
-        "option", "answer", "letter", "its", "it", "is", "i", "think", "say", "pick", "choose", "um", "uh", "umm",
+        "option", "answer", "letter", "its", "it", "is", "i", "think", "say", "said", "pick", "choose", "go", "with",
+        "the", "um", "uh", "umm", "er", "erm", "hmm", "oh", "so", "yeah", "ok", "okay",
     ]
     private static let trueWords: Set<String> = ["true", "yes", "yeah", "yep", "right", "correct", "its true"]
     private static let falseWords: Set<String> = ["false", "no", "nope", "wrong", "not true", "its false", "incorrect"]
@@ -66,7 +67,13 @@ public struct AnswerMatcher: Sendable {
 
     /// Which option the child chose, or nil if unclear / hedged between options.
     func chosenOption(_ transcript: String, options: [String], presented: PresentedQuestion) -> Int? {
-        let raw = TextNormalizer.tokens(transcript)
+        var transcript = transcript
+        var raw = TextNormalizer.tokens(transcript)
+        // Spelled-out initials ("W A", "W.A.") are one word: "wa".
+        if raw.count > 1, raw.allSatisfy({ $0.count == 1 && $0.first?.isLetter == true }) {
+            transcript = raw.joined()
+            raw = [transcript]
+        }
 
         // 1. Option letter: "B", "option B", "I think it's C".
         let core = raw.filter { !Self.letterFillers.contains($0) }
@@ -109,11 +116,14 @@ public struct AnswerMatcher: Sendable {
         //    "Help them up and ask if they're okay").
         let heardWords = Set(TextNormalizer.normalizedTokens(transcript)).subtracting(Self.stopWords)
         guard !heardWords.isEmpty else { return nil }
+        // Short options (one or two key words) must be said whole, so "South Australia" never
+        // passes for "Western Australia"; "West Australia" still does (a word's start counts).
         let scores: [(i: Int, score: Double)] = options.enumerated().map { i, option in
             let keys = Set(TextNormalizer.normalizedTokens(option)).subtracting(Self.stopWords)
             guard !keys.isEmpty else { return (i, 0) }
-            let hits = keys.filter { key in heardWords.contains { fuzzyEqual($0, key) } }.count
-            return (i, Double(hits) / Double(keys.count))
+            let hits = keys.filter { key in heardWords.contains { keyWord($0, matches: key) } }.count
+            let score = Double(hits) / Double(keys.count)
+            return (i, keys.count <= 2 && score < 1 ? 0 : score)
         }.sorted { $0.score > $1.score }
         guard scores[0].score >= optionOverlapThreshold else { return nil }
         if scores.count > 1, scores[1].score >= scores[0].score { return nil }
@@ -139,6 +149,13 @@ public struct AnswerMatcher: Sendable {
             if fuzzyEqual(window, t.joined(separator: " ")) { return .contained }
         }
         return .none
+    }
+
+    /// A heard word matches an option's key word if it's close, or a clear start of it
+    /// ("west" for "western").
+    func keyWord(_ heard: String, matches key: String) -> Bool {
+        if fuzzyEqual(heard, key) { return true }
+        return heard.count >= 4 && !heard.contains(where: \.isNumber) && key.hasPrefix(heard)
     }
 
     /// Exact for anything containing digits ("21" must never equal "22"), otherwise
