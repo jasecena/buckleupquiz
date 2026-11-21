@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Manage the family's players (from the home screen).
+/// Manage the family's players (from Game setup → Edit players).
 struct PlayersView: View {
     @Environment(PlayerStore.self) private var store
     @Environment(\.dismiss) private var dismiss

@@ -51,6 +51,15 @@ public struct Turn: Hashable, Sendable {
     public let number: Int
     public let player: Player
     public let presented: PresentedQuestion
+    /// New question, or a review (ADR-0016).
+    public let kind: TurnKind
+
+    public init(number: Int, player: Player, presented: PresentedQuestion, kind: TurnKind = .new) {
+        self.number = number
+        self.player = player
+        self.presented = presented
+        self.kind = kind
+    }
 }
 
 /// The game state for one session: turn rotation, question selection, scoring and each
@@ -62,7 +71,9 @@ public struct QuizSession: Sendable {
     public private(set) var turnsPlayed = 0
     public private(set) var isFinished = false
     public private(set) var scores: ScoreKeeper
-    /// Each player's Leitner boxes, updated as turns end. Persist after the session.
+    /// Leitner boxes for the whole family, keyed by player id, updated as turns end. Absent
+    /// family members are included so their recent questions can be shared and nobody gets a
+    /// question twice in a day. Persist after the session.
     public private(set) var learning: [String: LearningRecord]
     /// `LearningDay` number for today.
     public let day: Int
@@ -71,6 +82,9 @@ public struct QuizSession: Sendable {
     public private(set) var currentResult: ReviewResult?
 
     private var selector: QuestionSelector
+    /// Each player's own turn plan (`ReviewMix`), so everyone gets their share of new questions.
+    private var plans: [String: [TurnKind]] = [:]
+    private var turnsTaken: [String: Int] = [:]
     private var rng: AnyRandomGenerator
     private var nextPlayerIndex = 0
     private var recordedCurrent = false
@@ -101,13 +115,18 @@ public struct QuizSession: Sendable {
         for offset in 0..<config.players.count {
             let index = (nextPlayerIndex + offset) % config.players.count
             let player = config.players[index]
-            let record = learning[player.id] ?? LearningRecord()
-            guard let question = selector.next(for: player, record: record, day: day, using: &rng) else { continue }
+            let taken = turnsTaken[player.id] ?? 0
+            while (plans[player.id]?.count ?? 0) <= taken {
+                plans[player.id, default: []] += ReviewMix.plan(turns: turnsPerPlayer, using: &rng)
+            }
+            guard let (question, kind) = selector.next(
+                for: player, kind: plans[player.id]![taken], family: learning, day: day, using: &rng) else { continue }
+            turnsTaken[player.id] = taken + 1
             nextPlayerIndex = (index + 1) % config.players.count
             turnsPlayed += 1
             if question.type == .talkAbout { learning[player.id, default: LearningRecord()].noteTalkedAbout(question.id) }
             let presented = PresentedQuestion(question: question, shuffleOptions: config.shuffleOptions, using: &rng)
-            let turn = Turn(number: turnsPlayed, player: player, presented: presented)
+            let turn = Turn(number: turnsPlayed, player: player, presented: presented, kind: kind)
             currentTurn = turn
             currentResult = nil
             recordedCurrent = false
@@ -131,6 +150,12 @@ public struct QuizSession: Sendable {
         return scores.record(effective, playerID: turn.player.id, topic: turn.presented.question.topic)
     }
 
+    /// Turns each player is expected to get, for planning their review share.
+    private var turnsPerPlayer: Int {
+        let total = config.length.limit ?? ReviewMix.endlessBlock * config.players.count
+        return max(1, (total + config.players.count - 1) / config.players.count)
+    }
+
     /// Sets how the current turn went for its player's Leitner boxes, e.g. a parent tapping
     /// "Got it" / "Not yet". Can be changed until the turn ends. Ignored for Talk About.
     public mutating func mark(_ result: ReviewResult?) {
@@ -143,10 +168,18 @@ public struct QuizSession: Sendable {
 
     public var scoreboard: [ScoreboardEntry] { Scoreboard.rank(players: config.players, scores: scores) }
 
+    /// Updates the boxes when a turn ends (ADR-0016). The player whose turn it was moves up
+    /// (right) or starts over (wrong). Everyone else playing who could get this question heard
+    /// it too: they move up when the answer was right, and are left alone when it was wrong.
     private mutating func commitCurrent() {
         guard let turn = currentTurn, turn.presented.question.type.isScored, let result = currentResult else { return }
-        learning[turn.player.id, default: LearningRecord()]
-            .record(result, for: turn.presented.question.id, on: day)
+        let question = turn.presented.question
+        learning[turn.player.id, default: LearningRecord()].record(result, for: question.id, on: day)
+        if result != .incorrect {
+            for other in config.players where other.id != turn.player.id && QuestionSelector.suits(question, other) {
+                learning[other.id, default: LearningRecord()].record(.heard, for: question.id, on: day)
+            }
+        }
         currentResult = nil
     }
 

@@ -57,7 +57,7 @@ struct PlayerStoreTests {
 
         let saved = store.learning(for: [mia, leo])
         #expect(saved[mia.id.uuidString]?.card("ani-0001") == ReviewCard(box: 1, due: 11))
-        #expect(saved[mia.id.uuidString]?.card("ani-0002") == ReviewCard(box: 2, due: 12))
+        #expect(saved[mia.id.uuidString]?.card("ani-0002") == ReviewCard(box: 2, due: 12, last: 11))
         #expect(saved[leo.id.uuidString]?.cards.isEmpty == true, "Leo's boxes are his own")
     }
 

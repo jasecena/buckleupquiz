@@ -336,3 +336,7 @@ final class ListenSessionModel {
         deps.nowPlaying?.update(title: title, subtitle: topicTitle, isPlaying: status == .playing)
     }
 }
+
+extension ListenSessionModel: Identifiable {
+    nonisolated var id: ObjectIdentifier { ObjectIdentifier(self) }
+}

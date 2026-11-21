@@ -5,7 +5,10 @@ import Foundation
 /// Each player has their own boxes. A question starts in box 1 the day they first meet it.
 /// Every time they get it right it moves up a box and comes back after a longer wait;
 /// a wrong answer sends it back to box 1, for that player only. After box 6 it is learned
-/// and isn't asked again.
+/// and isn't asked again. No question is played twice on the same day, so box 1 comes back
+/// tomorrow at the earliest.
+///
+/// Reviews are a small, random share of each session (`ReviewMix`), so the game stays fresh.
 public enum Leitner {
     /// Days to wait before a question in each box comes back:
     /// box 1 today, then tomorrow, 2, 4, 8 and 16 days.
@@ -30,10 +33,22 @@ public struct ReviewCard: Codable, Hashable, Sendable {
     public var box: Int
     /// `LearningDay` number on which it's next due.
     public var due: Int
+    /// `LearningDay` number on which it was last played (asked, or heard as a bystander).
+    public var last: Int
 
-    public init(box: Int, due: Int) {
+    public init(box: Int, due: Int, last: Int? = nil) {
         self.box = box
         self.due = due
+        self.last = last ?? due
+    }
+
+    private enum CodingKeys: String, CodingKey { case box, due, last }
+
+    public init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        box = try c.decode(Int.self, forKey: .box)
+        due = try c.decode(Int.self, forKey: .due)
+        last = try c.decodeIfPresent(Int.self, forKey: .last) ?? due
     }
 
     public var isLearned: Bool { box > Leitner.boxCount }
@@ -55,6 +70,8 @@ public struct LearningRecord: Codable, Hashable, Sendable {
     public func card(_ questionID: String) -> ReviewCard? { cards[questionID] }
     public func isNew(_ questionID: String) -> Bool { cards[questionID] == nil }
     public func isDue(_ questionID: String, on day: Int) -> Bool { cards[questionID]?.isDue(on: day) ?? false }
+    public func isLearned(_ questionID: String) -> Bool { cards[questionID]?.isLearned ?? false }
+    public func wasPlayed(_ questionID: String, on day: Int) -> Bool { cards[questionID]?.last == day }
 
     /// Moves the question up a box (correct or heard) or back to box 1 (incorrect).
     /// A question met for the first time counts as box 1 "today", so a right answer
@@ -62,7 +79,7 @@ public struct LearningRecord: Codable, Hashable, Sendable {
     public mutating func record(_ result: ReviewResult, for questionID: String, on day: Int) {
         let box = result.movesUp ? (cards[questionID]?.box ?? 1) + 1 : 1
         let wait = box <= Leitner.boxCount ? Leitner.intervals[box - 1] : 0
-        cards[questionID] = ReviewCard(box: min(box, Leitner.boxCount + 1), due: day + wait)
+        cards[questionID] = ReviewCard(box: min(box, Leitner.boxCount + 1), due: day + wait, last: day)
     }
 
     public mutating func noteTalkedAbout(_ questionID: String) { talkedAbout.insert(questionID) }

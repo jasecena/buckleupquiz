@@ -21,5 +21,6 @@ accepted: to change a decision, add a new ADR that supersedes the old one.
 | [0014](0014-testflight-release-pipeline.md) | TestFlight releases: tag-triggered, cloud-managed signing | Accepted |
 | [0015](0015-choice-questions-and-named-players.md) | Every question is a choice; players picked by name and age | Accepted |
 | [0016](0016-leitner-spaced-repetition.md) | Each player learns with Leitner boxes (spaced repetition) | Accepted |
+| [0017](0017-one-tap-start.md) | One tap to play: remembered setup, random or chosen topic | Accepted |
 
 New ADR: copy [template.md](template.md) to the next number.

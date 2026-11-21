@@ -6,7 +6,8 @@
 > - Every quiz question is a single choice: **3 options**, or true/false. "Scenario" is merged into multiple choice. Open discussion questions stay as **Talk About** prompts (Parent mode, off by default) with **no time limit**: the app waits until the family presses Next.
 > - Families add players with a name and age. Sessions start with "Who's playing?" instead of an age-band picker, and each child gets questions for their own age.
 > - Parent mode has its own Settings section and a **separate talk timer** (default: no limit).
-> - Questions repeat per player with **Leitner boxes**: today, tomorrow, then after 2, 4, 8 and 16 days. A wrong answer starts over, for that player only ([ADR-0016](adr/0016-leitner-spaced-repetition.md)).
+> - Questions repeat per player with **Leitner boxes**: today, tomorrow, then after 2, 4, 8 and 16 days. A wrong answer starts over, for that player only. Reviews are about 20% of a session (10% own, 10% from what the others had), nothing repeats on the same day, and the rest is new ([ADR-0016](adr/0016-leitner-spaced-repetition.md)).
+> - **One tap to play:** who's playing and the length are remembered. Home has a big **Play** button (random topic), and tapping a topic starts it straight away. Setup appears only before the first game or via **Change** ([ADR-0017](adr/0017-one-tap-start.md)).
 
 ---
 

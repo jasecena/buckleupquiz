@@ -1,19 +1,17 @@
-/// Picks the next question for a player (FEATURES §4.4, ADR-0016):
+/// Picks the next question for a player (FEATURES §4.4, ADR-0016).
 ///
-/// 1. questions due for review in their Leitner boxes (lowest box first),
-/// 2. then questions they have never had (preferring ones nobody else got this session),
-/// 3. then, in Parent mode, Talk About prompts they've already discussed.
-///
-/// A player is asked each question at most once per session. Different players may get
-/// the same question, because each player has their own boxes. Questions that aren't due
-/// yet, or are already learned, are left alone.
+/// - No question is played twice on the same day, for anyone in the family.
+/// - Each turn has a `TurnKind` from `ReviewMix`: new (most turns), the player's own due
+///   reviews, or questions another family member had recently. If that kind has nothing
+///   left, it falls back to the others, so sessions don't stall.
+/// - New questions nobody in the family has had come first, so siblings hear different things.
+/// - Questions that aren't due yet, or are learned, are left alone.
 public struct QuestionSelector: Sendable {
     public let bank: QuestionBank
     public let topics: [String]
     public let includeTalkAbout: Bool
-    /// Question ids asked this session, per player id.
-    public private(set) var askedThisSession: [String: Set<String>] = [:]
-    private var askedToAnyone: Set<String> = []
+    /// Question ids asked to anyone this session.
+    public private(set) var askedThisSession: Set<String> = []
 
     public init(bank: QuestionBank, topics: [String], includeTalkAbout: Bool) {
         self.bank = bank
@@ -21,44 +19,79 @@ public struct QuestionSelector: Sendable {
         self.includeTalkAbout = includeTalkAbout
     }
 
-    /// Questions `player` could still be asked this session, before looking at their boxes.
+    /// Questions in `player`'s band and age not yet asked this session (before the boxes).
     public func pool(for player: Player) -> [Question] {
-        let asked = askedThisSession[player.id] ?? []
-        return bank.questions(topics: topics, ageBand: player.ageBand).filter { q in
-            !asked.contains(q.id)
+        bank.questions(topics: topics, ageBand: player.ageBand).filter { q in
+            !askedThisSession.contains(q.id)
                 && (includeTalkAbout || q.type != .talkAbout)
-                && (q.minAge == nil || player.age == nil || player.age! >= q.minAge!)
+                && Self.suits(q, player)
         }
     }
 
-    /// How many questions `player` can be asked today: due reviews, new questions and
-    /// (in Parent mode) Talk About prompts.
-    public func availableCount(for player: Player, record: LearningRecord, day: Int) -> Int {
-        pool(for: player).filter { q in
-            q.type == .talkAbout || record.isNew(q.id) || record.isDue(q.id, on: day)
-        }.count
+    static func suits(_ q: Question, _ player: Player) -> Bool {
+        q.ageBand == player.ageBand && (q.minAge == nil || player.age == nil || player.age! >= q.minAge!)
+    }
+
+    /// How many questions `player` could still get today.
+    public func availableCount(for player: Player, family: [String: LearningRecord], day: Int) -> Int {
+        let c = candidates(for: player, family: family, day: day)
+        return Set((c.own + c.shared + c.fresh + c.talkAgain).map(\.id)).count
     }
 
     public mutating func next(
-        for player: Player, record: LearningRecord, day: Int, using rng: inout some RandomNumberGenerator
-    ) -> Question? {
-        let pool = pool(for: player).shuffled(using: &rng)
-
-        let due = pool.filter { $0.type != .talkAbout && record.isDue($0.id, on: day) }
-        let fresh = pool.filter { q in
-            q.type == .talkAbout ? !record.talkedAbout.contains(q.id) : record.isNew(q.id)
+        for player: Player, kind: TurnKind, family: [String: LearningRecord], day: Int,
+        using rng: inout some RandomNumberGenerator
+    ) -> (Question, TurnKind)? {
+        let c = candidates(for: player, family: family, day: day)
+        let order: [(TurnKind, [Question])] = switch kind {
+        case .ownReview: [(.ownReview, c.own), (.sharedReview, c.shared), (.new, c.freshForFamily), (.new, c.fresh)]
+        case .sharedReview: [(.sharedReview, c.shared), (.ownReview, c.own), (.new, c.freshForFamily), (.new, c.fresh)]
+        case .new: [(.new, c.freshForFamily), (.new, c.fresh), (.ownReview, c.own), (.sharedReview, c.shared),
+                    (.new, c.talkAgain)]
         }
-        let freshForEveryone = fresh.filter { !askedToAnyone.contains($0.id) }
-        let talkAgain = pool.filter { $0.type == .talkAbout }
+        guard let (actual, list) = order.first(where: { !$0.1.isEmpty }),
+              let pick = list.randomElement(using: &rng) else { return nil }
+        askedThisSession.insert(pick.id)
+        return (pick, actual)
+    }
 
-        let pick = due.min { a, b in
-            let (ca, cb) = (record.card(a.id)!, record.card(b.id)!)
-            return (ca.box, ca.due) < (cb.box, cb.due)
-        } ?? freshForEveryone.first ?? fresh.first ?? talkAgain.first
+    struct Candidates {
+        var own: [Question] = []
+        /// Only the most recent day's shared questions ("from yesterday" first).
+        var shared: [Question] = []
+        var freshForFamily: [Question] = []
+        var fresh: [Question] = []
+        var talkAgain: [Question] = []
+    }
 
-        guard let pick else { return nil }
-        askedThisSession[player.id, default: []].insert(pick.id)
-        askedToAnyone.insert(pick.id)
-        return pick
+    func candidates(for player: Player, family: [String: LearningRecord], day: Int) -> Candidates {
+        let mine = family[player.id] ?? LearningRecord()
+        let others = family.filter { $0.key != player.id }.map(\.value)
+        var c = Candidates()
+        var sharedByDay: [Int: [Question]] = [:]
+        for q in pool(for: player) where !family.values.contains(where: { $0.wasPlayed(q.id, on: day) }) {
+            if q.type == .talkAbout {
+                if mine.talkedAbout.contains(q.id) {
+                    c.talkAgain.append(q)
+                } else {
+                    c.fresh.append(q)
+                    if !others.contains(where: { $0.talkedAbout.contains(q.id) }) { c.freshForFamily.append(q) }
+                }
+                continue
+            }
+            if mine.isLearned(q.id) { continue }
+            if mine.isDue(q.id, on: day) { c.own.append(q) }
+            if mine.isNew(q.id) {
+                c.fresh.append(q)
+                if others.allSatisfy({ $0.isNew(q.id) }) { c.freshForFamily.append(q) }
+            }
+            if mine.isNew(q.id) || mine.isDue(q.id, on: day) {
+                let recent = others.compactMap { $0.card(q.id)?.last }
+                    .filter { $0 < day && $0 >= day - ReviewMix.sharedLookback }.max()
+                if let recent { sharedByDay[recent, default: []].append(q) }
+            }
+        }
+        if let latest = sharedByDay.keys.max() { c.shared = sharedByDay[latest] ?? [] }
+        return c
     }
 }

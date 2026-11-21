@@ -67,6 +67,10 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
       turns per player with age-appropriate questions (ADR-0015)
 - [x] Leitner boxes per player (today, 1, 2, 4, 8, 16 days; wrong → start over), "Got it" / "Not yet"
       after each answer, permanent question ids with `retired-ids.json` (ADR-0016)
+- [x] Review mix: ~80% new, 10% own reviews, 10% shared from the others; nothing twice a day;
+      bystanders move up on right answers only (ADR-0016)
+- [x] One-tap start: remembered players and length, Play = random topic, tap a topic = start,
+      Game setup only first time or via Change (ADR-0017)
 - [ ] Onboarding (FEATURES §6): welcome, 3-question demo, add the first player
 - [ ] Mascot and app icon (original, not seatbelt-themed)
 - [ ] Mixed-topic sessions (paid)

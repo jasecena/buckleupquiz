@@ -57,10 +57,13 @@ public enum ListenScript {
     ) -> [SpeechStep] {
         let presented = turn.presented
         let q = presented.question
-        var steps: [SpeechStep] = [
-            .say(Phrases.questionNumber(turn.number), .number),
-            .say(Phrases.addressed(q.question, to: addressPlayer ? turn.player : nil), .question),
-        ]
+        var steps: [SpeechStep] = [.say(Phrases.questionNumber(turn.number), .number)]
+        switch turn.kind {
+        case .ownReview: steps.append(.say(Phrases.ownReviewIntro, .number))
+        case .sharedReview: steps.append(.say(Phrases.sharedReviewIntro, .number))
+        case .new: break
+        }
+        steps.append(.say(Phrases.addressed(q.question, to: addressPlayer ? turn.player : nil), .question))
         // Every question is a choice, so the options are always read (ADR-0015).
         if let options = Phrases.options(presented) {
             steps.append(.say(options, .options))

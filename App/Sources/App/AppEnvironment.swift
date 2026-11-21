@@ -75,7 +75,9 @@ final class AppEnvironment {
         let model = ListenSessionModel(
             bank: bank, config: config, settings: s.listen, duckOthers: s.duckOthers,
             dependencies: makeListenDependencies(settings),
-            learning: players.learning(for: profiles), day: LearningDay.number(),
+            // The whole family's boxes: absent players' recent questions can be shared, and
+            // nobody gets a question someone else already had today (ADR-0016).
+            learning: players.learning(for: players.players), day: LearningDay.number(),
             playerColors: Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.colorHex) }))
         model.onFinish = { [weak players] learning in players?.recordLearning(learning) }
         return model

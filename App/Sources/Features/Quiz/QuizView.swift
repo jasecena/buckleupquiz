@@ -62,6 +62,12 @@ struct QuizView: View {
                         .foregroundStyle(.white)
                         .background(Capsule().fill(Color(hex: model.playerColors[turn.player.id] ?? "#FF6919")))
                 }
+                if turn.kind != .new {
+                    Label(turn.kind == .ownReview ? "From before" : "Someone else had this one",
+                          systemImage: "arrow.triangle.2.circlepath")
+                        .font(Theme.body.weight(.semibold))
+                        .foregroundStyle(Theme.accent)
+                }
                 Text(turn.presented.question.question)
                     .font(Theme.question)
                     .multilineTextAlignment(.center)

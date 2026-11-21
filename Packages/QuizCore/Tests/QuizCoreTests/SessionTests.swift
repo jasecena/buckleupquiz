@@ -23,19 +23,6 @@ struct SessionTests {
         #expect(count == 3)
     }
 
-    @Test func asksDueReviewsBeforeNewQuestions() {
-        let bank = sampleBank(perBand: 4)
-        let player = Player.listener(ageBand: .sixToEight)
-        var record = LearningRecord()
-        record.record(.incorrect, for: "geography-6-8-2", on: 100) // box 1, due day 100
-        let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(1))
-        for seed in 0..<20 as Range<UInt64> {
-            var session = QuizSession(bank: bank, config: config, learning: [player.id: record], day: 100,
-                                      rng: AnyRandomGenerator(seed: seed))
-            #expect(session.advance()?.presented.question.id == "geography-6-8-2")
-        }
-    }
-
     @Test func leavesQuestionsThatAreNotDueOrLearned() {
         let bank = sampleBank(perBand: 3)
         let player = Player.listener(ageBand: .sixToEight)
@@ -50,23 +37,6 @@ struct SessionTests {
         #expect(ids == ["geography-6-8-2"])
     }
 
-    @Test func wrongAnswerResetsOnlyThatPlayer() {
-        let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
-        let leo = Player(id: "leo", name: "Leo", ageBand: .sixToEight)
-        let bank = sampleBank(perBand: 1)
-        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(4))
-        var session = QuizSession(bank: bank, config: config, day: 50, rng: AnyRandomGenerator(seed: 1))
-        var turns: [Turn] = []
-        while let turn = session.advance() {
-            turns.append(turn)
-            session.record(turn.player.id == "mia" ? .incorrect : .correct)
-        }
-        // Each player gets the one question once, even though they share it.
-        #expect(turns.map(\.player.name) == ["Mia", "Leo"])
-        #expect(session.learning["mia"]?.card("geography-6-8-0") == ReviewCard(box: 1, due: 50))
-        #expect(session.learning["leo"]?.card("geography-6-8-0") == ReviewCard(box: 2, due: 51))
-    }
-
     @Test func skippedBeforeTheAnswerLeavesTheBoxesAlone() {
         let player = Player.listener(ageBand: .sixToEight)
         let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(2))
@@ -79,7 +49,7 @@ struct SessionTests {
         session.advance()
         #expect(session.isFinished)
         #expect(session.learning[player.id]?.cards.count == 1)
-        #expect(session.learning[player.id]?.cards.values.first == ReviewCard(box: 2, due: 11))
+        #expect(session.learning[player.id]?.cards.values.first == ReviewCard(box: 2, due: 11, last: 10))
     }
 
     @Test func rotatesPlayersWithTheirOwnAgeBand() {

@@ -7,6 +7,9 @@ public enum Phrases {
     public static let listening = "I'm listening."
     public static let didntCatch = "Sorry, I didn't catch that. Say it again?"
     public static let greatChat = "Great chat!"
+    /// Said before a review question, so it feels like a callback, not a repeat.
+    public static let ownReviewIntro = "Here's one from before. Do you remember?"
+    public static let sharedReviewIntro = "This one came up for someone else. Let's see!"
     public static let talkItOver = "Take your time and talk it over. Press next when you're ready."
 
     public static let cheers = [
