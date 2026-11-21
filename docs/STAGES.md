@@ -137,7 +137,8 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [ ] Real-car tests: 3 or more head units plus CarPlay, road noise, kids
 - [x] Anonymous error reports (ADR-0020): `Telemetry` queue + batches, MetricKit crashes/hangs,
       voice failure events, per-game voice counts, Settings toggle + Diagnostics screen
-- [ ] Deploy `infra/telemetry` and set `TELEMETRY_URL`; update the App Store privacy label (Diagnostics, not linked)
+- [x] Terraform for AWS: bootstrap (state bucket), domain (buckleupquiz.com, zone, certificate), platform (CloudFront, content bucket, reports Lambda) (ADR-0021)
+- [ ] Apply the stacks, set `TELEMETRY_URL`; update the App Store privacy label (Diagnostics, not linked)
 - [ ] Proxy test: only the telemetry endpoint, only anonymous fields (criterion 10, amended by ADR-0020)
 - [ ] Name checks (IP Australia), domains and handles (FEATURES §0)
 

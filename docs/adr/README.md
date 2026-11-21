@@ -25,5 +25,6 @@ accepted: to change a decision, add a new ADR that supersedes the old one.
 | [0018](0018-hands-free-voice-answers.md) | Hands-free voice answers with turn-based scoring | Accepted |
 | [0019](0019-natural-voice-packs.md) | Natural voices: pre-generated audio, downloaded 10 questions at a time | Proposed |
 | [0020](0020-anonymous-error-telemetry.md) | Anonymous error reports (first-party telemetry) | Accepted |
+| [0021](0021-aws-infrastructure-terraform.md) | AWS infrastructure with Terraform: domain, content CDN and error reports | Accepted |
 
 New ADR: copy [template.md](template.md) to the next number.

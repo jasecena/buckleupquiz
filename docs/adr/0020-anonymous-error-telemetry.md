@@ -1,6 +1,6 @@
 # 0020. Anonymous error reports (first-party telemetry)
 
-- **Status:** Accepted (app side, v0.3.1). Endpoint deployment pending.
+- **Status:** Accepted. The endpoint is defined in Terraform by [ADR-0021](0021-aws-infrastructure-terraform.md).
 - **Date:** 2026-11-22
 - **Amends:** [ADR-0004](0004-privacy-no-network-no-sdks.md) (first network request; the privacy label changes)
 
@@ -48,11 +48,12 @@ address (the endpoint never logs it). Field values are capped at 500 characters.
   While it's empty, reports stay on the device and in Diagnostics.
 
 ### The endpoint (AWS, per the hosting preference)
-- `infra/telemetry/template.yaml`: a CloudFormation stack in **ap-southeast-2** with one
-  Lambda **function URL** (Node 22, arm64, 128 MB) that validates each batch and logs each
-  event as structured JSON to the `/buckleupquiz/telemetry` log group, kept **90 days**.
-  No database, no IP or headers logged. This is plain CloudFormation rather than CDK
-  (ADR-0012): one function needs no build step.
+- `https://api.buckleupquiz.com/v1/reports`: CloudFront in front of a Lambda **function URL**
+  (Node 22, arm64, 128 MB) in **ap-southeast-2**. It validates each batch and logs each event
+  as structured JSON to the `/buckleupquiz/telemetry` log group, kept **90 days**. No database,
+  and no IP or headers are logged. Defined in Terraform (`infra/terraform/platform`,
+  [ADR-0021](0021-aws-infrastructure-terraform.md)). The first draft was a CloudFormation
+  template.
 - Cost: within the Lambda free tier, plus CloudWatch Logs ingestion (cents per month at this
   scale). Reserved concurrency can cap abuse (`MaxConcurrency`).
 - Reading reports: CloudWatch Logs Insights (queries in [RELEASING.md](../RELEASING.md)).

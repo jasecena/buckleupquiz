@@ -1,18 +1,24 @@
 # infra/
 
-Infrastructure as code. See [ADR-0012](../docs/adr/0012-future-backend.md) for the backend
-direction. `site/` is hosted on GitHub Pages ([ADR-0005](../docs/adr/0005-static-hosting-github-pages.md))
-and needs nothing here.
+AWS infrastructure in Terraform ([ADR-0021](../docs/adr/0021-aws-infrastructure-terraform.md)).
+Three stacks, each with its own state, so one-time things are created once and never touched
+by everyday changes:
 
-| Folder | What | ADR |
+| Stack | What | Run |
 |---|---|---|
-| [`telemetry/`](telemetry/template.yaml) | Anonymous error reports endpoint (Lambda function URL + CloudWatch Logs, ap-southeast-2) | [0020](../docs/adr/0020-anonymous-error-telemetry.md) |
+| [`terraform/bootstrap`](terraform/bootstrap/main.tf) | Terraform state bucket | once per account: `make infra-bootstrap` |
+| [`terraform/domain`](terraform/domain/main.tf) | buckleupquiz.com, DNS zone, certificate, website records | once: `make infra-domain` |
+| [`terraform/platform`](terraform/platform/main.tf) | `api.buckleupquiz.com`: content bucket + CloudFront, error reports (Lambda) | `make infra-platform` |
 
-## Deploying the telemetry endpoint
 ```sh
-aws cloudformation deploy --region ap-southeast-2 --stack-name buckleupquiz-telemetry \
-  --template-file infra/telemetry/template.yaml --capabilities CAPABILITY_IAM
-aws cloudformation describe-stacks --region ap-southeast-2 --stack-name buckleupquiz-telemetry \
-  --query "Stacks[0].Outputs[?OutputKey=='Endpoint'].OutputValue" --output text
+export AWS_PROFILE=buckleupquiz
+make infra-check        # account, domain availability and price
+make infra-bootstrap
+cp infra/terraform/domain/contact.auto.tfvars.example infra/terraform/domain/contact.auto.tfvars  # fill in
+make infra-domain
+make infra-platform     # NO_DOMAIN=1 before the certificate is issued
+make infra-plan         # later: see what would change
 ```
-Put the endpoint URL in `project.yml` as `TELEMETRY_URL` and release a new build.
+
+`site/` is still hosted on GitHub Pages ([ADR-0005](../docs/adr/0005-static-hosting-github-pages.md));
+the domain stack points buckleupquiz.com at it.
