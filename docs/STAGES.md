@@ -15,7 +15,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 | M5 | Players & scoring | ⬜ (engine side ✅) |
 | M6 | Paywall & parental gate | ⬜ |
 | M7 | Content & polish | ⬜ |
-| M8 | TestFlight & real-car testing | 🟡 (pipeline ✅) |
+| M8 | TestFlight & real-car testing | 🟡 (first build on TestFlight ✅) |
 | M9 | Backend (cloud data, content packs) | ⬜ (ADR-0012 proposed) |
 
 ---
@@ -110,8 +110,10 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 
 ## M8 — TestFlight 🟡
 - [x] Signing + tag-triggered TestFlight workflow (ADR-0014)
-- [ ] One-time App Store Connect app record + API key secrets ([RELEASING.md](RELEASING.md))
-- [ ] First internal TestFlight build (v0.1.0)
+- [x] One-time App Store Connect app record + API key secrets ([RELEASING.md](RELEASING.md))
+- [x] First TestFlight upload: 0.1.0 (2), 2026-11-22
+- [ ] Internal testing group + testers in App Store Connect
+- [ ] Build with the iOS 27 SDK (Xcode 27) before April 2027 (App Store Connect warning 90725). The release workflow picks the newest non-beta Xcode on the runner; set `vars.MACOS_RUNNER_LABEL` if a newer image is needed
 - [ ] Real-car tests: 3 or more head units plus CarPlay, road noise, kids
 - [ ] Proxy test: zero network requests (criterion 10)
 - [ ] Name checks (IP Australia), domains and handles (FEATURES §0)
