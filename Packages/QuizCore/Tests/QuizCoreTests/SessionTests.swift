@@ -1,0 +1,220 @@
+import Foundation
+import Testing
+@testable import QuizCore
+
+@Suite("Quiz session")
+struct SessionTests {
+    @Test func neverRepeatsWithinSession() {
+        let bank = sampleBank(perBand: 5)
+        let config = SessionConfig(topics: ["geography"], players: [.listener(ageBand: .sixToEight)], length: .endless)
+        var session = QuizSession(bank: bank, config: config, rng: AnyRandomGenerator(seed: 7))
+        var ids: [String] = []
+        while let turn = session.advance() { ids.append(turn.presented.question.id) }
+        #expect(ids.count == 5)
+        #expect(Set(ids).count == 5)
+        #expect(session.isFinished)
+    }
+
+    @Test func stopsAtSessionLength() {
+        let config = SessionConfig(topics: ["geography"], players: [.listener(ageBand: .nineToTen)], length: .questions(3))
+        var session = QuizSession(bank: sampleBank(perBand: 10), config: config, rng: AnyRandomGenerator(seed: 1))
+        var count = 0
+        while session.advance() != nil { count += 1 }
+        #expect(count == 3)
+    }
+
+    @Test func prefersUnseenQuestions() {
+        let bank = sampleBank(perBand: 4)
+        let player = Player.listener(ageBand: .sixToEight)
+        let seen: Set<String> = ["geography-6-8-0", "geography-6-8-1", "geography-6-8-2"]
+        let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(1))
+        for seed in 0..<20 as Range<UInt64> {
+            var session = QuizSession(bank: bank, config: config, seenQuestionIDs: [player.id: seen],
+                                      rng: AnyRandomGenerator(seed: seed))
+            #expect(session.advance()?.presented.question.id == "geography-6-8-3")
+        }
+    }
+
+    @Test func fallsBackToSeenWhenPoolExhausted() {
+        let bank = sampleBank(perBand: 2)
+        let player = Player.listener(ageBand: .sixToEight)
+        let seen: Set<String> = ["geography-6-8-0", "geography-6-8-1"]
+        let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(5))
+        var session = QuizSession(bank: bank, config: config, seenQuestionIDs: [player.id: seen],
+                                  rng: AnyRandomGenerator(seed: 3))
+        var count = 0
+        while session.advance() != nil { count += 1 }
+        #expect(count == 2)
+    }
+
+    @Test func rotatesPlayersWithTheirOwnAgeBand() {
+        let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
+        let leo = Player(id: "leo", name: "Leo", ageBand: .elevenToTwelve)
+        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(6))
+        var session = QuizSession(bank: sampleBank(perBand: 5), config: config, rng: AnyRandomGenerator(seed: 9))
+        var turns: [Turn] = []
+        while let t = session.advance() { turns.append(t) }
+        #expect(turns.map(\.player.name) == ["Mia", "Leo", "Mia", "Leo", "Mia", "Leo"])
+        for turn in turns {
+            #expect(turn.presented.question.ageBand == turn.player.ageBand)
+        }
+    }
+
+    @Test func respectsMinAgeAndTalkAboutToggle() {
+        let topic = Topic(id: "manners", name: "Manners", symbol: "s", color: "#000000", category: .values, isFree: true)
+        let bank = QuestionBank(topics: [topic], questions: [
+            makeQuestion("old", topic: "manners", band: .elevenToTwelve, minAge: 12),
+            makeQuestion("chat", topic: "manners", band: .elevenToTwelve, type: .talkAbout, answer: nil),
+            makeQuestion("ok", topic: "manners", band: .elevenToTwelve),
+        ])
+        let eleven = Player(id: "p", name: "Pip", ageBand: .elevenToTwelve, age: 11)
+        let selector = QuestionSelector(bank: bank, topics: ["manners"], includeTalkAbout: false)
+        #expect(selector.pool(for: eleven).map(\.id) == ["ok"])
+    }
+
+    @Test func recordsScoresAndTreatsTalkAboutAsUnscored() {
+        let topic = Topic(id: "manners", name: "Manners", symbol: "s", color: "#000000", category: .values, isFree: true)
+        let bank = QuestionBank(topics: [topic], questions: [
+            makeQuestion("chat", topic: "manners", type: .talkAbout, answer: nil),
+        ])
+        let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
+        var session = QuizSession(bank: bank, config: SessionConfig(topics: ["manners"], players: [mia]),
+                                  rng: AnyRandomGenerator(seed: 1))
+        session.advance()
+        let event = session.record(.correct)
+        #expect(event?.outcome == .notScored)
+        #expect(event?.pointsAwarded == 0)
+        #expect(session.record(.correct) == nil, "a turn can only be recorded once")
+    }
+
+    @Test func unrecordedTurnCountsAsSkipped() {
+        let config = SessionConfig(topics: ["geography"], players: [Player(id: "a", name: "A", ageBand: .sixToEight)])
+        var session = QuizSession(bank: sampleBank(), config: config, rng: AnyRandomGenerator(seed: 1))
+        session.advance()
+        session.record(.correct)
+        session.advance()
+        session.advance()
+        #expect(session.scores.stats(for: "a").currentStreak == 0)
+        #expect(session.scores.stats(for: "a").attempted == 1)
+    }
+
+    @Test func tracksSeenQuestions() {
+        let player = Player.listener(ageBand: .sixToEight)
+        let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(2))
+        var session = QuizSession(bank: sampleBank(), config: config, rng: AnyRandomGenerator(seed: 5))
+        while session.advance() != nil {}
+        #expect(session.seenQuestionIDs[player.id]?.count == 2)
+    }
+}
+
+@Suite("Content loading")
+struct ContentLoadingTests {
+    @Test func loadsFixtureContent() throws {
+        let bank = try DirectoryQuestionSource(root: fixtureContentURL()).loadBankSync()
+        #expect(bank.topics.map(\.id) == ["geography", "manners"])
+        #expect(bank.questions.count == 4)
+        #expect(bank.questionCount(topic: "geography") == 2)
+        let tasmania = try #require(bank.questions.first { $0.id == "geo-0001" })
+        #expect(tasmania.acceptedAnswers == ["hobart", "hobart city"])
+        let chat = try #require(bank.questions.first { $0.id == "man-0002" })
+        #expect(chat.answer == nil)
+        #expect(chat.acceptedAnswers.isEmpty)
+    }
+
+    @Test func missingCatalogueThrows() {
+        let source = DirectoryQuestionSource(root: URL(fileURLWithPath: "/nonexistent"))
+        #expect(throws: QuestionSourceError.self) { try source.loadBankSync() }
+    }
+}
+
+@Suite("Listen script")
+struct ListenScriptTests {
+    @Test func openQuestionSteps() {
+        var q = makeQuestion(text: "What is the capital city of Tasmania?", answer: "Hobart")
+        q.funFact = "Hobart is Australia's second-oldest capital city."
+        let turn = Turn(number: 1, player: .listener(ageBand: .sixToEight), presented: present(q))
+        let steps = ListenScript.steps(for: turn, category: .knowledge, settings: ListenSettings(), addressPlayer: false)
+        #expect(steps == [
+            .say("Buckle up, kids… question one!", .number),
+            .say("What is the capital city of Tasmania?", .question),
+            .cue(.think),
+            .think(seconds: 8),
+            .say("The answer is… Hobart!", .answer),
+            .say("Hobart is Australia's second-oldest capital city.", .followUp),
+            .wait(seconds: 2),
+        ])
+    }
+
+    @Test func scenarioReadsOptionsAndExplanation() {
+        var q = makeQuestion(topic: "manners", type: .scenario, text: "Your friend falls over.",
+                             options: ["Laugh", "Help them up", "Keep playing"], answer: "Help them up")
+        q.explanation = "Helping shows you care."
+        let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
+        var settings = ListenSettings()
+        settings.funFacts = false
+        let steps = ListenScript.steps(for: Turn(number: 2, player: mia, presented: present(q)),
+                                       category: .values, settings: settings, addressPlayer: true)
+        #expect(steps == [
+            .say("Question two.", .number),
+            .say("Mia, this one's for you: Your friend falls over.", .question),
+            .say("A: Laugh. B: Help them up. C: Keep playing.", .options),
+            .cue(.think),
+            .think(seconds: 8),
+            .say("The best choice is… B: Help them up!", .answer),
+            .say("Helping shows you care.", .followUp),
+            .wait(seconds: 2),
+        ])
+    }
+
+    @Test func talkAboutUsesLongThinkTime() {
+        let q = makeQuestion(type: .talkAbout, text: "What made you smile today?", answer: nil)
+        let steps = ListenScript.steps(for: Turn(number: 3, player: .listener(ageBand: .sixToEight), presented: present(q)),
+                                       category: .values, settings: ListenSettings(), addressPlayer: false)
+        #expect(steps.contains(.think(seconds: 30)))
+        #expect(steps.contains(.say("Great chat!", .answer)))
+    }
+
+    @Test func thinkTimeIsClamped() {
+        var settings = ListenSettings()
+        settings.thinkTime = 99
+        let turn = Turn(number: 1, player: .listener(ageBand: .sixToEight), presented: present(makeQuestion()))
+        let steps = ListenScript.steps(for: turn, category: nil, settings: settings, addressPlayer: false)
+        #expect(steps.contains(.think(seconds: 20)))
+    }
+
+    @Test func gentleFeedbackForValuesTopics() {
+        var rng = SeededGenerator(seed: 1)
+        let p = present(makeQuestion(type: .scenario, options: ["Laugh", "Help"], answer: "Help"))
+        #expect(Phrases.feedback(.incorrect, presented: p, category: .values, using: &rng)
+            == "Good try! A kinder choice might be… B: Help.")
+        #expect(Phrases.feedback(.incorrect, presented: present(makeQuestion(answer: "Hobart")),
+                                 category: .knowledge, using: &rng) == "Not quite, the answer was Hobart.")
+    }
+}
+
+@Suite("Repository content")
+struct RepositoryContentTests {
+    /// The real bundled content must decode with the same models the app uses.
+    @Test func bundledContentDecodes() throws {
+        let repoRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent() // QuizCoreTests
+            .deletingLastPathComponent() // Tests
+            .deletingLastPathComponent() // QuizCore
+            .deletingLastPathComponent() // Packages
+            .deletingLastPathComponent()
+        let bank = try DirectoryQuestionSource(root: repoRoot.appendingPathComponent("Content")).loadBankSync()
+        #expect(bank.topics.filter(\.isFree).count == 3)
+        #expect(!bank.questions.isEmpty)
+        let matcher = AnswerMatcher()
+        var rng = SeededGenerator(seed: 1)
+        for q in bank.questions where q.type.isScored {
+            let presented = PresentedQuestion(question: q, shuffleOptions: true, using: &rng)
+            if q.type.hasOptions {
+                #expect(presented.correctOptionIndex != nil, "\(q.id): answer must be an option")
+            }
+            // The canonical answer must always be accepted when said back.
+            let answer = try #require(q.answer)
+            #expect(matcher.match(transcriptions: [answer], to: presented) == .correct(heard: answer), "\(q.id)")
+        }
+    }
+}

@@ -1,0 +1,124 @@
+import QuizCore
+import SwiftUI
+
+/// The in-game screen: readable, but never required (FEATURES §2.2).
+struct QuizView: View {
+    let model: ListenSessionModel
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 24) {
+            header
+            Spacer(minLength: 0)
+            content
+            Spacer(minLength: 0)
+            controls
+        }
+        .padding()
+        .background(Theme.background.ignoresSafeArea())
+        .onAppear { model.start() }
+        .onDisappear { model.stop() }
+        .persistentSystemOverlays(.hidden)
+    }
+
+    private var header: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(model.topicTitle).font(Theme.headline)
+                if let turn = model.turn {
+                    Text(progressText(turn.number)).font(Theme.body).foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+            Button {
+                model.stop()
+                dismiss()
+            } label: {
+                Image(systemName: "xmark.circle.fill").font(.largeTitle)
+            }
+            .accessibilityLabel("End quiz")
+        }
+    }
+
+    @ViewBuilder private var content: some View {
+        if model.status == .finished {
+            VStack(spacing: 20) {
+                Image(systemName: "flag.checkered")
+                    .font(.system(size: 64))
+                    .foregroundStyle(Theme.accent)
+                Text(model.closingMessage ?? Phrases.outroPrefix)
+                    .font(Theme.title)
+                    .multilineTextAlignment(.center)
+                Button("Done") { dismiss() }
+                    .buttonStyle(BigButtonStyle())
+            }
+        } else if let turn = model.turn {
+            VStack(spacing: 24) {
+                Text(turn.presented.question.question)
+                    .font(Theme.question)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                if let options = turn.presented.options, turn.presented.question.type != .trueFalse {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(Array(zip(turn.presented.optionLetters, options)), id: \.0) { letter, option in
+                            Text("\(letter): \(option)").font(Theme.headline)
+                        }
+                    }
+                }
+                if let answer = model.revealedAnswer {
+                    VStack(spacing: 8) {
+                        Text(answer)
+                            .font(Theme.hero)
+                            .foregroundStyle(Theme.accent)
+                            .multilineTextAlignment(.center)
+                        if let followUp = model.followUp {
+                            Text(followUp).font(Theme.body).multilineTextAlignment(.center)
+                        }
+                    }
+                    .transition(.scale.combined(with: .opacity))
+                } else if model.isThinking || model.thinkRemaining > 0 {
+                    CountdownRing(remaining: model.thinkRemaining, total: model.thinkTotal)
+                        .frame(width: 140, height: 140)
+                }
+            }
+            .animation(.spring, value: model.revealedAnswer)
+        } else {
+            VStack(spacing: 12) {
+                Image(systemName: "car.fill").font(.system(size: 56)).foregroundStyle(Theme.accent)
+                Text("Buckle up…").font(Theme.title)
+            }
+        }
+        if let warning = model.audioWarning {
+            Text(warning).font(.footnote).foregroundStyle(.secondary)
+        }
+    }
+
+    private var controls: some View {
+        HStack(spacing: 12) {
+            Button { model.repeatQuestion() } label: {
+                Label("Repeat", systemImage: "arrow.counterclockwise")
+            }
+            .buttonStyle(BigButtonStyle(prominent: false))
+
+            Button { model.togglePause() } label: {
+                Label(model.status == .paused ? "Resume" : "Pause",
+                      systemImage: model.status == .paused ? "play.fill" : "pause.fill")
+            }
+            .buttonStyle(BigButtonStyle())
+
+            Button { model.skip() } label: {
+                Label("Skip", systemImage: "forward.fill")
+            }
+            .buttonStyle(BigButtonStyle(prominent: false))
+        }
+        .labelStyle(.iconOnly)
+        .font(.title)
+        .disabled(model.status == .finished || model.status == .ready)
+        .opacity(model.status == .finished ? 0 : 1)
+    }
+
+    private func progressText(_ number: Int) -> String {
+        if let total = model.questionCount { return "Question \(number) of \(total)" }
+        return "Question \(number)"
+    }
+}

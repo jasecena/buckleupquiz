@@ -1,0 +1,214 @@
+[
+  {
+    "id": "geo-0001",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "What is the capital city of Tasmania?",
+    "options": null,
+    "answer": "Hobart",
+    "acceptedAnswers": [
+      "hobart",
+      "hobart city"
+    ],
+    "funFact": "Hobart is Australia's second-oldest capital city.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0002",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which is the biggest ocean?",
+    "options": [
+      "Indian",
+      "Pacific",
+      "Atlantic"
+    ],
+    "answer": "Pacific",
+    "acceptedAnswers": [
+      "pacific ocean"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0003",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "What is the capital city of Australia?",
+    "options": null,
+    "answer": "Canberra",
+    "acceptedAnswers": [
+      "canberra"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0004",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Australia is both an island and a continent. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0005",
+    "topic": "geography",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "What is the name of the big red rock in the middle of Australia?",
+    "options": null,
+    "answer": "Uluru",
+    "acceptedAnswers": [
+      "uluru",
+      "ayers rock"
+    ],
+    "funFact": "Uluru is sacred to the Anangu people, its traditional owners.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0101",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "What is the longest river in Australia?",
+    "options": null,
+    "answer": "Murray",
+    "acceptedAnswers": [
+      "murray",
+      "murray river",
+      "river murray"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0102",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which state is Perth in?",
+    "options": [
+      "Western Australia",
+      "Queensland",
+      "Victoria"
+    ],
+    "answer": "Western Australia",
+    "acceptedAnswers": [
+      "wa"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0103",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "What is the huge coral reef off the coast of Queensland called?",
+    "options": null,
+    "answer": "Great Barrier Reef",
+    "acceptedAnswers": [
+      "great barrier reef",
+      "barrier reef"
+    ],
+    "funFact": "The Great Barrier Reef can be seen from space.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0104",
+    "topic": "geography",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Antarctica is the coldest continent. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0201",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "open",
+    "question": "What is the tallest mountain in mainland Australia?",
+    "options": null,
+    "answer": "Mount Kosciuszko",
+    "acceptedAnswers": [
+      "kosciuszko",
+      "kosciusko",
+      "mount kosciusko",
+      "mt kosciuszko"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "geo-0202",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which imaginary line divides the Earth into northern and southern halves?",
+    "options": [
+      "The equator",
+      "The Prime Meridian",
+      "The Tropic of Capricorn"
+    ],
+    "answer": "The equator",
+    "acceptedAnswers": [
+      "equator"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0203",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "open",
+    "question": "What is the capital city of Japan?",
+    "options": null,
+    "answer": "Tokyo",
+    "acceptedAnswers": [
+      "tokyo"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "geo-0204",
+    "topic": "geography",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "New Zealand is closer to Australia than Japan is. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  }
+]

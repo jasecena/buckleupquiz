@@ -1,0 +1,98 @@
+# XcodeGen spec — the .xcodeproj is generated from this file and never committed (ADR-0003).
+#   brew install xcodegen && xcodegen generate
+name: BuckleUpQuiz
+options:
+  bundleIdPrefix: com.jasecena
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+    # Signing is configured in M8 (TestFlight); simulator builds don't need it.
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+
+packages:
+  QuizCore:
+    path: Packages/QuizCore
+
+targets:
+  BuckleUpQuiz:
+    type: application
+    platform: iOS
+    sources:
+      - path: App/Sources
+      - path: App/Resources
+      # Bundled as a folder reference so the app reads Content/topics.json + Content/questions/*.json.
+      - path: Content
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - package: QuizCore
+    info:
+      path: App/Info.plist # generated
+      properties:
+        CFBundleDisplayName: BuckleUp Quiz
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.education
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIBackgroundModes: [audio]
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSMicrophoneUsageDescription: >-
+          Used to hear your child's answers. Audio is processed on this device and never stored or sent anywhere.
+        NSSpeechRecognitionUsageDescription: >-
+          Used to understand your child's spoken answers. Speech is recognised on this device and never stored or sent anywhere.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jasecena.buckleupquiz
+        PRODUCT_NAME: BuckleUpQuiz
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+
+  BuckleUpQuizTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: App/Tests
+    dependencies:
+      - target: BuckleUpQuiz
+      - package: QuizCore
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.jasecena.buckleupquiz.tests
+
+schemes:
+  BuckleUpQuiz:
+    build:
+      targets:
+        BuckleUpQuiz: all
+        BuckleUpQuizTests: [test]
+    test:
+      gatherCoverageData: true
+      targets:
+        - BuckleUpQuizTests
+    run:
+      config: Debug
+    archive:
+      config: Release

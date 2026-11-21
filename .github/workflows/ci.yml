@@ -1,0 +1,77 @@
+# Continuous integration (ADR-0013).
+# - content + core run on cheap Linux runners and fail fast on logic/content mistakes.
+# - app builds and tests the iOS app on a macOS runner (free for public repositories).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  content:
+    name: Content validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Validator unit tests
+        run: python -m unittest discover -s scripts/tests -v
+      - name: Validate question bank
+        run: python scripts/validate_content.py
+
+  core:
+    name: QuizCore tests (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container: swift:6.1-noble
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build and test
+        run: swift test --package-path Packages/QuizCore
+
+  app:
+    name: iOS app build & test
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Pick simulator
+        id: sim
+        run: echo "destination=$(scripts/ci/simulator-destination.sh)" >> "$GITHUB_OUTPUT"
+      - name: Build and test
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project BuckleUpQuiz.xcodeproj \
+            -scheme BuckleUpQuiz \
+            -destination "${{ steps.sim.outputs.destination }}" \
+            -resultBundlePath build/TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify --renderer github-actions
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: TestResults
+          path: build/TestResults.xcresult
+          retention-days: 7

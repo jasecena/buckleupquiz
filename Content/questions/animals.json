@@ -1,0 +1,257 @@
+[
+  {
+    "id": "ani-0001",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "What Australian animal hops and carries its baby in a pouch?",
+    "options": null,
+    "answer": "Kangaroo",
+    "acceptedAnswers": [
+      "kangaroo",
+      "roo",
+      "wallaby"
+    ],
+    "funFact": "A baby kangaroo is called a joey.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0002",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Koalas are a kind of bear. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Koalas are marsupials, not bears!",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0003",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do koalas mostly eat?",
+    "options": [
+      "Gum leaves",
+      "Grass",
+      "Fish"
+    ],
+    "answer": "Gum leaves",
+    "acceptedAnswers": [
+      "gum leaves",
+      "eucalyptus",
+      "eucalyptus leaves",
+      "gum"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0004",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "How many legs does a spider have?",
+    "options": null,
+    "answer": "8",
+    "acceptedAnswers": [
+      "eight"
+    ],
+    "funFact": "Insects have six legs, so spiders are not insects.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0005",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "What is a baby kangaroo called?",
+    "options": null,
+    "answer": "Joey",
+    "acceptedAnswers": [
+      "joey",
+      "joeys"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0006",
+    "topic": "animals",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which Australian bird sounds like it's laughing?",
+    "options": [
+      "Kookaburra",
+      "Emu",
+      "Magpie"
+    ],
+    "answer": "Kookaburra",
+    "acceptedAnswers": [
+      "kookaburra"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0101",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "What is the only mammal that can truly fly?",
+    "options": null,
+    "answer": "Bat",
+    "acceptedAnswers": [
+      "bat",
+      "bats"
+    ],
+    "funFact": "Flying foxes are big bats that live in Australia.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0102",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which of these animals lays eggs?",
+    "options": [
+      "Echidna",
+      "Koala",
+      "Wombat"
+    ],
+    "answer": "Echidna",
+    "acceptedAnswers": [
+      "echidna"
+    ],
+    "funFact": "Echidnas and platypuses are the only mammals that lay eggs.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0103",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "A group of kangaroos is called a mob. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0104",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "What shape is wombat poo?",
+    "options": null,
+    "answer": "Cube",
+    "acceptedAnswers": [
+      "cube",
+      "cubes",
+      "square",
+      "squares",
+      "cube shaped"
+    ],
+    "funFact": "Wombats are the only animals known to make cube-shaped poo.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0105",
+    "topic": "animals",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "How many hearts does an octopus have?",
+    "options": null,
+    "answer": "3",
+    "acceptedAnswers": [
+      "three"
+    ],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0201",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What do we call an animal that is active at night?",
+    "options": [
+      "Nocturnal",
+      "Diurnal",
+      "Migratory"
+    ],
+    "answer": "Nocturnal",
+    "acceptedAnswers": [
+      "nocturnal"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0202",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "open",
+    "question": "What is the largest animal that has ever lived?",
+    "options": null,
+    "answer": "Blue whale",
+    "acceptedAnswers": [
+      "blue whale",
+      "blue whales"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "ani-0203",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "A platypus has a bill like a duck and lays eggs. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "Male platypuses have a venomous spur on their back legs.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "ani-0204",
+    "topic": "animals",
+    "ageBand": "11-12",
+    "type": "open",
+    "question": "What do we call animals that eat only plants?",
+    "options": null,
+    "answer": "Herbivores",
+    "acceptedAnswers": [
+      "herbivore",
+      "herbivores"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  }
+]

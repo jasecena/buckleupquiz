@@ -1,0 +1,183 @@
+[
+  {
+    "id": "mat-0001",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "What is five plus three?",
+    "options": null,
+    "answer": "8",
+    "acceptedAnswers": [
+      "eight"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0002",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "How many sides does a triangle have?",
+    "options": null,
+    "answer": "3",
+    "acceptedAnswers": [
+      "three"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0003",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "What is ten take away four?",
+    "options": null,
+    "answer": "6",
+    "acceptedAnswers": [
+      "six"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0004",
+    "topic": "maths",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Twelve is an even number. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0101",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "What is seven times eight?",
+    "options": null,
+    "answer": "56",
+    "acceptedAnswers": [
+      "fifty six"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0102",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "How many minutes are in an hour?",
+    "options": null,
+    "answer": "60",
+    "acceptedAnswers": [
+      "sixty"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0103",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "What is half of fifty?",
+    "options": null,
+    "answer": "25",
+    "acceptedAnswers": [
+      "twenty five"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0104",
+    "topic": "maths",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which shape has six sides?",
+    "options": [
+      "Hexagon",
+      "Pentagon",
+      "Octagon"
+    ],
+    "answer": "Hexagon",
+    "acceptedAnswers": [
+      "hexagon"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0201",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "open",
+    "question": "What is twelve times twelve?",
+    "options": null,
+    "answer": "144",
+    "acceptedAnswers": [
+      "one hundred and forty four"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0202",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "open",
+    "question": "What is twenty-five percent of two hundred?",
+    "options": null,
+    "answer": "50",
+    "acceptedAnswers": [
+      "fifty"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0203",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "open",
+    "question": "How many degrees are in a right angle?",
+    "options": null,
+    "answer": "90",
+    "acceptedAnswers": [
+      "ninety"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "mat-0204",
+    "topic": "maths",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Every prime number is odd. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Two is a prime number, and it's even!",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  }
+]

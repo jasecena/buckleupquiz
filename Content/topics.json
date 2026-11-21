@@ -1,0 +1,320 @@
+[
+  {
+    "id": "animals",
+    "name": "Animals",
+    "symbol": "pawprint.fill",
+    "color": "#F39C12",
+    "category": "knowledge",
+    "isFree": true,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": false
+  },
+  {
+    "id": "geography",
+    "name": "Geography",
+    "symbol": "globe.asia.australia.fill",
+    "color": "#2E86DE",
+    "category": "knowledge",
+    "isFree": true,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": false
+  },
+  {
+    "id": "space",
+    "name": "Space",
+    "symbol": "moon.stars.fill",
+    "color": "#6C5CE7",
+    "category": "knowledge",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": false
+  },
+  {
+    "id": "maths",
+    "name": "Maths",
+    "symbol": "plus.forwardslash.minus",
+    "color": "#00B894",
+    "category": "knowledge",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": false
+  },
+  {
+    "id": "aussie-history",
+    "name": "Aussie History",
+    "symbol": "building.columns.fill",
+    "color": "#B7950B",
+    "category": "knowledge",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": false
+  },
+  {
+    "id": "science",
+    "name": "Science",
+    "symbol": "flask.fill",
+    "color": "#0984E3",
+    "category": "knowledge",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": false
+  },
+  {
+    "id": "sport",
+    "name": "Sport",
+    "symbol": "figure.run",
+    "color": "#D63031",
+    "category": "knowledge",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": false
+  },
+  {
+    "id": "food",
+    "name": "Food",
+    "symbol": "fork.knife",
+    "color": "#E17055",
+    "category": "knowledge",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": false
+  },
+  {
+    "id": "manners",
+    "name": "Manners & Friendship",
+    "symbol": "heart.fill",
+    "color": "#E84393",
+    "category": "values",
+    "isFree": true,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "respect",
+    "name": "Respect & Differences",
+    "symbol": "hands.and.sparkles.fill",
+    "color": "#A29BFE",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "feelings",
+    "name": "Feelings",
+    "symbol": "face.smiling.inverse",
+    "color": "#FDCB6E",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "honesty",
+    "name": "Honesty & Fairness",
+    "symbol": "scalemass.fill",
+    "color": "#55EFC4",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "never-give-up",
+    "name": "Never Give Up",
+    "symbol": "arrow.up.forward.circle.fill",
+    "color": "#FF7675",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "staying-safe",
+    "name": "Staying Safe",
+    "symbol": "cross.case.fill",
+    "color": "#E74C3C",
+    "category": "safety",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "planet",
+    "name": "Caring for Our Planet",
+    "symbol": "leaf.fill",
+    "color": "#27AE60",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "animal-kindness",
+    "name": "Kindness to Animals",
+    "symbol": "hare.fill",
+    "color": "#E67E22",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "healthy-habits",
+    "name": "Healthy Habits",
+    "symbol": "figure.walk",
+    "color": "#16A085",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "teamwork",
+    "name": "Teamwork & Leadership",
+    "symbol": "person.3.fill",
+    "color": "#2980B9",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "upstander",
+    "name": "Being an Upstander",
+    "symbol": "hand.raised.fill",
+    "color": "#8E44AD",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "money",
+    "name": "Money Smarts",
+    "symbol": "dollarsign.circle.fill",
+    "color": "#F1C40F",
+    "category": "values",
+    "isFree": false,
+    "ageBands": [
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "online-safety",
+    "name": "Online Safety & Scams",
+    "symbol": "lock.shield.fill",
+    "color": "#34495E",
+    "category": "safety",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "personal-safety",
+    "name": "Personal Safety & Security",
+    "symbol": "figure.and.child.holdinghands",
+    "color": "#C0392B",
+    "category": "safety",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  },
+  {
+    "id": "first-nations",
+    "name": "First Nations Cultures",
+    "symbol": "sun.max.fill",
+    "color": "#D35400",
+    "category": "knowledge",
+    "isFree": false,
+    "ageBands": [
+      "6-8",
+      "9-10",
+      "11-12"
+    ],
+    "requiresReview": true
+  }
+]

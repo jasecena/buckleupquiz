@@ -1,0 +1,4 @@
+[
+  {"id": "geography", "name": "Geography", "symbol": "globe.asia.australia.fill", "color": "#2E86DE", "category": "knowledge", "isFree": true, "ageBands": ["6-8", "9-10", "11-12"], "requiresReview": false},
+  {"id": "manners", "name": "Manners & Friendship", "symbol": "heart.fill", "color": "#E84393", "category": "values", "isFree": true, "ageBands": ["6-8", "9-10", "11-12"], "requiresReview": true}
+]

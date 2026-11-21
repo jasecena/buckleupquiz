@@ -1,0 +1,272 @@
+import Foundation
+import Observation
+import QuizCore
+
+/// Drives a hands-free Listen-mode session (FEATURES §2.2–2.3): plays each question's
+/// `ListenScript` steps, and handles pause/resume, skip, repeat, interruptions and remote commands.
+///
+/// Pausing cancels the running task; resuming re-runs the current step (re-reading the
+/// question or continuing the countdown where it left off).
+@MainActor
+@Observable
+final class ListenSessionModel {
+    enum Status: Equatable { case ready, playing, paused, finished }
+
+    struct Dependencies {
+        var speech: any SpeechOutput
+        var cues: any CuePlaying
+        var sleeper: any Sleeper = TaskSleeper()
+        var audioSession: (any AudioSessionControlling)?
+        var nowPlaying: (any NowPlayingUpdating)?
+    }
+
+    // MARK: Observable state for the UI
+
+    private(set) var status: Status = .ready
+    private(set) var turn: Turn?
+    private(set) var revealedAnswer: String?
+    private(set) var followUp: String?
+    private(set) var thinkTotal: Double = 0
+    private(set) var thinkRemaining: Double = 0
+    private(set) var isThinking = false
+    private(set) var closingMessage: String?
+    /// Set if the audio session could not be configured; the quiz still runs on the speaker.
+    private(set) var audioWarning: String?
+
+    var questionCount: Int? { session.config.length.limit }
+
+    // MARK: Internals
+
+    @ObservationIgnored private var session: QuizSession
+    private let bank: QuestionBank
+    private let settings: ListenSettings
+    private let duckOthers: Bool
+    private let deps: Dependencies
+    @ObservationIgnored private var steps: [SpeechStep] = []
+    @ObservationIgnored private var stepIndex = 0
+    @ObservationIgnored private var welcomeBackPending = false
+    @ObservationIgnored private(set) var runner: Task<Void, Never>?
+    /// Bumped on every (re)launch so a cancelled runner can't touch the new one's state.
+    @ObservationIgnored private var generation = 0
+
+    init(bank: QuestionBank, config: SessionConfig, settings: ListenSettings, duckOthers: Bool,
+         dependencies: Dependencies, rng: AnyRandomGenerator = .system()) {
+        self.bank = bank
+        self.session = QuizSession(bank: bank, config: config, rng: rng)
+        self.settings = settings
+        self.duckOthers = duckOthers
+        self.deps = dependencies
+    }
+
+    var topicTitle: String {
+        let names = session.config.topics.compactMap { bank.topic(id: $0)?.name }
+        return names.count == 1 ? names[0] : "Mixed topics"
+    }
+
+    // MARK: Controls
+
+    func start() {
+        guard status == .ready else { return }
+        do {
+            try deps.audioSession?.activateForListening(duckOthers: duckOthers)
+        } catch {
+            audioWarning = "Couldn't set up car audio. Playing through this device."
+        }
+        deps.audioSession?.onEvent = { [weak self] in self?.handle($0) }
+        deps.nowPlaying?.onCommand = { [weak self] in self?.handle($0) }
+        deps.nowPlaying?.enable()
+        deps.cues.startSession()
+        status = .playing
+        launchRunner()
+    }
+
+    func pause() {
+        guard status == .playing else { return }
+        status = .paused
+        haltRunner()
+        updateNowPlaying()
+    }
+
+    func resume() {
+        guard status == .paused else { return }
+        status = .playing
+        launchRunner()
+    }
+
+    func togglePause() { status == .playing ? pause() : resume() }
+
+    /// Moves straight to the next question.
+    func skip() {
+        guard status == .playing || status == .paused else { return }
+        haltRunner()
+        session.record(.skipped)
+        stepIndex = steps.count
+        status = .playing
+        launchRunner()
+    }
+
+    /// Re-reads the current question from the start.
+    func repeatQuestion() {
+        guard status == .playing || status == .paused, turn != nil else { return }
+        haltRunner()
+        restartCurrentQuestion()
+        status = .playing
+        launchRunner()
+    }
+
+    /// Ends the session immediately, without the spoken outro.
+    func stop() {
+        guard status != .finished else { return }
+        haltRunner()
+        session.stop()
+        tearDown()
+    }
+
+    // MARK: Events
+
+    func handle(_ event: AudioSessionEvent) {
+        switch event {
+        case .interruptionBegan:
+            pause()
+        case .interruptionEnded(let shouldResume):
+            guard status == .paused else { return }
+            welcomeBackPending = true
+            restartCurrentQuestion()
+            if shouldResume { resume() }
+        case .outputLost:
+            pause()
+        }
+    }
+
+    func handle(_ command: RemoteCommand) {
+        switch command {
+        case .play: resume()
+        case .pause: pause()
+        case .toggle: togglePause()
+        case .next: skip()
+        case .previous: repeatQuestion()
+        }
+    }
+
+    // MARK: Runner
+
+    private func launchRunner() {
+        runner?.cancel()
+        generation += 1
+        let current = generation
+        runner = Task { [weak self] in await self?.run(generation: current) }
+    }
+
+    private func haltRunner() {
+        runner?.cancel()
+        runner = nil
+        deps.speech.stop()
+        if isThinking { deps.cues.stopThinking() }
+    }
+
+    private func run(generation: Int) async {
+        guard !Task.isCancelled, generation == self.generation else { return }
+        updateNowPlaying()
+        do {
+            if welcomeBackPending {
+                welcomeBackPending = false
+                try await deps.speech.speak(Phrases.welcomeBack)
+            }
+            while !Task.isCancelled {
+                if stepIndex >= steps.count {
+                    guard loadNextTurn() else {
+                        try await finishNaturally()
+                        return
+                    }
+                }
+                try await perform(steps[stepIndex], generation: generation)
+                guard generation == self.generation else { return }
+                stepIndex += 1
+            }
+        } catch {
+            // Cancelled by pause/skip/repeat/stop: state is already set by the caller.
+        }
+    }
+
+    private func loadNextTurn() -> Bool {
+        guard let next = session.advance() else { return false }
+        session.record(.notScored) // Listen mode keeps no score.
+        turn = next
+        revealedAnswer = nil
+        followUp = nil
+        thinkRemaining = 0
+        let category = bank.topic(id: next.presented.question.topic)?.category
+        steps = ListenScript.steps(for: next, category: category, settings: settings,
+                                   addressPlayer: session.config.isTurnBased)
+        stepIndex = 0
+        updateNowPlaying()
+        return true
+    }
+
+    private func perform(_ step: SpeechStep, generation: Int) async throws {
+        switch step {
+        case .say(let text, let purpose):
+            if purpose == .answer { revealedAnswer = turn?.presented.answerText ?? text }
+            if purpose == .followUp { followUp = text }
+            try await deps.speech.speak(text)
+        case .cue(.think):
+            break // the tick runs during `.think`
+        case .cue(.listening):
+            deps.cues.play(.listening)
+        case .think(let seconds):
+            try await think(seconds: seconds, generation: generation)
+        case .wait(let seconds):
+            try await deps.sleeper.sleep(seconds: seconds)
+        }
+    }
+
+    private func think(seconds: Double, generation: Int) async throws {
+        if thinkRemaining <= 0 || thinkTotal != seconds {
+            thinkTotal = seconds
+            thinkRemaining = seconds
+        }
+        isThinking = true
+        deps.cues.startThinking()
+        defer {
+            if generation == self.generation {
+                isThinking = false
+                deps.cues.stopThinking()
+            }
+        }
+        let tick = 0.1
+        while thinkRemaining > 0 {
+            try await deps.sleeper.sleep(seconds: tick)
+            guard generation == self.generation else { return }
+            thinkRemaining = max(0, thinkRemaining - tick)
+        }
+    }
+
+    private func restartCurrentQuestion() {
+        stepIndex = steps.firstIndex { if case .say(_, .question) = $0 { true } else { false } } ?? 0
+        thinkRemaining = 0
+        revealedAnswer = nil
+        followUp = nil
+    }
+
+    private func finishNaturally() async throws {
+        closingMessage = Phrases.scoreAnnouncement(session.scoreboard)
+        turn = nil
+        if let closingMessage { try await deps.speech.speak(closingMessage) }
+        tearDown()
+    }
+
+    private func tearDown() {
+        status = .finished
+        turn = nil
+        if closingMessage == nil { closingMessage = Phrases.outroPrefix }
+        deps.cues.endSession()
+        deps.nowPlaying?.disable()
+        deps.audioSession?.deactivate()
+        deps.audioSession?.onEvent = nil
+    }
+
+    private func updateNowPlaying() {
+        let title = turn.map { "Question \($0.number)" } ?? "BuckleUp Quiz"
+        deps.nowPlaying?.update(title: title, subtitle: topicTitle, isPlaying: status == .playing)
+    }
+}

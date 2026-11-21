@@ -1,0 +1,173 @@
+[
+  {
+    "id": "man-0001",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "scenario",
+    "question": "Your friend falls over at the park. What's the kind thing to do?",
+    "options": [
+      "Laugh",
+      "Help them up and ask if they're okay",
+      "Keep playing"
+    ],
+    "answer": "Help them up and ask if they're okay",
+    "acceptedAnswers": [],
+    "explanation": "Helping shows you care, and they'd do the same for you.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0002",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "It's okay to feel angry, as long as we don't hurt anyone. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "Everyone feels angry sometimes. What matters is what we do with it.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0003",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "scenario",
+    "question": "Someone gives you a present you don't really like. What could you say?",
+    "options": [
+      "Thank you, that was kind of you",
+      "I don't like it",
+      "Say nothing"
+    ],
+    "answer": "Thank you, that was kind of you",
+    "acceptedAnswers": [],
+    "explanation": "Saying thank you shows you value their kindness, even if the present isn't your favourite.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0004",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "talkAbout",
+    "question": "What's something kind someone did for you this week?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0005",
+    "topic": "manners",
+    "ageBand": "6-8",
+    "type": "scenario",
+    "question": "You and another kid both want the window seat. What's a fair thing to do?",
+    "options": [
+      "Take turns",
+      "Grab it first",
+      "Sulk the whole trip"
+    ],
+    "answer": "Take turns",
+    "acceptedAnswers": [],
+    "explanation": "Taking turns means everyone gets a go.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0101",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "scenario",
+    "question": "A new kid is standing alone at lunch. What could you do?",
+    "options": [
+      "Invite them to join you",
+      "Wait for someone else to do it",
+      "Pretend you didn't see them"
+    ],
+    "answer": "Invite them to join you",
+    "acceptedAnswers": [],
+    "explanation": "Including someone can make their whole day better.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0102",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Saying sorry works best when you really mean it. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "A real sorry shows the other person you understand how they feel.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0103",
+    "topic": "manners",
+    "ageBand": "9-10",
+    "type": "talkAbout",
+    "question": "What's a game you like playing with friends, and why?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0201",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "scenario",
+    "question": "Your group chat starts making fun of someone's photo. What could you do?",
+    "options": [
+      "Don't join in, and tell a trusted adult",
+      "Add a laughing emoji",
+      "Share it around"
+    ],
+    "answer": "Don't join in, and tell a trusted adult",
+    "acceptedAnswers": [],
+    "explanation": "Not joining in is kind, and a trusted adult can help if it keeps going.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0202",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Being a good sport means saying 'good game' even when you lose. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "Good sports make games fun for everyone, win or lose.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "man-0203",
+    "topic": "manners",
+    "ageBand": "11-12",
+    "type": "talkAbout",
+    "question": "What do you think makes someone a good friend?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  }
+]

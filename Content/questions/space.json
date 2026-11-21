@@ -1,0 +1,163 @@
+[
+  {
+    "id": "spc-0001",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "What is the closest star to Earth?",
+    "options": null,
+    "answer": "The Sun",
+    "acceptedAnswers": [
+      "sun"
+    ],
+    "funFact": "The Sun is so big that about a million Earths could fit inside it.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0002",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "open",
+    "question": "How many planets are in our solar system?",
+    "options": null,
+    "answer": "8",
+    "acceptedAnswers": [
+      "eight"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0003",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which planet is known as the Red Planet?",
+    "options": [
+      "Mars",
+      "Venus",
+      "Jupiter"
+    ],
+    "answer": "Mars",
+    "acceptedAnswers": [
+      "mars"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0004",
+    "topic": "space",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "The Moon makes its own light. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "The Moon shines because it reflects light from the Sun.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0101",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "What is the biggest planet in our solar system?",
+    "options": null,
+    "answer": "Jupiter",
+    "acceptedAnswers": [
+      "jupiter"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0102",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "open",
+    "question": "Which planet is famous for its beautiful rings?",
+    "options": null,
+    "answer": "Saturn",
+    "acceptedAnswers": [
+      "saturn"
+    ],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0103",
+    "topic": "space",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Who was the first person to walk on the Moon?",
+    "options": [
+      "Neil Armstrong",
+      "Buzz Aldrin",
+      "Yuri Gagarin"
+    ],
+    "answer": "Neil Armstrong",
+    "acceptedAnswers": [
+      "armstrong"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0201",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "open",
+    "question": "What is the name of our galaxy?",
+    "options": null,
+    "answer": "Milky Way",
+    "acceptedAnswers": [
+      "milky way"
+    ],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0202",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which is the hottest planet?",
+    "options": [
+      "Venus",
+      "Mercury",
+      "Mars"
+    ],
+    "answer": "Venus",
+    "acceptedAnswers": [
+      "venus"
+    ],
+    "funFact": "Venus is hotter than Mercury because its thick clouds trap heat.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spc-0203",
+    "topic": "space",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Light from the Sun takes about eight minutes to reach Earth. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  }
+]
