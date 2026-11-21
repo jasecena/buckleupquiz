@@ -43,13 +43,22 @@ struct PlayerStoreTests {
         #expect(store.players.isEmpty)
     }
 
-    @Test func remembersSeenQuestions() throws {
+    @Test func remembersEachPlayersBoxes() throws {
         let store = PlayerStore.inMemory()
         let mia = try #require(store.add(name: "Mia", age: 7))
-        let id = mia.id.uuidString
-        store.recordSeen([id: ["ani-0001", "ani-0002"]])
-        store.recordSeen([id: ["ani-0002", "ani-0003"]])
-        #expect(store.seenQuestionIDs(for: [mia])[id] == ["ani-0001", "ani-0002", "ani-0003"])
+        let leo = try #require(store.add(name: "Leo", age: 11))
+        var first = LearningRecord()
+        first.record(.correct, for: "ani-0001", on: 10)
+        store.recordLearning([mia.id.uuidString: first])
+        var second = store.learning(for: [mia])[mia.id.uuidString] ?? LearningRecord()
+        second.record(.incorrect, for: "ani-0001", on: 11)
+        second.record(.correct, for: "ani-0002", on: 11)
+        store.recordLearning([mia.id.uuidString: second])
+
+        let saved = store.learning(for: [mia, leo])
+        #expect(saved[mia.id.uuidString]?.card("ani-0001") == ReviewCard(box: 1, due: 11))
+        #expect(saved[mia.id.uuidString]?.card("ani-0002") == ReviewCard(box: 2, due: 12))
+        #expect(saved[leo.id.uuidString]?.cards.isEmpty == true, "Leo's boxes are his own")
     }
 
     @Test func settingsFromAnOlderBuildKeepTheirValues() throws {

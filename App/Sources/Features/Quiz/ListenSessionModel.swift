@@ -29,8 +29,15 @@ final class ListenSessionModel {
     private(set) var thinkTotal: Double = 0
     private(set) var thinkRemaining: Double = 0
     private(set) var isThinking = false
-    /// A Talk About prompt is waiting, untimed, for the family to finish talking.
+    /// A Talk About prompt is waiting for the family to finish talking.
     private(set) var isDiscussing = false
+    /// The current Talk About has a Parent mode timer (shown as a ring).
+    private(set) var isDiscussionTimed = false
+    /// "Got it" / "Not yet" for the current turn (ADR-0016). nil until the answer is heard.
+    private(set) var result: ReviewResult?
+
+    /// Whether the current turn can be marked: a quiz question whose answer has been read.
+    var canMark: Bool { revealedAnswer != nil && turn?.presented.question.type.isScored == true }
     private(set) var closingMessage: String?
     /// Set if the audio session could not be configured; the quiz still runs on the speaker.
     private(set) var audioWarning: String?
@@ -54,18 +61,18 @@ final class ListenSessionModel {
     /// Bumped on every (re)launch so a cancelled runner can't touch the new one's state.
     @ObservationIgnored private var generation = 0
 
-    /// Called once when the session ends (finished or stopped) with every question
-    /// each player heard, so they can be persisted and avoided next time.
-    @ObservationIgnored var onFinish: (([String: Set<String>]) -> Void)?
+    /// Called once when the session ends (finished or stopped) with each player's
+    /// updated Leitner boxes, so they can be saved.
+    @ObservationIgnored var onFinish: (([String: LearningRecord]) -> Void)?
 
     /// "#RRGGBB" per player id, for the "Mia's turn" label.
     let playerColors: [String: String]
 
     init(bank: QuestionBank, config: SessionConfig, settings: ListenSettings, duckOthers: Bool,
-         dependencies: Dependencies, seenQuestionIDs: [String: Set<String>] = [:],
+         dependencies: Dependencies, learning: [String: LearningRecord] = [:], day: Int = LearningDay.number(),
          playerColors: [String: String] = [:], rng: AnyRandomGenerator = .system()) {
         self.bank = bank
-        self.session = QuizSession(bank: bank, config: config, seenQuestionIDs: seenQuestionIDs, rng: rng)
+        self.session = QuizSession(bank: bank, config: config, learning: learning, day: day, rng: rng)
         self.playerColors = playerColors
         self.settings = settings
         self.duckOthers = duckOthers
@@ -121,14 +128,23 @@ final class ListenSessionModel {
         launchRunner()
     }
 
-    /// Ends an untimed Talk About chat and continues with the next step.
+    /// Ends a Talk About chat early (or with no timer) and continues with "Great chat!".
     func finishDiscussion() {
         guard isDiscussing, status == .playing || status == .paused else { return }
         haltRunner()
+        thinkRemaining = 0
         isDiscussing = false
         stepIndex += 1
         status = .playing
         launchRunner()
+    }
+
+    /// "Got it" (`.correct`) or "Not yet" (`.incorrect`) for the player whose turn it is.
+    /// A wrong answer sends the question back to box 1 for that player only.
+    func mark(_ result: ReviewResult) {
+        guard canMark else { return }
+        session.mark(result)
+        self.result = result
     }
 
     /// Re-reads the current question from the start.
@@ -218,6 +234,8 @@ final class ListenSessionModel {
         guard let next = session.advance() else { return false }
         session.record(.notScored) // Listen mode keeps no score.
         turn = next
+        result = nil
+        isDiscussionTimed = false
         revealedAnswer = nil
         followUp = nil
         thinkRemaining = 0
@@ -230,10 +248,17 @@ final class ListenSessionModel {
     }
 
     private func perform(_ step: SpeechStep, generation: Int) async throws {
-        isDiscussing = step == .discuss
+        if case .discuss = step { isDiscussing = true } else { isDiscussing = false }
         switch step {
         case .say(let text, let purpose):
-            if purpose == .answer { revealedAnswer = turn?.presented.answerText ?? text }
+            if purpose == .answer {
+                revealedAnswer = turn?.presented.answerText ?? text
+                // Heard but not marked counts as right unless someone taps "Not yet".
+                if result == nil, turn?.presented.question.type.isScored == true {
+                    session.mark(.heard)
+                    result = .heard
+                }
+            }
             if purpose == .followUp { followUp = text }
             try await deps.speech.speak(text)
         case .cue(.think):
@@ -241,24 +266,30 @@ final class ListenSessionModel {
         case .cue(.listening):
             deps.cues.play(.listening)
         case .think(let seconds):
-            try await think(seconds: seconds, generation: generation)
-        case .discuss:
-            // No countdown and no tick. Only `finishDiscussion()` (or skip, stop, pause) moves on.
-            while true { try await Task.sleep(for: .seconds(3600)) }
+            try await countdown(seconds: seconds, ticking: true, generation: generation)
+        case .discuss(let seconds):
+            isDiscussionTimed = seconds != nil
+            if let seconds {
+                // Parent mode timer: a quiet countdown (no ticking over the chat).
+                try await countdown(seconds: seconds, ticking: false, generation: generation)
+            } else {
+                // No limit: only `finishDiscussion()` (or skip, stop, pause) moves on.
+                while true { try await Task.sleep(for: .seconds(3600)) }
+            }
         case .wait(let seconds):
             try await deps.sleeper.sleep(seconds: seconds)
         }
     }
 
-    private func think(seconds: Double, generation: Int) async throws {
+    private func countdown(seconds: Double, ticking: Bool, generation: Int) async throws {
         if thinkRemaining <= 0 || thinkTotal != seconds {
             thinkTotal = seconds
             thinkRemaining = seconds
         }
-        isThinking = true
-        deps.cues.startThinking()
+        isThinking = ticking
+        if ticking { deps.cues.startThinking() }
         defer {
-            if generation == self.generation {
+            if generation == self.generation, ticking {
                 isThinking = false
                 deps.cues.stopThinking()
             }
@@ -290,7 +321,7 @@ final class ListenSessionModel {
     private func tearDown() {
         status = .finished
         isDiscussing = false
-        onFinish?(session.seenQuestionIDs)
+        onFinish?(session.learning)
         onFinish = nil
         turn = nil
         if closingMessage == nil { closingMessage = Phrases.outroPrefix }

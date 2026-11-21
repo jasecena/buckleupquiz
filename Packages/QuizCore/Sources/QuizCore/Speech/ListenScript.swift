@@ -15,9 +15,10 @@ public enum SpeechStep: Hashable, Sendable {
     case cue(Cue)
     /// Think time, shown as a countdown ring.
     case think(seconds: Double)
-    /// Open-ended Talk About time: no countdown. Waits until the family says
-    /// they're done (Next on screen, or the car's next-track button).
-    case discuss
+    /// Talk About time. Ends when the family says they're done (We're done / Next on
+    /// screen, or the car's next-track button), or when the Parent mode timer runs out.
+    /// `seconds == nil` means no time limit.
+    case discuss(seconds: Double?)
     case wait(seconds: Double)
 }
 
@@ -25,20 +26,24 @@ public enum SpeechStep: Hashable, Sendable {
 public struct ListenSettings: Hashable, Sendable, Codable {
     public static let thinkTimeRange: ClosedRange<Double> = 3...20
 
-    /// Think time for quiz questions. Talk About prompts are untimed (`SpeechStep.discuss`).
+    /// Think time for quiz questions.
     public var thinkTime: Double = 8
+    /// Parent mode's own timer for Talk About prompts. nil = no limit (the default).
+    public var talkTime: Double?
+    public static let talkTimePresets: [Double?] = [nil, 30, 60, 120, 180, 300]
     public var funFacts = true
     public var pauseAfterAnswer: Double = 2
 
     public init() {}
 
     // Decoded key by key so settings saved by older builds (missing or extra keys) still load.
-    private enum CodingKeys: String, CodingKey { case thinkTime, funFacts, pauseAfterAnswer }
+    private enum CodingKeys: String, CodingKey { case thinkTime, talkTime, funFacts, pauseAfterAnswer }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let d = ListenSettings()
         thinkTime = try c.decodeIfPresent(Double.self, forKey: .thinkTime) ?? d.thinkTime
+        talkTime = try c.decodeIfPresent(Double.self, forKey: .talkTime)
         funFacts = try c.decodeIfPresent(Bool.self, forKey: .funFacts) ?? d.funFacts
         pauseAfterAnswer = try c.decodeIfPresent(Double.self, forKey: .pauseAfterAnswer) ?? d.pauseAfterAnswer
     }
@@ -62,9 +67,9 @@ public enum ListenScript {
         }
 
         if q.type == .talkAbout {
-            // No clock: people should talk without being rushed.
+            // Parent mode has its own timer, off by default, so nobody is rushed.
             steps.append(.say(Phrases.talkItOver, .options))
-            steps.append(.discuss)
+            steps.append(.discuss(seconds: settings.talkTime.map { max($0, 10) }))
             steps.append(.say(Phrases.greatChat, .answer))
         } else {
             steps.append(.cue(.think))

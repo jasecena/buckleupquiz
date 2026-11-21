@@ -88,14 +88,17 @@ struct SessionSetupView: View {
         playerStore.players.filter(isSelected)
     }
 
-    /// Selected players who have questions in this topic for their age.
+    /// Selected players with something to play today: reviews due or new questions.
     private var playable: [PlayerProfile] {
-        selected.filter { questionCount(for: $0) > 0 }
+        selected.filter { availableToday(for: $0) > 0 }
     }
 
     private var startTitle: String {
         if selected.isEmpty { return "Pick who's playing" }
-        if playable.isEmpty { return "No questions for these ages yet" }
+        if playable.isEmpty {
+            return selected.allSatisfy { questionCount(for: $0) == 0 }
+                ? "No questions for these ages yet" : "All done for today. Come back tomorrow!"
+        }
         return "Start"
     }
 
@@ -120,8 +123,16 @@ struct SessionSetupView: View {
         bank.questionCount(topic: topic.id, ageBand: profile.ageBand)
     }
 
+    /// Due reviews and new questions this player can get today (ADR-0016).
+    private func availableToday(for profile: PlayerProfile) -> Int {
+        QuestionSelector(bank: bank, topics: [topic.id], includeTalkAbout: settingsStore.settings.includeTalkAbout)
+            .availableCount(for: profile.quizPlayer, record: profile.learning, day: LearningDay.number())
+    }
+
     private func note(for profile: PlayerProfile) -> String? {
-        questionCount(for: profile) == 0 ? "Age \(profile.currentAge()) · no questions yet" : nil
+        if questionCount(for: profile) == 0 { return "Age \(profile.currentAge()) · no questions yet" }
+        if availableToday(for: profile) == 0 { return "All done for today" }
+        return nil
     }
 
     private func normaliseSelection() {

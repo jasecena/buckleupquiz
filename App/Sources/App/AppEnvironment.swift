@@ -75,9 +75,9 @@ final class AppEnvironment {
         let model = ListenSessionModel(
             bank: bank, config: config, settings: s.listen, duckOthers: s.duckOthers,
             dependencies: makeListenDependencies(settings),
-            seenQuestionIDs: players.seenQuestionIDs(for: profiles),
+            learning: players.learning(for: profiles), day: LearningDay.number(),
             playerColors: Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.colorHex) }))
-        model.onFinish = { [weak players] seen in players?.recordSeen(seen) }
+        model.onFinish = { [weak players] learning in players?.recordLearning(learning) }
         return model
     }
 }

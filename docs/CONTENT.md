@@ -7,7 +7,7 @@ Questions live in `Content/questions/<topic>.json`, one JSON array per topic. To
 
 | Field | Required | Notes |
 |---|---|---|
-| `id` | ✅ | `abc-0001`. The prefix is per topic; numbers are unique. Convention: `0001–0099` for 6–8, `0101–0199` for 9–10, `0201–0299` for 11–12 (extend with `1xxx` etc.) |
+| `id` | ✅ | `abc-0001`. **Permanent**: players' progress is stored by id ([ADR-0016](adr/0016-leitner-spaced-repetition.md)), so never renumber, reuse or move an id, and keep its meaning if you reword it. Removed ids go in `Content/retired-ids.json`. One prefix per topic; numbers are unique. Convention: `0001–0099` for 6–8, `0101–0199` for 9–10, `0201–0299` for 11–12 (extend with `1xxx` etc.) |
 | `topic` | ✅ | an `id` from `topics.json` |
 | `ageBand` | ✅ | `6-8`, `9-10` or `11-12` (must be one of the topic's bands) |
 | `type` | ✅ | `multipleChoice` (exactly 3 options), `trueFalse`, or `talkAbout` (open discussion, Parent mode, no score, no time limit). No free-answer quiz questions ([ADR-0015](adr/0015-choice-questions-and-named-players.md)) |

@@ -24,10 +24,12 @@ Product decision (2026-11-22):
     choice might be…") and `explanation` come from the topic's category, not from a separate
     type.
   - **trueFalse** has no options; the answer is "True" or "False".
-  - **talkAbout** is an open discussion with no score and **no timer**. The app says "Take your
-    time and talk it over. Press next when you're ready." and waits (`SpeechStep.discuss`) until
-    someone taps **We're done** / Next or presses the car's next-track button, then says
-    "Great chat!". It is only included when Parent mode is on, which is off by default.
+  - **talkAbout** is an open discussion with no score. Parent mode has its **own section in
+    Settings** with a **separate talk timer**: No limit (default), 30 s, 1, 2, 3 or 5 min. It is
+    not tied to think time. The app says "Take your time and talk it over. Press next when
+    you're ready." then waits (`SpeechStep.discuss(seconds:)`) until someone taps **We're done**
+    / Next, presses the car's next-track button, or the timer runs out. Then it says "Great
+    chat!". Parent mode is off by default.
     *(Amended 2026-11-22: an earlier draft gave it 2 × think time.)*
   
   The validator rejects `open` and `scenario` with a pointer to this ADR. Options are always
@@ -35,12 +37,12 @@ Product decision (2026-11-22):
   `acceptedAnswers` stays optional, as extra ways to say the *correct option*
   ("gum" for "Gum leaves").
 - **Players** (`PlayerProfile`, SwiftData, CloudKit-ready per ADR-0009) have a name, an age
-  (4–14), a colour, and the question ids they've heard. The age is stored with the date it was
+  (4–14), a colour, and their Leitner boxes ([ADR-0016](0016-leitner-spaced-repetition.md)). The age is stored with the date it was
   set, and the current age adds the years since, so kids move up a band on their own.
   Age → band: up to 8 → 6–8, 9–10 → 9–10, 11 and over → 11–12. Up to 6 players.
 - **Session setup** is topic → "Who's playing?" (multi-select chips, add a player inline) →
   length → Start. Players take turns in list order ("Mia, this one's for you: …"). Each turn
-  draws from that player's band, and prefers questions they haven't heard before (seen ids are
+  draws from that player's band: due reviews first, then new questions (ADR-0016; boxes are
   saved when the session ends). Players whose band has no questions in the topic are flagged
   and skipped.
 - Listen mode keeps no score, so the outro cheers the players by name.

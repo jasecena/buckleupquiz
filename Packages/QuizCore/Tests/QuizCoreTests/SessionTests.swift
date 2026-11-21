@@ -23,28 +23,63 @@ struct SessionTests {
         #expect(count == 3)
     }
 
-    @Test func prefersUnseenQuestions() {
+    @Test func asksDueReviewsBeforeNewQuestions() {
         let bank = sampleBank(perBand: 4)
         let player = Player.listener(ageBand: .sixToEight)
-        let seen: Set<String> = ["geography-6-8-0", "geography-6-8-1", "geography-6-8-2"]
+        var record = LearningRecord()
+        record.record(.incorrect, for: "geography-6-8-2", on: 100) // box 1, due day 100
         let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(1))
         for seed in 0..<20 as Range<UInt64> {
-            var session = QuizSession(bank: bank, config: config, seenQuestionIDs: [player.id: seen],
+            var session = QuizSession(bank: bank, config: config, learning: [player.id: record], day: 100,
                                       rng: AnyRandomGenerator(seed: seed))
-            #expect(session.advance()?.presented.question.id == "geography-6-8-3")
+            #expect(session.advance()?.presented.question.id == "geography-6-8-2")
         }
     }
 
-    @Test func fallsBackToSeenWhenPoolExhausted() {
-        let bank = sampleBank(perBand: 2)
+    @Test func leavesQuestionsThatAreNotDueOrLearned() {
+        let bank = sampleBank(perBand: 3)
         let player = Player.listener(ageBand: .sixToEight)
-        let seen: Set<String> = ["geography-6-8-0", "geography-6-8-1"]
+        var record = LearningRecord()
+        record.record(.correct, for: "geography-6-8-0", on: 100) // box 2, due day 101
+        for day in 100...131 { record.record(.correct, for: "geography-6-8-1", on: day) } // learned
         let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(5))
-        var session = QuizSession(bank: bank, config: config, seenQuestionIDs: [player.id: seen],
+        var session = QuizSession(bank: bank, config: config, learning: [player.id: record], day: 100,
                                   rng: AnyRandomGenerator(seed: 3))
-        var count = 0
-        while session.advance() != nil { count += 1 }
-        #expect(count == 2)
+        var ids: [String] = []
+        while let turn = session.advance() { ids.append(turn.presented.question.id) }
+        #expect(ids == ["geography-6-8-2"])
+    }
+
+    @Test func wrongAnswerResetsOnlyThatPlayer() {
+        let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
+        let leo = Player(id: "leo", name: "Leo", ageBand: .sixToEight)
+        let bank = sampleBank(perBand: 1)
+        let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(4))
+        var session = QuizSession(bank: bank, config: config, day: 50, rng: AnyRandomGenerator(seed: 1))
+        var turns: [Turn] = []
+        while let turn = session.advance() {
+            turns.append(turn)
+            session.record(turn.player.id == "mia" ? .incorrect : .correct)
+        }
+        // Each player gets the one question once, even though they share it.
+        #expect(turns.map(\.player.name) == ["Mia", "Leo"])
+        #expect(session.learning["mia"]?.card("geography-6-8-0") == ReviewCard(box: 1, due: 50))
+        #expect(session.learning["leo"]?.card("geography-6-8-0") == ReviewCard(box: 2, due: 51))
+    }
+
+    @Test func skippedBeforeTheAnswerLeavesTheBoxesAlone() {
+        let player = Player.listener(ageBand: .sixToEight)
+        let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(2))
+        var session = QuizSession(bank: sampleBank(), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
+        session.advance()
+        session.record(.skipped)
+        session.advance()
+        session.record(.notScored)
+        session.mark(.heard)
+        session.advance()
+        #expect(session.isFinished)
+        #expect(session.learning[player.id]?.cards.count == 1)
+        #expect(session.learning[player.id]?.cards.values.first == ReviewCard(box: 2, due: 11))
     }
 
     @Test func rotatesPlayersWithTheirOwnAgeBand() {
@@ -98,12 +133,19 @@ struct SessionTests {
         #expect(session.scores.stats(for: "a").attempted == 1)
     }
 
-    @Test func tracksSeenQuestions() {
-        let player = Player.listener(ageBand: .sixToEight)
-        let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(2))
-        var session = QuizSession(bank: sampleBank(), config: config, rng: AnyRandomGenerator(seed: 5))
-        while session.advance() != nil {}
-        #expect(session.seenQuestionIDs[player.id]?.count == 2)
+    @Test func talkAboutIsNotBoxedButRemembered() {
+        let topic = Topic(id: "manners", name: "Manners", symbol: "s", color: "#000000", category: .values, isFree: true)
+        let bank = QuestionBank(topics: [topic], questions: [
+            makeQuestion("chat", topic: "manners", type: .talkAbout, answer: nil),
+        ])
+        let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
+        var session = QuizSession(bank: bank, config: SessionConfig(topics: ["manners"], players: [mia], includeTalkAbout: true),
+                                  rng: AnyRandomGenerator(seed: 1))
+        session.advance()
+        session.record(.correct)
+        session.stop()
+        #expect(session.learning["mia"]?.cards.isEmpty == true)
+        #expect(session.learning["mia"]?.talkedAbout == ["chat"])
     }
 }
 
@@ -173,10 +215,20 @@ struct ListenScriptTests {
                                        category: .values, settings: ListenSettings(), addressPlayer: false)
         #expect(!steps.contains { if case .think = $0 { true } else { false } })
         #expect(!steps.contains(.cue(.think)))
-        let discuss = steps.firstIndex(of: .discuss)
+        let discuss = steps.firstIndex(of: .discuss(seconds: nil))
         let chat = steps.firstIndex(of: .say("Great chat!", .answer))
         #expect(discuss != nil && chat != nil && discuss! < chat!)
         #expect(steps.contains(.say(Phrases.talkItOver, .options)))
+    }
+
+    @Test func parentModeHasItsOwnTalkTimer() {
+        let q = makeQuestion(type: .talkAbout, text: "What made you smile today?", answer: nil)
+        var settings = ListenSettings()
+        settings.thinkTime = 5
+        settings.talkTime = 120
+        let steps = ListenScript.steps(for: Turn(number: 1, player: .listener(ageBand: .sixToEight), presented: present(q)),
+                                       category: .values, settings: settings, addressPlayer: false)
+        #expect(steps.contains(.discuss(seconds: 120)), "separate from think time, not a multiple of it")
     }
 
     @Test func thinkTimeIsClamped() {

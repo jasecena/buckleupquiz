@@ -82,6 +82,7 @@ struct QuizView: View {
                         if let followUp = model.followUp {
                             Text(followUp).font(Theme.body).multilineTextAlignment(.center)
                         }
+                        if model.canMark { markButtons(for: turn) }
                     }
                     .transition(.scale.combined(with: .opacity))
                 } else if model.isDiscussing {
@@ -89,7 +90,12 @@ struct QuizView: View {
                         Label("Talk it over", systemImage: "bubble.left.and.bubble.right.fill")
                             .font(Theme.title)
                             .foregroundStyle(Theme.accent)
-                        Text("No rush. Tap when you're ready to move on.")
+                        if model.isDiscussionTimed {
+                            CountdownRing(remaining: model.thinkRemaining, total: model.thinkTotal)
+                                .frame(width: 110, height: 110)
+                        }
+                        Text(model.isDiscussionTimed ? "Tap when you're ready, or wait for the timer."
+                                                     : "No rush. Tap when you're ready to move on.")
                             .font(Theme.body)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -113,6 +119,27 @@ struct QuizView: View {
         if let warning = model.audioWarning {
             Text(warning).font(.footnote).foregroundStyle(.secondary)
         }
+    }
+
+    /// "Got it" / "Not yet" for the player whose turn it is (ADR-0016). Untapped counts as got it.
+    private func markButtons(for turn: Turn) -> some View {
+        let who = model.isTurnBased && !turn.player.name.isEmpty ? turn.player.name : "You"
+        return HStack(spacing: 12) {
+            Button { model.mark(.correct) } label: {
+                Label("\(who) got it", systemImage: "checkmark")
+            }
+            .buttonStyle(BigButtonStyle(color: .green, prominent: model.result == .correct))
+            .accessibilityAddTraits(model.result == .correct ? .isSelected : [])
+
+            Button { model.mark(.incorrect) } label: {
+                Label("Not yet", systemImage: "arrow.uturn.backward")
+            }
+            .buttonStyle(BigButtonStyle(color: .orange, prominent: model.result == .incorrect))
+            .accessibilityAddTraits(model.result == .incorrect ? .isSelected : [])
+            .accessibilityHint("Asks this question again later so it can be learned")
+        }
+        .font(Theme.body)
+        .padding(.top, 8)
     }
 
     private var controls: some View {

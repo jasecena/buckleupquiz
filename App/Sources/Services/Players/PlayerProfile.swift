@@ -16,8 +16,9 @@ final class PlayerProfile {
     var ageSetAt: Date = Date.now
     var colorHex: String = "#2E86DE"
     var createdAt: Date = Date.now
-    /// Question ids this player has heard, so new sessions prefer fresh questions.
-    var seenQuestionIDs: [String] = []
+    /// This player's Leitner boxes (ADR-0016), JSON-encoded `LearningRecord`.
+    /// Stored as data so the schema stays simple and CloudKit-friendly.
+    var learningData: Data = Data()
 
     init(name: String, age: Int, colorHex: String, now: Date = .now) {
         self.id = UUID()
@@ -26,7 +27,7 @@ final class PlayerProfile {
         self.ageSetAt = now
         self.colorHex = colorHex
         self.createdAt = now
-        self.seenQuestionIDs = []
+        self.learningData = Data()
     }
 
     func currentAge(now: Date = .now) -> Int {
@@ -35,6 +36,11 @@ final class PlayerProfile {
     }
 
     var ageBand: AgeBand { AgeBand(age: currentAge()) }
+
+    var learning: LearningRecord {
+        get { (try? JSONDecoder().decode(LearningRecord.self, from: learningData)) ?? LearningRecord() }
+        set { learningData = (try? JSONEncoder().encode(newValue)) ?? learningData }
+    }
 
     /// The value type the quiz engine works with.
     var quizPlayer: Player { Player(id: id.uuidString, name: name, age: currentAge()) }

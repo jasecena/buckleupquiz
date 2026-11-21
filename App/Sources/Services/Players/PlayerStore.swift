@@ -79,16 +79,18 @@ final class PlayerStore {
         players.first { $0.id.uuidString == id }
     }
 
-    /// Seen-question ids for these players, keyed the way `QuizSession` expects.
-    func seenQuestionIDs(for profiles: [PlayerProfile]) -> [String: Set<String>] {
-        Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, Set($0.seenQuestionIDs)) })
+    /// Leitner boxes for these players, keyed the way `QuizSession` expects (ADR-0016).
+    func learning(for profiles: [PlayerProfile]) -> [String: LearningRecord] {
+        Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.learning) })
     }
 
-    /// Merges what each player heard in a session.
-    func recordSeen(_ seen: [String: Set<String>]) {
+    /// Saves each player's boxes after a session.
+    func recordLearning(_ learning: [String: LearningRecord]) {
         for profile in players {
-            guard let ids = seen[profile.id.uuidString], !ids.isEmpty else { continue }
-            profile.seenQuestionIDs = Array(Set(profile.seenQuestionIDs).union(ids)).sorted()
+            guard let newer = learning[profile.id.uuidString] else { continue }
+            var record = profile.learning
+            record.merge(newer)
+            profile.learning = record
         }
         save()
     }

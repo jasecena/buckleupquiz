@@ -26,5 +26,5 @@ wanted later (ADR-0012).
 - **GRDB / SQLite** — a third-party dependency (ADR-0004), and has no Apple-managed sync.
 
 ## Consequences
-- Seen-question sets for 1,500 questions are tiny, so they can be stored as arrays of ids.
+- Learning records (ADR-0016) for 1,500 questions are tiny, so they are stored as one JSON `Data` field per player.
 - CloudKit-compatible modelling rules must be enforced in code review.

@@ -37,10 +37,10 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] `AnswerMatcher`: normalisation, number words, Levenshtein, choice letters,
       true/false synonyms, scenario key-word overlap, hedge detection (ADR-0007)
 - [x] `VoiceCommand` parsing
-- [x] `QuestionSelector`: no repeats within a session, prefer unseen, `minAge`, Talk About toggle
+- [x] `QuestionSelector`: once per player per session, Leitner due-first then new, `minAge`, Talk About toggle
 - [x] `PresentedQuestion`: shuffled options, correct letter
 - [x] `ScoreKeeper` (+10, +5 streak bonus from the 3rd), `Scoreboard` with ties, `BadgeRules`
-- [x] `QuizSession`: turn rotation with each player's own age band, session length, seen tracking
+- [x] `QuizSession`: turn rotation with each player's own age band, session length, Leitner records
 - [x] `ListenScript` + `Phrases`: everything the app says, gentle wording for values topics
 - [x] 47 unit tests, including "every bundled answer is accepted"
 
@@ -62,9 +62,11 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 ## M3 — UI 🟡
 - [x] Home topic grid (icon, name, count, lock), topic setup (age band, length), quiz screen
       (question, countdown ring, answer reveal, big Pause/Skip/Repeat), settings
-- [x] Quiz questions are 3-option multiple choice or true/false; Talk About (Parent mode, off by default) has no time limit and waits for Next (ADR-0015)
+- [x] Quiz questions are 3-option multiple choice or true/false; Talk About (Parent mode, off by default) with its own timer, default no limit (ADR-0015)
 - [x] Players: add/edit/remove with name, age and colour; "Who's playing?" replaces the age picker;
-      turns per player with age-appropriate questions; seen questions remembered (ADR-0015)
+      turns per player with age-appropriate questions (ADR-0015)
+- [x] Leitner boxes per player (today, 1, 2, 4, 8, 16 days; wrong → start over), "Got it" / "Not yet"
+      after each answer, permanent question ids with `retired-ids.json` (ADR-0016)
 - [ ] Onboarding (FEATURES §6): welcome, 3-question demo, add the first player
 - [ ] Mascot and app icon (original, not seatbelt-themed)
 - [ ] Mixed-topic sessions (paid)
@@ -89,7 +91,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Player profiles (up to 6: name, age, colour), pick players per session (done early, in M3)
 - [ ] Turn-based voice sessions using `QuizSession` rotation (engine ✅)
 - [ ] Spoken and on-screen scoreboard, per-player stats, badges (engine ✅)
-- [x] Persist seen questions per player
+- [x] Persist each player's Leitner boxes
 
 **Exit:** acceptance criterion 8 passes.
 

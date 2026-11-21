@@ -36,11 +36,24 @@ struct SettingsView: View {
                         Text("Think time: \(Int(store.settings.listen.thinkTime)) seconds")
                     }
                     Toggle("Fun facts", isOn: $store.settings.listen.funFacts)
-                    Toggle("Parent mode (Talk About prompts)", isOn: $store.settings.includeTalkAbout)
                 } header: {
                     Text("Questions")
                 } footer: {
-                    Text("Talk About prompts are open questions to chat about, with no right answer. There's no timer: take as long as you like, then press Next. Off by default; turn it on when a grown-up is joining in.")
+                    Text("Questions someone gets wrong come back for them later, until they're learned: today, tomorrow, then after 2, 4, 8 and 16 days.")
+                }
+
+                Section {
+                    Toggle("Talk About prompts", isOn: $store.settings.includeTalkAbout)
+                    Picker("Time to talk", selection: $store.settings.listen.talkTime) {
+                        ForEach(ListenSettings.talkTimePresets, id: \.self) { preset in
+                            Text(Self.talkTimeLabel(preset)).tag(preset)
+                        }
+                    }
+                    .disabled(!store.settings.includeTalkAbout)
+                } header: {
+                    Text("Parent mode")
+                } footer: {
+                    Text("Talk About prompts are open questions to chat about together, with no right answer and no score. They have their own timer, separate from think time. With no limit, the quiz waits until you tap \"We're done\" or press next on the car or headphones. Off by default; turn it on when a grown-up is joining in.")
                 }
 
                 Section {
@@ -64,5 +77,10 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+
+    static func talkTimeLabel(_ seconds: Double?) -> String {
+        guard let seconds else { return "No limit" }
+        return seconds < 60 ? "\(Int(seconds)) seconds" : "\(Int(seconds / 60)) min"
     }
 }

@@ -234,6 +234,17 @@ def check_targets(table, report: Report) -> None:
                 report.error(where, f"{c['scored'] + c['talk']}/{TARGET_PER_BAND} questions")
 
 
+def load_retired_ids(content: Path, report: Report) -> set[str]:
+    path = content / "retired-ids.json"
+    if not path.exists():
+        return set()
+    data = load_json(path, report)
+    if not isinstance(data, list) or not all(isinstance(x, str) for x in data):
+        report.error(path.name, "must be an array of question ids")
+        return set()
+    return set(data)
+
+
 def validate(content: Path, strict: bool = False) -> tuple[Report, dict]:
     report = Report()
     catalogue = content / "topics.json"
@@ -244,6 +255,11 @@ def validate(content: Path, strict: bool = False) -> tuple[Report, dict]:
 
     all_questions: list[dict] = []
     seen_ids: dict[str, str] = {}
+    # Ids are permanent: players' Leitner boxes are stored by id (ADR-0016), so an id
+    # must never move to another topic or be given to a new question after it's removed.
+    retired = load_retired_ids(content, report)
+    prefix_topic: dict[str, str] = {}
+    topic_prefix: dict[str, str] = {}
     seen_text: dict[tuple[str, str], str] = {}
     files = sorted((content / "questions").glob("*.json"))
     if not files:
@@ -265,6 +281,17 @@ def validate(content: Path, strict: bool = False) -> tuple[Report, dict]:
                 report.error(where, f"duplicate id (also in {seen_ids[qid]})")
             elif qid:
                 seen_ids[qid] = path.name
+            if isinstance(qid, str) and qid in retired:
+                report.error(where, "id was retired and can't be reused; use the next free number")
+            topic = q.get("topic")
+            if isinstance(qid, str) and ID_PATTERN.match(qid) and isinstance(topic, str):
+                prefix = qid[:3]
+                owner = prefix_topic.setdefault(prefix, topic)
+                expected = topic_prefix.setdefault(topic, prefix)
+                if owner != topic:
+                    report.error(where, f"id prefix '{prefix}' already belongs to topic {owner}")
+                elif expected != prefix:
+                    report.error(where, f"topic {topic} uses the id prefix '{expected}'")
             key = (q.get("ageBand", ""), normalise(str(q.get("question", ""))))
             if key in seen_text:
                 report.warn(where, f"same question text as {seen_text[key]}")

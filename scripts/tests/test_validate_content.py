@@ -28,11 +28,13 @@ def question(**overrides):
 
 
 class ValidateContentTests(unittest.TestCase):
-    def run_with(self, questions, topics=TOPICS, strict=False):
+    def run_with(self, questions, topics=TOPICS, strict=False, retired=None):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "questions").mkdir()
             (root / "topics.json").write_text(json.dumps(topics))
+            if retired is not None:
+                (root / "retired-ids.json").write_text(json.dumps(retired))
             (root / "questions" / "q.json").write_text(json.dumps(questions))
             report, _ = vc.validate(root, strict=strict)
             return report
@@ -45,6 +47,16 @@ class ValidateContentTests(unittest.TestCase):
 
     def test_duplicate_ids(self):
         self.assertError(self.run_with([question(), question()]), "duplicate id")
+
+    def test_retired_ids_cannot_come_back(self):
+        self.assertError(self.run_with([question()], retired=["geo-0001"]), "retired")
+        self.assertEqual(self.run_with([question()], retired=["geo-0099"]).errors, [])
+
+    def test_each_topic_keeps_one_id_prefix(self):
+        report = self.run_with([question(), question(id="xyz-0002", question="Which ocean is biggest?")])
+        self.assertError(report, "uses the id prefix 'geo'")
+        report = self.run_with([question(), question(id="geo-0002", topic="space", question="Which planet is red?")])
+        self.assertError(report, "already belongs to topic geography")
 
     def test_open_questions_are_rejected(self):
         q = question(type="open", options=None)
