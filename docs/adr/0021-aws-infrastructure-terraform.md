@@ -38,6 +38,27 @@ resource (AWS provider v6). Code is in `infra/terraform/`, run through `make`:
   so it doesn't depend on another stack's state file. With `use_custom_domain = false` it can be
   applied before the domain exists, answering on its `*.cloudfront.net` name.
 
+### Access: least privilege in a shared account
+The account (ap-southeast-2) also hosts other projects, so:
+- **Bootstrap is the only stack run as admin** (`AWS_PROFILE=<admin> make infra-bootstrap`).
+  Along with the state bucket, it creates:
+  - **`buckleupquiz-deployer`**, a role only the admin principal can assume. Its policy allows
+    only BuckleUp Quiz things: `buckleupquiz-content-*` buckets, `buckleupquiz-*` functions,
+    `/buckleupquiz/*` log groups (including reading reports), its own state objects, DNS changes
+    limited to `buckleupquiz.com` names
+    (`route53:ChangeResourceRecordSetsNormalizedRecordNames`), CloudFront and ACM changes or
+    deletes only on resources tagged `Project=buckleupquiz`, and registering (not transferring
+    or deleting) the domain.
+  - **`buckleupquiz/service-boundary`**, a permissions boundary. The deployer can create roles
+    only under `/buckleupquiz/`, only with this boundary attached, and only for Lambda. So even a
+    role it creates can do no more than write its own logs and read content. Removing a
+    boundary is explicitly denied.
+- On this machine, the `buckleupquiz` profile is `role_arn = …:role/buckleupquiz-deployer`
+  plus `source_profile = <admin>`. No new long-lived keys. Checked: listing the account's
+  buckets, functions or users is denied.
+- **The app has no AWS credentials.** It only calls public HTTPS URLs. Keys in an app binary
+  can be extracted by anyone.
+
 ### What the app uses
 | URL | Method | Behind it |
 |---|---|---|
@@ -57,7 +78,8 @@ resource (AWS provider v6). Code is in `infra/terraform/`, run through `make`:
 - **S3 lock files**, not a DynamoDB lock table.
 - The website stays on **GitHub Pages** (free). DNS just points the apex there.
 - Expected bill: about **US$0.50 a month** (Route 53 hosted zone) plus the **.com registration
-  (about US$15 a year)**, plus cents for logs and storage. That's roughly **US$21 a year**.
+  (US$16 a year, checked 2026-11-22)**, plus cents for logs and storage. That's roughly
+  **US$22 a year**.
 
 ### Family data
 Not here. Players, progress and scores keep syncing through the family's own iCloud
@@ -65,9 +87,11 @@ Not here. Players, progress and scores keep syncing through the family's own iCl
 
 ## Running it
 ```sh
-export AWS_PROFILE=buckleupquiz      # the account to use
+AWS_PROFILE=<admin> make infra-bootstrap   # once per account: state bucket, deployer role
+aws configure set role_arn arn:aws:iam::<account>:role/buckleupquiz-deployer --profile buckleupquiz
+aws configure set source_profile <admin> --profile buckleupquiz
+export AWS_PROFILE=buckleupquiz      # everything below runs least-privilege
 make infra-check                     # who am I, is the domain available, its price
-make infra-bootstrap                 # once per account
 cp infra/terraform/domain/contact.auto.tfvars.example infra/terraform/domain/contact.auto.tfvars
 make infra-domain                    # registers the domain (charged once a year)
 make infra-platform                  # NO_DOMAIN=1 to deploy before the certificate exists
@@ -90,3 +114,6 @@ Then put `reports_url` from the platform outputs into `project.yml` as `TELEMETR
 - Registration details for the domain are kept in `contact.auto.tfvars`, which git ignores,
   never in the repo.
 - Any CI that applies Terraform needs AWS credentials. Today applies are run by hand.
+- **Deployed 2026-11-22:** bootstrap and platform (on `d3fmbcooclif09.cloudfront.net` until the
+  domain exists). The domain is waiting on the registrant's contact details. Builds from v0.3.3
+  send reports to the CloudFront address.

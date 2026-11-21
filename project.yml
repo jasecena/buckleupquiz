@@ -71,7 +71,9 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         GENERATE_INFOPLIST_FILE: NO
-        TELEMETRY_URL: ""
+        # Error reports (ADR-0020/0021). Moves to https://api.buckleupquiz.com/v1/reports once the
+        # domain is registered; this CloudFront address keeps working for older builds.
+        TELEMETRY_URL: "https://d3fmbcooclif09.cloudfront.net/v1/reports"
 
 
   BuckleUpQuizTests:

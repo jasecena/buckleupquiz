@@ -140,7 +140,9 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Anonymous error reports (ADR-0020): `Telemetry` queue + batches, MetricKit crashes/hangs,
       voice failure events, per-game voice counts, Settings toggle + Diagnostics screen
 - [x] Terraform for AWS: bootstrap (state bucket), domain (buckleupquiz.com, zone, certificate), platform (CloudFront, content bucket, reports Lambda) (ADR-0021)
-- [ ] Apply the stacks, set `TELEMETRY_URL`; update the App Store privacy label (Diagnostics, not linked)
+- [x] Applied bootstrap (state bucket, least-privilege deployer role + boundary) and platform; `TELEMETRY_URL` set (CloudFront address)
+- [ ] Register buckleupquiz.com (`make infra-domain`, needs contact details), switch platform to api.buckleupquiz.com
+- [ ] Update the App Store privacy label (Diagnostics, not linked) before the public release
 - [ ] Proxy test: only the telemetry endpoint, only anonymous fields (criterion 10, amended by ADR-0020)
 - [ ] Name checks (IP Australia), domains and handles (FEATURES §0)
 

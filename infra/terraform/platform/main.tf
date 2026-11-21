@@ -158,8 +158,12 @@ resource "aws_cloudwatch_log_group" "reports" {
   retention_in_days = var.reports_retention_days
 }
 
+# Service roles live under /buckleupquiz/ and carry the boundary from the bootstrap stack, the
+# only kind of role the deployer may create (ADR-0021).
 resource "aws_iam_role" "reports" {
-  name = "buckleupquiz-reports"
+  name                 = "buckleupquiz-reports"
+  path                 = "/buckleupquiz/"
+  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/buckleupquiz/service-boundary"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{

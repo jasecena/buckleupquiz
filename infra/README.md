@@ -11,9 +11,9 @@ by everyday changes:
 | [`terraform/platform`](terraform/platform/main.tf) | `api.buckleupquiz.com`: content bucket + CloudFront, error reports (Lambda) | `make infra-platform` |
 
 ```sh
-export AWS_PROFILE=buckleupquiz
+AWS_PROFILE=<admin> make infra-bootstrap   # once: state bucket + least-privilege deployer role
+export AWS_PROFILE=buckleupquiz            # role_arn = buckleupquiz-deployer, source_profile = <admin>
 make infra-check        # account, domain availability and price
-make infra-bootstrap
 cp infra/terraform/domain/contact.auto.tfvars.example infra/terraform/domain/contact.auto.tfvars  # fill in
 make infra-domain
 make infra-platform     # NO_DOMAIN=1 before the certificate is issued
