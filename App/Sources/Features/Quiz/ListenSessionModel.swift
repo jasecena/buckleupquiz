@@ -473,18 +473,18 @@ final class ListenSessionModel {
     /// Half-duplex: speech has finished → short gap → chime → listen, once. If nothing clear is
     /// heard, nothing is said about it: the answer is shared and the game moves on (ADR-0018).
     /// Voice answers (ADR-0018): all the options are read first, then the mic opens straight
-    /// away (no beep, no gap) for the think time, with the tick and the countdown. Kids keep
-    /// saying their answer until it's heard. The end of the options can reach the mic a moment
-    /// late over Bluetooth, so the app's own words are taken out of what was heard.
+    /// away (no beep) for the think time, with the tick and the countdown. Kids keep saying their
+    /// answer until it's heard. A 0.3 s gap lets the end of the options finish playing over
+    /// Bluetooth (which lags), so the app never hears its own last option as an answer.
     private func listenForAnswer(seconds: Double, options: String?, generation: Int) async throws {
         if let options { try await deps.speech.speak(options) }
+        try await deps.sleeper.sleep(seconds: 0.3)
         guard isVoice, let listener = deps.listener, let turn else {
             // Voice is off (or the recogniser broke): behave like Listen mode.
             try await countdown(seconds: seconds, ticking: true, generation: generation)
             return
         }
         let presented = turn.presented
-        let echo = options ?? ""
         isListening = true
         let started = Date.now
         deps.cues.startThinking()
@@ -505,7 +505,7 @@ final class ListenSessionModel {
         do {
             raw = try await listener.listen(
                 for: seconds, hints: VoiceReply.hints(for: presented),
-                isConclusive: { VoiceReply.interpret(EchoFilter.remove(echo, from: $0), for: presented).isConclusive })
+                isConclusive: { VoiceReply.interpret($0, for: presented).isConclusive })
             deps.cues.stopThinking()
         } catch is CancellationError {
             deps.cues.stopThinking()
@@ -531,7 +531,7 @@ final class ListenSessionModel {
         }
         isListening = false
         guard generation == self.generation else { return }
-        let transcriptions = EchoFilter.remove(echo, from: raw)
+        let transcriptions = raw
 
         switch VoiceReply.interpret(transcriptions, for: turn.presented) {
         case .command(let command):

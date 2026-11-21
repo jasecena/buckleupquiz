@@ -115,9 +115,10 @@ speaks**.
 - In voice mode the listening step reads all the options, then opens the mic **straight
   away**, with no beep and no gap, for the think time with the tick and countdown
   (`SpeechStep.listen(seconds:options:)`). Kids keep saying their answer until it's heard.
-- Over Bluetooth the end of the options can reach the mic a moment late. `EchoFilter` removes
-  the options' words from what was heard (in-order fuzzy alignment), so "…C: Darwin" never
-  counts as the child's answer.
+- Over Bluetooth the end of the options can reach the mic a moment late, so the mic opens
+  0.3 s after the speech finishes. (Filtering the options' words out of what was heard was
+  tried and dropped: once the mic opens after the options, the child's answer *is* an option
+  word, so the filter removed real answers.)
 - "Say your answer as soon as you know it!" replaces "Say your answer after the beep!".
 - The cue player now remembers whether it was ticking, and restarts properly after the audio
   is reconfigured.
