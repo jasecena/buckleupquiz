@@ -189,12 +189,17 @@ resource "aws_route53_record" "www" {
 
 # --- No email is sent from this domain: tell receivers to reject anything claiming to be us ---
 
+# All TXT values for the apex live in one record set (Route 53 allows one per name).
 resource "aws_route53_record" "spf" {
   zone_id = local.zone_id
   name    = var.domain_name
   type    = "TXT"
   ttl     = 3600
-  records = ["v=spf1 -all"]
+  records = [
+    "v=spf1 -all",
+    # Apple domain verification (requested by the account holder, 2026-11-22).
+    "apple-domain-verification=C9EMenBswkzDSsuD",
+  ]
 }
 
 resource "aws_route53_record" "dmarc" {
