@@ -80,11 +80,22 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Toggle("Show the scoreboard", isOn: $store.settings.showScoreboard)
+                } header: {
+                    Text("Scoreboard")
+                } footer: {
+                    Text("Each player's points along the top of the screen during the game, read out at the end. Turn it off for a relaxed game; points still count towards badges.")
+                }
+
+                Section {
                     Toggle("Lower music instead of stopping it", isOn: $store.settings.duckOthers)
+                    Toggle("Keep playing in the background", isOn: Binding(
+                        get: { store.settings.backgroundPlay ?? true },
+                        set: { store.settings.backgroundPlay = $0 }))
                 } header: {
                     Text("Audio")
                 } footer: {
-                    Text("BuckleUp Quiz plays through your car's Bluetooth or CarPlay audio, and keeps going with the screen locked.")
+                    Text("BuckleUp Quiz plays through your car's Bluetooth or CarPlay audio. With background play on, it keeps going when the screen is locked or you switch apps; off, the game pauses until you come back.")
                 }
 
                 if entitlements.isTestBuild {

@@ -88,9 +88,11 @@ final class ListenSessionModel {
 
     /// Scores are shown once anyone has answered out loud.
     /// Named players always see the scoreboard, from the first question (everyone starts at 0).
-    var showsScores: Bool { isTurnBased || scoreboard.contains { $0.points > 0 } || hasAttempts }
+    var showsScores: Bool { showScoreboard && (isTurnBased || scoreboard.contains { $0.points > 0 } || hasAttempts) }
     /// The trophy screen only when someone scored; otherwise just "Great job, everyone".
-    var showsFinalScores: Bool { scoreboard.contains { $0.points > 0 } }
+    var showsFinalScores: Bool { showScoreboard && scoreboard.contains { $0.points > 0 } }
+    /// Voice answers were asked for but aren't running (no mic, or it stopped working).
+    var isVoiceOff: Bool { answerMode == .voice && !isVoice }
 
     var questionCount: Int? { session.config.length.limit }
 
@@ -104,6 +106,8 @@ final class ListenSessionModel {
     private let settings: ListenSettings
     private let duckOthers: Bool
     private let answerMode: AnswerMode
+    /// Settings → Scoreboard: show the scores on screen and read them out at the end.
+    let showScoreboard: Bool
     private let mic: MicPreference
     private let lifetimeStats: [String: PlayerStats]
     private let deps: Dependencies
@@ -135,7 +139,9 @@ final class ListenSessionModel {
     init(bank: QuestionBank, config: SessionConfig, settings: ListenSettings, duckOthers: Bool,
          dependencies: Dependencies, answerMode: AnswerMode = .listen, mic: MicPreference = .automatic,
          learning: [String: LearningRecord] = [:], lifetimeStats: [String: PlayerStats] = [:],
-         day: Int = LearningDay.number(), playerColors: [String: String] = [:], rng: AnyRandomGenerator = .system()) {
+         day: Int = LearningDay.number(), playerColors: [String: String] = [:], showScoreboard: Bool = true,
+         rng: AnyRandomGenerator = .system()) {
+        self.showScoreboard = showScoreboard
         self.bank = bank
         self.session = QuizSession(bank: bank, config: config, learning: learning, day: day, rng: rng)
         self.playerColors = playerColors
@@ -454,8 +460,22 @@ final class ListenSessionModel {
         let presented = turn.presented
         let started = Date.now
         let transcriptions: [String]
-        // The think tick runs while we listen, so everyone hears the clock ("ding, ding, ding").
+        // The think tick runs while we listen, so everyone hears the clock ("ding, ding, ding"),
+        // and the countdown shows beside the microphone.
         deps.cues.startThinking()
+        thinkTotal = seconds
+        thinkRemaining = seconds
+        let clock = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(100))
+                guard let self, self.isListening else { return }
+                self.thinkRemaining = max(0, self.thinkRemaining - 0.1)
+            }
+        }
+        defer {
+            clock.cancel()
+            if !isThinking { thinkRemaining = 0 }
+        }
         do {
             transcriptions = try await listener.listen(
                 for: seconds, hints: VoiceReply.hints(for: presented),
@@ -604,10 +624,13 @@ final class ListenSessionModel {
         turn = nil
         if hasAttempts {
             // "Mia wins with 80 points! Leo got 60 points! Mia earned the High Five badge!"
+            // With the scoreboard off, just "Great job, Mia and Leo!" (badges are still cheered).
             scoreboard = session.scoreboard
             earnedBadges = newlyEarnedBadges()
-            closingMessage = ([Phrases.scoreAnnouncement(scoreboard)]
-                + earnedBadges.map { Phrases.badgeEarned($0.badge, by: $0.player) }).joined(separator: " ")
+            let ending = showScoreboard ? Phrases.scoreAnnouncement(scoreboard)
+                : Phrases.listenOutro(players: session.config.players)
+            closingMessage = ([ending] + earnedBadges.map { Phrases.badgeEarned($0.badge, by: $0.player) })
+                .joined(separator: " ")
         } else {
             closingMessage = Phrases.listenOutro(players: session.config.players)
         }

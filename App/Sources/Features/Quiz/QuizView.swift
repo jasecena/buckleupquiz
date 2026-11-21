@@ -5,6 +5,12 @@ import SwiftUI
 struct QuizView: View {
     let model: ListenSessionModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(SettingsStore.self) private var settingsStore
+    /// The first time the game goes to the background it keeps playing (so a car trip isn't
+    /// interrupted), and the question is asked as soon as the app is back on screen.
+    @State private var askAboutBackground = false
+    @State private var wentToBackground = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -20,6 +26,28 @@ struct QuizView: View {
         .onAppear { model.start() }
         .onDisappear { model.stop() }
         .persistentSystemOverlays(.hidden)
+        .onChange(of: scenePhase) { _, phase in handle(phase) }
+        .alert("Keep playing in the background?", isPresented: $askAboutBackground) {
+            Button("Yes, keep playing") { settingsStore.settings.backgroundPlay = true }
+            Button("No, pause it") { settingsStore.settings.backgroundPlay = false }
+        } message: {
+            Text("BuckleUp Quiz can keep playing when you lock the screen or switch apps, which is handy in the car. You can change this later in Settings.")
+        }
+    }
+
+    /// Background play (Settings → Audio): pause when it's off; ask once when it's never been set.
+    private func handle(_ phase: ScenePhase) {
+        guard model.status == .playing || model.status == .paused else { return }
+        switch phase {
+        case .background:
+            wentToBackground = true
+            if settingsStore.settings.backgroundPlay == false { model.pause() }
+        case .active:
+            if wentToBackground, settingsStore.settings.backgroundPlay == nil { askAboutBackground = true }
+            wentToBackground = false
+        default:
+            break
+        }
     }
 
     private var header: some View {
@@ -136,17 +164,28 @@ struct QuizView: View {
         }
         if let mic = model.micName, model.isVoice, model.status != .finished {
             Label("Using: \(mic)", systemImage: "mic.fill").font(.footnote).foregroundStyle(.secondary)
+        } else if model.isVoiceOff, model.status != .finished, model.audioWarning == nil {
+            // For the grown-ups: listening isn't running, so answers are being read out.
+            Label("Not listening: answers are read out. See Settings → Mic check.", systemImage: "mic.slash")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
         }
     }
 
     // MARK: Voice answers (ADR-0018)
 
+    /// The microphone and the countdown side by side, so it's clear the app is still listening
+    /// while the clock runs.
     private func listening(for turn: Turn) -> some View {
         VStack(spacing: 12) {
-            Image(systemName: "waveform.circle.fill")
-                .font(.system(size: 88))
-                .foregroundStyle(Theme.accent)
-                .symbolEffect(.variableColor.iterative, options: .repeating)
+            HStack(spacing: 28) {
+                Image(systemName: "waveform.circle.fill")
+                    .font(.system(size: 88))
+                    .foregroundStyle(Theme.accent)
+                    .symbolEffect(.variableColor.iterative, options: .repeating)
+                CountdownRing(remaining: model.thinkRemaining, total: model.thinkTotal)
+                    .frame(width: 88, height: 88)
+            }
             Text(turn.player.name.isEmpty ? "Listening…" : "Listening to \(turn.player.name)…")
                 .font(Theme.title)
             Text(turn.presented.question.type == .trueFalse ? "Say true or false" : "Say A, B or C, or the answer")

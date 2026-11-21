@@ -109,7 +109,8 @@ final class AppEnvironment {
             // nobody gets a question someone else already had today (ADR-0016).
             learning: players.learning(for: players.players), lifetimeStats: players.stats(for: profiles),
             day: LearningDay.number(),
-            playerColors: Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.colorHex) }))
+            playerColors: Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.colorHex) }),
+            showScoreboard: s.showScoreboard)
         model.onFinish = { [weak players] summary in players?.record(summary) }
         return model
     }

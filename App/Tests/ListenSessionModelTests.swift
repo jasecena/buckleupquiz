@@ -264,6 +264,25 @@ struct ListenSessionModelTests {
         #expect(speech.spoken.last?.contains("Mia got 10 points") == true || speech.spoken.last?.contains("Mia wins") == true)
     }
 
+    @Test func scoreboardCanBeTurnedOff() async {
+        let listener = FakeListener([["answer 0"]])
+        let model = ListenSessionModel(
+            bank: makeBank(questions: 1), config: SessionConfig(topics: ["animals"],
+                                                                players: [Player(id: "mia", name: "Mia", age: 7)],
+                                                                length: .questions(1)),
+            settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
+                                listener: listener),
+            answerMode: .voice, showScoreboard: false, rng: AnyRandomGenerator(seed: 1))
+        #expect(!model.showsScores)
+        model.start()
+        await model.runner?.value
+        #expect(speech.spoken.contains { $0.hasPrefix("Correct!") }, "still cheered")
+        #expect(!model.showsFinalScores)
+        #expect(speech.spoken.last?.hasPrefix("That's the end of the ride! Great job, Mia!") == true)
+        #expect(!(speech.spoken.last ?? "").contains("points"))
+    }
+
     @Test func silenceIsNeverMentioned() async {
         let (model, listener) = makeVoiceModel([], questions: 5, length: 5)
         model.start()

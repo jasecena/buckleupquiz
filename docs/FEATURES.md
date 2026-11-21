@@ -104,7 +104,9 @@ Goal: kids answer through the **car's built-in microphone**, and the app talks t
 
 ### 3.1 Players
 - Create up to 6 player profiles, each with a **name**, **age band** and **avatar/colour**. Up to 6 can play together with the Family Pass (2 for free).
-- A **live scoreboard** sits at the top of the screen during every question, for every player, from the first question. Scores are kept per game and added to each player's lifetime points.
+- A **live scoreboard** sits at the top of the screen during every question, for every player, from the first question. Scores are kept per game and added to each player's lifetime points. **Settings → Scoreboard** turns it off (on by default): no scores on screen or read out, but points still count towards badges.
+- While listening, the **microphone and the countdown show side by side**, so it's clear the app is still listening while the clock runs. If listening isn't running, a small note says answers are being read out.
+- **Background play** (Settings → Audio) is a choice. The first time a game goes to the background it keeps playing (so a car trip isn't interrupted), and the parent is asked "Keep playing in the background?" when they're back in the app. The answer is remembered. Off: the game pauses until they return.
 - Before a session, pick who's playing.
 
 ### 3.2 Turn-based play
