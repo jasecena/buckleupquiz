@@ -29,6 +29,8 @@ final class ListenSessionModel {
     private(set) var thinkTotal: Double = 0
     private(set) var thinkRemaining: Double = 0
     private(set) var isThinking = false
+    /// A Talk About prompt is waiting, untimed, for the family to finish talking.
+    private(set) var isDiscussing = false
     private(set) var closingMessage: String?
     /// Set if the audio session could not be configured; the quiz still runs on the speaker.
     private(set) var audioWarning: String?
@@ -107,12 +109,24 @@ final class ListenSessionModel {
 
     func togglePause() { status == .playing ? pause() : resume() }
 
-    /// Moves straight to the next question.
+    /// Moves straight to the next question. During a Talk About chat it means
+    /// "we're done talking": the app says "Great chat!" and carries on.
     func skip() {
         guard status == .playing || status == .paused else { return }
+        if isDiscussing { return finishDiscussion() }
         haltRunner()
         session.record(.skipped)
         stepIndex = steps.count
+        status = .playing
+        launchRunner()
+    }
+
+    /// Ends an untimed Talk About chat and continues with the next step.
+    func finishDiscussion() {
+        guard isDiscussing, status == .playing || status == .paused else { return }
+        haltRunner()
+        isDiscussing = false
+        stepIndex += 1
         status = .playing
         launchRunner()
     }
@@ -216,6 +230,7 @@ final class ListenSessionModel {
     }
 
     private func perform(_ step: SpeechStep, generation: Int) async throws {
+        isDiscussing = step == .discuss
         switch step {
         case .say(let text, let purpose):
             if purpose == .answer { revealedAnswer = turn?.presented.answerText ?? text }
@@ -227,6 +242,9 @@ final class ListenSessionModel {
             deps.cues.play(.listening)
         case .think(let seconds):
             try await think(seconds: seconds, generation: generation)
+        case .discuss:
+            // No countdown and no tick. Only `finishDiscussion()` (or skip, stop, pause) moves on.
+            while true { try await Task.sleep(for: .seconds(3600)) }
         case .wait(let seconds):
             try await deps.sleeper.sleep(seconds: seconds)
         }
@@ -254,6 +272,7 @@ final class ListenSessionModel {
     }
 
     private func restartCurrentQuestion() {
+        isDiscussing = false
         stepIndex = steps.firstIndex { if case .say(_, .question) = $0 { true } else { false } } ?? 0
         thinkRemaining = 0
         revealedAnswer = nil
@@ -270,6 +289,7 @@ final class ListenSessionModel {
 
     private func tearDown() {
         status = .finished
+        isDiscussing = false
         onFinish?(session.seenQuestionIDs)
         onFinish = nil
         turn = nil

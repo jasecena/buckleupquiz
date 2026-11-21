@@ -84,6 +84,20 @@ struct QuizView: View {
                         }
                     }
                     .transition(.scale.combined(with: .opacity))
+                } else if model.isDiscussing {
+                    VStack(spacing: 16) {
+                        Label("Talk it over", systemImage: "bubble.left.and.bubble.right.fill")
+                            .font(Theme.title)
+                            .foregroundStyle(Theme.accent)
+                        Text("No rush. Tap when you're ready to move on.")
+                            .font(Theme.body)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                        Button { model.finishDiscussion() } label: {
+                            Label("We're done", systemImage: "checkmark")
+                        }
+                        .buttonStyle(BigButtonStyle())
+                    }
                 } else if model.isThinking || model.thinkRemaining > 0 {
                     CountdownRing(remaining: model.thinkRemaining, total: model.thinkTotal)
                         .frame(width: 140, height: 140)

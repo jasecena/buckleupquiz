@@ -11,7 +11,8 @@ struct AppSettings: Codable, Equatable, Sendable {
     /// Lower music volume instead of stopping it.
     var duckOthers = true
     /// "Parent mode": include Talk About prompts (FEATURES §4.3).
-    var includeTalkAbout = true
+    /// Parent mode. Off by default: Talk About needs a grown-up to chat with.
+    var includeTalkAbout = false
     /// Players picked last time ("Who's playing?"), as `PlayerProfile.id` strings.
     var selectedPlayerIDs: [String] = []
     var lastSessionLength: SessionLength = .questions(10)

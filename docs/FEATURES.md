@@ -3,7 +3,7 @@
 > **BuckleUp Quiz** — a hands-free, voice-first educational quiz for kids aged 6–12, built for car trips and home. The app reads a question aloud, waits, then reveals the answer. The paid tier listens for spoken answers, takes turns between named players and keeps score.
 
 > **Changes since this spec was written** (see [ADR-0015](adr/0015-choice-questions-and-named-players.md)):
-> - Every quiz question is a single choice: **3 options**, or true/false. "Scenario" is merged into multiple choice. Open discussion questions stay as **Talk About** prompts (Parent mode) with **double** the think time.
+> - Every quiz question is a single choice: **3 options**, or true/false. "Scenario" is merged into multiple choice. Open discussion questions stay as **Talk About** prompts (Parent mode, off by default) with **no time limit**: the app waits until the family presses Next.
 > - Families add players with a name and age. Sessions start with "Who's playing?" instead of an age-band picker, and each child gets questions for their own age.
 
 ---
@@ -184,7 +184,7 @@ Teaches kindness, manners, friendship and feelings through everyday situations.
 **Question styles**
 - **Scenario (scored):** "Your friend falls over at the park. What's the kind thing to do? A: laugh, B: help them up and ask if they're okay, C: keep playing." Then the answer, plus the `explanation`: "Helping shows you care, and they'd do the same for you."
 - **True/false (scored):** "It's okay to feel angry, as long as we don't hurt anyone. True or false?"
-- **Talk About (not scored):** "What's something kind someone did for you this week?" The app pauses for a longer think time (default 30 seconds), then says "Great chat!" and moves on. In the paid tier, it's addressed to the player whose turn it is but **awards no points**.
+- **Talk About (not scored):** "What's something kind someone did for you this week?" There is no timer: the app says "Take your time and talk it over" and waits until someone presses Next (on screen or the car's next-track button), then says "Great chat!" and moves on. In the paid tier, it's addressed to the player whose turn it is but **awards no points**.
 
 **Content rules**
 - Positive framing: reward the kind choice and never shame a wrong answer. A wrong answer gets "Good try! A kinder choice might be…", never "Wrong!"

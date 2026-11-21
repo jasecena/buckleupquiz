@@ -10,8 +10,8 @@ Product decision (2026-11-22):
 1. **All quiz questions are a single choice between three answers.** True/false is fine too.
    Free-answer quiz questions are dropped. "Scenario" was the same thing as multiple choice,
    and having both was confusing, so they are merged.
-   **Talk About** prompts, the open discussion questions turned on by Parent mode, stay, and
-   get **double the think time** so the family can talk.
+   **Talk About** prompts, the open discussion questions turned on by Parent mode, stay.
+   They have **no time limit**, so nobody is rushed, and Parent mode is **off by default**.
 2. **Families add their kids once, with name and age.** Each session starts with "Who's
    playing?", and the family picks names. There is no age-band picker: the app already knows
    each child's age, so each child gets questions for their own age. The names are used later
@@ -24,8 +24,11 @@ Product decision (2026-11-22):
     choice might be…") and `explanation` come from the topic's category, not from a separate
     type.
   - **trueFalse** has no options; the answer is "True" or "False".
-  - **talkAbout** is an open discussion with no score. It lasts **2 × think time** (16 s at the
-    default 8 s) and is only included when Parent mode is on.
+  - **talkAbout** is an open discussion with no score and **no timer**. The app says "Take your
+    time and talk it over. Press next when you're ready." and waits (`SpeechStep.discuss`) until
+    someone taps **We're done** / Next or presses the car's next-track button, then says
+    "Great chat!". It is only included when Parent mode is on, which is off by default.
+    *(Amended 2026-11-22: an earlier draft gave it 2 × think time.)*
   
   The validator rejects `open` and `scenario` with a pointer to this ADR. Options are always
   read aloud, so the "read options" setting is gone.

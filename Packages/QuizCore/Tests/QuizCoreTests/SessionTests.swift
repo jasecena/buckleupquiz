@@ -167,15 +167,16 @@ struct ListenScriptTests {
         ])
     }
 
-    @Test func talkAboutGetsDoubleThinkTime() {
+    @Test func talkAboutHasNoTimeLimit() {
         let q = makeQuestion(type: .talkAbout, text: "What made you smile today?", answer: nil)
-        var settings = ListenSettings()
-        settings.thinkTime = 10
         let steps = ListenScript.steps(for: Turn(number: 3, player: .listener(ageBand: .sixToEight), presented: present(q)),
-                                       category: .values, settings: settings, addressPlayer: false)
-        #expect(steps.contains(.think(seconds: 20)))
-        #expect(!steps.contains { if case .say(_, .options) = $0 { true } else { false } })
-        #expect(steps.contains(.say("Great chat!", .answer)))
+                                       category: .values, settings: ListenSettings(), addressPlayer: false)
+        #expect(!steps.contains { if case .think = $0 { true } else { false } })
+        #expect(!steps.contains(.cue(.think)))
+        let discuss = steps.firstIndex(of: .discuss)
+        let chat = steps.firstIndex(of: .say("Great chat!", .answer))
+        #expect(discuss != nil && chat != nil && discuss! < chat!)
+        #expect(steps.contains(.say(Phrases.talkItOver, .options)))
     }
 
     @Test func thinkTimeIsClamped() {

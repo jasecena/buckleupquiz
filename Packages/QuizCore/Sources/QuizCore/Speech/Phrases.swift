@@ -7,6 +7,7 @@ public enum Phrases {
     public static let listening = "I'm listening."
     public static let didntCatch = "Sorry, I didn't catch that. Say it again?"
     public static let greatChat = "Great chat!"
+    public static let talkItOver = "Take your time and talk it over. Press next when you're ready."
 
     public static let cheers = [
         "Correct!", "Correct! Awesome!", "Correct! You're a superstar!", "Correct! Nailed it!",

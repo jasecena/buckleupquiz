@@ -92,6 +92,31 @@ struct ListenSessionModelTests {
         #expect(seen["leo"]?.allSatisfy { ["ani-1003", "ani-1004", "ani-1005"].contains($0) } == true)
     }
 
+    @Test func talkAboutWaitsUntilTheFamilyIsDone() async {
+        let topic = Topic(id: "manners", name: "Manners", symbol: "heart", color: "#E74C3C",
+                          category: .values, isFree: true)
+        let prompt = Question(id: "man-1000", topic: "manners", ageBand: .sixToEight, type: .talkAbout,
+                              question: "What made you smile today?", options: nil, answer: nil)
+        let config = SessionConfig(topics: ["manners"], players: [.listener(ageBand: .sixToEight)],
+                                   length: .questions(1), includeTalkAbout: true)
+        let model = ListenSessionModel(
+            bank: QuestionBank(topics: [topic], questions: [prompt]), config: config, settings: ListenSettings(),
+            duckOthers: true, dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio),
+            rng: AnyRandomGenerator(seed: 1))
+        model.start()
+        for _ in 0..<200 where !model.isDiscussing { await Task.yield() }
+
+        #expect(model.isDiscussing, "no timer: it waits for the family")
+        #expect(speech.spoken.last == Phrases.talkItOver)
+        #expect(!cues.events.contains("think"), "no ticking while people talk")
+
+        model.skip() // the car's next-track button
+        await model.runner?.value
+        #expect(!model.isDiscussing)
+        #expect(speech.spoken.contains(Phrases.greatChat))
+        #expect(model.status == .finished)
+    }
+
     @Test func endsEarlyWhenQuestionsRunOut() async {
         let model = makeModel(questions: 2, length: .questions(10))
         model.start()

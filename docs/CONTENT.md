@@ -10,7 +10,7 @@ Questions live in `Content/questions/<topic>.json`, one JSON array per topic. To
 | `id` | ✅ | `abc-0001`. The prefix is per topic; numbers are unique. Convention: `0001–0099` for 6–8, `0101–0199` for 9–10, `0201–0299` for 11–12 (extend with `1xxx` etc.) |
 | `topic` | ✅ | an `id` from `topics.json` |
 | `ageBand` | ✅ | `6-8`, `9-10` or `11-12` (must be one of the topic's bands) |
-| `type` | ✅ | `multipleChoice` (exactly 3 options), `trueFalse`, or `talkAbout` (open discussion, Parent mode, no score, double think time). No free-answer quiz questions ([ADR-0015](adr/0015-choice-questions-and-named-players.md)) |
+| `type` | ✅ | `multipleChoice` (exactly 3 options), `trueFalse`, or `talkAbout` (open discussion, Parent mode, no score, no time limit). No free-answer quiz questions ([ADR-0015](adr/0015-choice-questions-and-named-players.md)) |
 | `question` | ✅ | must read aloud in ≤12 s (about 30 words, *including* options) |
 | `options` | multipleChoice | **exactly 3** options. `null` for trueFalse and talkAbout |
 | `answer` | quiz questions | must be one of `options` for multipleChoice; `"True"`/`"False"` for trueFalse; `null` for talkAbout |

@@ -8,7 +8,7 @@ public enum QuestionType: String, Codable, CaseIterable, Sendable, Hashable {
     case multipleChoice
     /// Answer is "True" or "False".
     case trueFalse
-    /// Open discussion prompt (Parent mode). Never scored, no options, double think time.
+    /// Open discussion prompt (Parent mode, off by default). Never scored, no options, no time limit.
     case talkAbout
 
     /// Whether answering this question can earn points.
