@@ -12,11 +12,11 @@ import QuizCore
 @MainActor
 @Observable
 final class AllowanceStore {
-    static let starterPerTopic = 30
-    static let starterValues = 10
-    static let dailyTopUp = 2
-    static let basicDaily = 40
-    static let packSize = 50
+    nonisolated static let starterPerTopic = 30
+    nonisolated static let starterValues = 10
+    nonisolated static let dailyTopUp = 2
+    nonisolated static let basicDaily = 40
+    nonisolated static let packSize = 50
 
     /// Everything here only grows (or is a max), so copies from two devices, iCloud and the
     /// Keychain merge without losing anything or handing out free questions twice (ADR-0023).
