@@ -114,8 +114,8 @@ struct SettingsView: View {
                     Text("Plan")
                 } footer: {
                     Text(entitlements.hasBasic
-                         ? "\(AllowanceStore.basicDaily) new questions every day, in every topic. Questions you've had come back as reviews for free."
-                         : "Free: \(AllowanceStore.starterPerTopic) questions in each free topic plus \(AllowanceStore.dailyTopUp) more each day you play, and \(AllowanceStore.starterValues) in Manners & Friendship. Questions you've had come back as reviews for free.")
+                         ? "\(AllowanceStore.basicDaily) new questions each day you open the app, in every topic. Questions you've had come back as reviews for free."
+                         : "Free: \(AllowanceStore.starterPerTopic) questions in each free topic plus \(AllowanceStore.dailyTopUp) more each day you open the app, and \(AllowanceStore.starterValues) in Manners & Friendship. Questions you've had come back as reviews for free.")
                 }
 
                 if entitlements.isTestBuild {
@@ -124,7 +124,7 @@ struct SettingsView: View {
                     } header: {
                         Text("Testing")
                     } footer: {
-                        Text("TestFlight only, until purchases are added. Unlocks every topic, 40 new questions a day, fixing scores and games with up to \(PlayerStore.maxPlayers) players.")
+                        Text("TestFlight only, until purchases are added. Unlocks every topic, 40 new questions each day the app is opened, fixing scores and games with up to \(PlayerStore.maxPlayers) players.")
                     }
                 }
 

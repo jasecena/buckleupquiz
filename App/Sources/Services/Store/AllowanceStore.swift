@@ -8,7 +8,8 @@ import QuizCore
 /// - **Free:** the free topics (Animals, Geography) start with 30 questions each and get 2 more
 ///   each day the app is opened; Manners & Friendship has 10 and no top-up.
 /// - **Question packs:** 50 new questions each, for any topic you can open. They never expire.
-/// - **BuckleUp Basic:** every topic, and 40 new questions a day (packs add on top).
+/// - **BuckleUp Basic:** every topic, and 40 new questions each day the app is opened
+///   (unused ones don't carry over; packs add on top).
 @MainActor
 @Observable
 final class AllowanceStore {

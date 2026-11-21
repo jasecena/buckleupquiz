@@ -55,7 +55,7 @@ struct PlansView: View {
             price: store.basic.map { "\($0.displayPrice) a month" } ?? "A$4.99 a month",
             lines: [
                 "All 10 topics",
-                "\(AllowanceStore.basicDaily) new questions every day",
+                "\(AllowanceStore.basicDaily) new questions each day you open the app",
                 "Up to \(PlayerStore.maxPlayers) players",
                 "Fix scores after a game",
                 "Cancel anytime",

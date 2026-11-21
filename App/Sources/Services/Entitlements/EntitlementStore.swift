@@ -8,7 +8,7 @@ import StoreKit
 /// - **Free:** the free topics (Animals, Geography, and Manners & Friendship with fewer
 ///   questions), up to 2 players per game, a set number of new questions (`AllowanceStore`).
 /// - **BuckleUp Basic** (monthly subscription, cancel anytime): every topic, up to 6 players,
-///   40 new questions a day and fixing scores after a game.
+///   40 new questions each day the app is opened, and fixing scores after a game.
 @MainActor
 @Observable
 final class EntitlementStore {

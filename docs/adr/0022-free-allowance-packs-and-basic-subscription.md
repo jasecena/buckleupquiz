@@ -31,7 +31,7 @@ charges what was actually asked when a game ends.
 |---|---|---|---|
 | Price | $0 | **A$0.99**, one-off (consumable) | **A$4.99 / month**, cancel anytime |
 | Topics | Animals, Geography (free knowledge topics) + Manners & Friendship | — | **All 10** (every topic with content) |
-| New questions | **30** per free knowledge topic + **2 more each day the app is opened**; Manners **10**, no top-up | **+50**, any topic you can open, never expire | **40 a day**, any topic (packs add on top) |
+| New questions | **30** per free knowledge topic + **2 more each day the app is opened**; Manners **10**, no top-up | **+50**, any topic you can open, never expire | **40 each day the app is opened**, any topic; unused ones don't carry over (packs add on top) |
 | Players per game | 2 | — | 6 |
 | Fix scores after a game | — | — | ✓ |
 | Natural voices (ADR-0019) | 1 voice, streamed 10 at a time, needs internet | — | 3 voices, up to 500 questions kept offline |
