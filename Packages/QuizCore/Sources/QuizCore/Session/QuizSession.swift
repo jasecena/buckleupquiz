@@ -209,7 +209,10 @@ public struct QuizSession: Sendable {
         switch outcome {
         case .correct: currentResult = .correct
         case .incorrect, .timedOut: currentResult = .incorrect
-        case .skipped, .unheard: currentResult = nil
+        // Not heard: unless we caught a wrong answer, they heard the question and the answer, so
+        // it counts as remembered and moves forward (product decision, 2026-11-22). No points.
+        case .unheard: currentResult = .heard
+        case .skipped: currentResult = nil
         case .notScored: break
         }
         let effective = turn.presented.question.type.isScored ? outcome : .notScored

@@ -72,14 +72,15 @@ mics.
   streaks and per-topic stats are saved per player (`PlayerProfile.statsData`). Badges come
   from `BadgeRules` and show in Players.
 - **Leitner boxes** (ADR-0016) use the spoken result: right → up a box, wrong → start over,
-  not heard → untouched. The "Got it / Not yet" buttons only appear in "Just listen" mode.
+  not heard → moves forward (counts as remembered, no points). The "Got it / Not yet" buttons only appear in "Just listen" mode.
 - **Talk About** is hands-free too: while the family chats, the app listens for "we're done",
   "all done", "finished" or "next", alongside the Parent mode timer.
 - **Joy, not correction** (product decision, 2026-11-22): "It's all about knowledge and joy.
   If we don't hear it, it's okay. We silently don't hear it."
   - If we heard an answer, we record it. If not, we move on: no "Sorry, I didn't catch that",
-    no "Time's up", no retry. An unheard turn (`AnswerOutcome.unheard`) scores nothing, keeps
-    the streak and leaves the Leitner boxes alone.
+    no "Time's up", no retry. An unheard turn (`AnswerOutcome.unheard`) scores nothing and keeps
+    the streak. For the Leitner boxes it counts as remembered and moves forward (amended
+    2026-11-22: only a wrong answer we actually caught starts over, as in Listen mode).
   - Nothing says or shows failure: no "Not quite", no ✗ on screen. Only right answers get a
     line ("Correct!"). Everything else is the plain answer reveal.
   - Nobody is announced with zero points: they get "Great listening, Leo!", and if nobody

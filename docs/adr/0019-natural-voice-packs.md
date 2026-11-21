@@ -107,3 +107,40 @@ The on-device voice (`AVSpeechSynthesizer`) doesn't sound natural. The product d
 - Content edits trigger audio regeneration, so a content PR shows its audio diff in CI.
 - `Phrases` must be built from a fixed set of segments so every spoken line can be
   pre-generated. Free-form sentences become clip sequences.
+
+## Amendment (2026-11-22): voices per plan, caching and provider
+Product direction: **ElevenLabs** generates the audio, once per question per voice. It's stored
+in S3 (`api.buckleupquiz.com/voices/…`, ADR-0021) and never generated live.
+
+| | Free | BuckleUp Basic |
+|---|---|---|
+| Voices | **1 natural voice** + the iPhone voice | **3 natural voices** + the iPhone voice |
+| Question audio | Streamed in batches of **10 questions**, needs internet, **deleted when the game ends** | **Kept on the phone, up to 500 questions** (and a size cap, about 50 MB) |
+| Offline or not downloaded | iPhone voice for that line | iPhone voice for that line |
+| Phrase pack (numbers, cheers, names, "this one's for you"…) | always downloaded for the chosen voice | always downloaded for the chosen voice |
+
+**Basic's cache:** audio for a question is deleted when the question is **learned** (it passes
+the 16-day Leitner box and won't be asked again), or least-recently-used first when the cache
+passes 500 questions or the size cap. Reviews that are still due keep their audio, so a car
+with no signal still sounds natural.
+
+### Is it sustainable? (estimate, prices checked 2026-11-22; confirm on elevenlabs.io/pricing)
+- **Generation is one-off.** About 300 characters per question (question, options, answer, fun
+  fact), plus about 50,000 for the phrase and name pack, per voice.
+  - Today's 211 questions × 3 voices ≈ **0.35 M characters**: about one month of the Creator
+    plan (~US$22, ~120 k credits a month) or Pro (~US$99, ~500–600 k credits).
+  - At 1,500 questions × 3 voices ≈ **1.5 M characters**: about US$300 (Pro for a few months, or
+    one month of Scale). Flash/Turbo models cost about half the credits.
+  - After that, only new or edited questions are generated. A paid plan is needed only in the
+    months audio is generated. The free ElevenLabs plan has **no commercial licence**.
+- **Storage:** about 60 KB per question per voice. 1,500 × 4 voice slots ≈ 360 MB in S3: cents a
+  month.
+- **Delivery:** CloudFront's always-free 1 TB a month covers about 16 million question clips. A
+  Basic family filling its 500-question cache once is about 30 MB.
+- **Revenue:** a Basic family pays A$4.99 a month, about US$2.50 after GST and Apple's 15%
+  (Small Business Program). Voice delivery costs well under a cent per family per month.
+- **Verdict: sustainable.** The cost is a one-off per question and per voice, not per family.
+  The ongoing risk is only egress beyond the free tier at very large scale, and Cloudflare R2
+  (no egress fees) is the exit.
+- Check before generating: ElevenLabs' terms for **storing and redistributing** generated audio
+  inside an app, and whether any chosen voice is a library voice with extra conditions.

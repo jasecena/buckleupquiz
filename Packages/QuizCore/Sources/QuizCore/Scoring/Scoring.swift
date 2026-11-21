@@ -8,8 +8,9 @@ public enum AnswerOutcome: String, Codable, Sendable, Hashable {
     case skipped
     /// Talk About prompts and Listen mode: no score.
     case notScored
-    /// Voice answers: nothing (or only a mumble) was heard. No score, no comment, streak kept,
-    /// Leitner boxes untouched: not hearing a child is never their failure (ADR-0018).
+    /// Voice answers: nothing (or only a mumble) was heard. No score, no comment, streak kept.
+    /// For the Leitner boxes it counts as remembered (moves forward), like an untapped answer in
+    /// Listen mode: only a wrong answer we actually caught starts over (ADR-0016, ADR-0018).
     case unheard
 }
 

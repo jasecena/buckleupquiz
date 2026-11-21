@@ -95,3 +95,11 @@ It prefers questions they haven't heard this session, and is never the one they 
 repeat scores normally, but a right answer doesn't move its box up a second time that day (a
 wrong one still starts over). Endless mode only uses repeats to finish a round. Solo games
 still end when fresh questions run out.
+
+## Amendment (2026-11-22): not caught wrong = remembered
+Unless we actually caught a wrong answer, a question counts as remembered and moves to the next
+box: a voice answer the app didn't hear (or only a mumble) moves forward exactly like an
+untapped answer in Listen mode. It scores no points. Only a wrong answer that was heard (or a
+parent tapping "Not yet") sends it back to box 1, for that player only. A question that passes
+the 16-day box is **learned**: it no longer comes up, and later its cached natural-voice audio
+can be deleted (ADR-0019).

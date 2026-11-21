@@ -34,6 +34,7 @@ charges what was actually asked when a game ends.
 | New questions | **30** per free knowledge topic + **2 more each day the app is opened**; Manners **10**, no top-up | **+50**, any topic you can open, never expire | **40 a day**, any topic (packs add on top) |
 | Players per game | 2 | — | 6 |
 | Fix scores after a game | — | — | ✓ |
+| Natural voices (ADR-0019) | 1 voice, streamed 10 at a time, needs internet | — | 3 voices, up to 500 questions kept offline |
 | Reviews of questions already heard | free | free | free |
 
 Higher tiers (for example "Plus" with more questions a day for long trips) come later, in the

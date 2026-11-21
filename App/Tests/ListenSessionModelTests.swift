@@ -189,7 +189,8 @@ struct ListenSessionModelTests {
         await model.runner?.value
         #expect(listener.listens == 1, "no \"say it again\"")
         #expect(speech.spoken.contains { $0.hasPrefix("The answer is") })
-        #expect(summary?.learning["mia"]?.card("ani-1000") == nil, "boxes untouched when not heard")
+        #expect(summary?.learning["mia"]?.card("ani-1000")?.box == 2, "not caught wrong counts as remembered")
+        #expect(model.scoreboard.first?.points == 0, "but no points")
     }
 
     @Test func sayingSkipMovesOn() async {

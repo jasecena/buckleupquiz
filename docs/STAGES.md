@@ -17,7 +17,8 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 | M7 | Content & polish | ⬜ |
 | M8 | TestFlight & real-car testing | 🟡 (first build on TestFlight ✅) |
 | M9 | Backend (cloud data, content packs) | ⬜ (ADR-0012 proposed) |
-| M10 | Natural voice packs | ⬜ (ADR-0019 proposed) |
+| M10 | Natural voice packs (ElevenLabs) | ⬜ (ADR-0019; plans and costs agreed) |
+| M11 | Progress for parents (Leitner view) | ⬜ |
 
 ---
 
@@ -158,6 +159,11 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 
 **Exit:** all FEATURES §9 acceptance criteria pass, ready for App Review.
 
+## M11 — Progress for parents (later) ⬜
+- [ ] A screen per child showing their Leitner boxes: questions learned for good (past the 16-day
+      box), on the way, and coming back for review, per topic, over time
+- [ ] "What Mia knows now": the learned questions with their answers, to celebrate progress
+
 ## M9 — Backend (later) ⬜
 - [ ] Accept ADR-0012 (CloudKit sync + remote content packs; AWS only if needed)
 - [ ] Remote `QuestionSource` with signed, versioned content packs
@@ -170,6 +176,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [ ] `Phrases` → speech plans (fixed segments with clip ids); segment player with on-device fallback
 - [ ] Generation pipeline (`scripts/voices/`, content-hash keyed, CI on content changes)
 - [ ] S3 + CloudFront via CDK in `infra/`; signed per-voice manifests
-- [ ] `VoicePackStore`: phrase pack, name buckets, rolling 10-question buffer per player, delete after play
+- [ ] `VoicePackStore`: Free = 1 voice, 10-question batches deleted after the game; Basic = 3 voices,
+      up to 500 questions cached, learned questions' audio deleted (ADR-0019 amendment)
 - [ ] Selector prefers questions with cached audio; Settings → Voice with samples and download status
 - [ ] Amend ADR-0004, privacy policy and App Review notes for the content download

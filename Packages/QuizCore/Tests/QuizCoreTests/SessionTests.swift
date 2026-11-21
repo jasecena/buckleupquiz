@@ -137,7 +137,7 @@ struct SessionTests {
         #expect(session.scoreboard.first?.points == 0)
     }
 
-    @Test func unheardAnswerChangesNothing() {
+    @Test func unheardScoresNothingButCountsAsRemembered() {
         let player = Player(id: "mia", name: "Mia", age: 7)
         let config = SessionConfig(topics: ["geography"], players: [player], length: .questions(3))
         var session = QuizSession(bank: sampleBank(), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
@@ -152,7 +152,9 @@ struct SessionTests {
         #expect(stats.points == 20)
         #expect(stats.currentStreak == 2, "not being heard doesn't break a streak")
         #expect(stats.attempted == 2)
-        #expect(session.learning["mia"]?.cards.count == 2, "the unheard question's boxes are untouched")
+        #expect(session.learning["mia"]?.cards.count == 3)
+        #expect(session.learning["mia"]?.cards.values.allSatisfy { $0.box == 2 } == true,
+                "not caught wrong means remembered: it moves forward like a right answer")
     }
 
     @Test func rotatesPlayersWithTheirOwnAgeBand() {
