@@ -1,6 +1,6 @@
 # BuckleUp Quiz — notes for AI assistants
 
-- Read `docs/STAGES.md` for what's done and what's next, and `docs/adr/` before changing structure.
+- Read `docs/PROGRESS.md` (plain-language status, simplification list) and `docs/STAGES.md` for what's done and what's next, and `docs/adr/` before changing structure.
 - `Packages/QuizCore` must stay platform-free (Foundation only). It's tested on Linux:
   `make test-core-docker`.
 - The iOS app can only be compiled on macOS. CI (`macos-26`) is the compile check from Linux.

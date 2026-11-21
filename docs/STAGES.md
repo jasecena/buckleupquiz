@@ -1,5 +1,7 @@
 # Delivery stages
 
+For a plain-language summary of done and remaining work, see [PROGRESS.md](PROGRESS.md).
+
 Status key: ✅ done · 🟡 in progress · ⬜ not started
 
 The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a later backend stage
@@ -66,7 +68,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Home topic grid (icon, name, count, lock), topic setup (age band, length), quiz screen
       (question, countdown ring, answer reveal, big Pause/Skip/Repeat), settings
 - [x] Quiz questions are 3-option multiple choice or true/false; Talk About (Parent mode, off by default) with its own timer, default 30 s, No limit optional (ADR-0015)
-- [x] Players: add/edit/remove with name, age and colour; "Who's playing?" replaces the age picker;
+- [x] Players: add/edit with name, age and colour (rename only, never deleted: ADR-0025); "Who's playing?" replaces the age picker;
       turns per player with age-appropriate questions (ADR-0015)
 - [x] Leitner boxes per player (today, 1, 2, 4, 8, 16 days; wrong → start over), "Got it" / "Not yet"
       after each answer, permanent question ids with `retired-ids.json` (ADR-0016)
@@ -113,20 +115,21 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Lifetime per-player stats (`PlayerProfile.statsData`), points and badges in Players
 - [ ] Per-player stats screen (accuracy per topic, badge gallery)
 - [x] Persist each player's Leitner boxes
+- [x] Players can only be renamed, never deleted; tombstones removed from the backup (ADR-0025)
 
 **Exit:** acceptance criterion 8 passes.
 
 ## M6 — Paywall & parental gate 🟡 ([ADR-0022](adr/0022-free-allowance-packs-and-basic-subscription.md))
 - [x] Free allowance (30 per free topic + 2 a day opened; Manners 10), question packs (50 for A$0.99),
-      BuckleUp Basic (A$4.99/month: all topics, 40 new a day, 6 players, Endless, fix scores)
+      BuckleUp Basic (A$4.99/month: all topics, 40 new each day the app is opened, 6 players, fix scores)
 - [x] Games planned up front; 0–2 each blocks, 3–4 warns, 5 each minimum; lengths are questions each
 - [x] StoreKit 2 store (products, purchase, restore, Transaction.updates), plans screen, parental gate
 - [ ] Create the products in App Store Connect; Paid Applications agreement (account holder)
 - [x] Progress survives a reinstall: iCloud key-value storage + Keychain backup, merged at launch (ADR-0023)
 - [x] No Endless mode; games are 5/10/15 each, at most 50 questions
 - [ ] Parental gate before settings, links and support email
-- [ ] Locked topics, Endless mode and custom mixes enforced
-- [x] Free games: up to 2 players; Family Pass: up to 6 (Game setup note + alert). TestFlight-only "Family Pass (testing)" switch until purchases land
+- [ ] Locked topics and custom mixes enforced
+- [x] Free games: up to 2 players; BuckleUp Basic: up to 6 (Game setup note + alert). TestFlight-only switch to try Basic until purchases land
 
 **Exit:** acceptance criterion 9 passes in the StoreKit sandbox.
 
@@ -177,6 +180,8 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [ ] Remote `QuestionSource` with signed, versioned content packs
 - [ ] SwiftData CloudKit sync toggle
 - [ ] Privacy label, policy and parental consent updates
+- [ ] Accounts (random account id; players' name and age; question history per player) and the
+      admin app (questions, voices, users, promote to unlimited), ADR-0025. Not before the privacy check
 
 ## M10 — Natural voice packs ⬜ ([ADR-0019](adr/0019-natural-voice-packs.md), proposed)
 - [ ] Decide the open questions in ADR-0019 (own database or CloudKit, voices, names, free or paid)

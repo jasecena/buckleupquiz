@@ -47,10 +47,11 @@
 - **The free tier unlocks 3 topics**, and the rest show a lock icon. Consider making Manners & Friendship one of the free topics, because it's a strong selling point for parents.
 - Each tile shows an icon, the topic name and the question count.
 - User picks a topic, then **who's playing** (named players with ages; each gets questions for their own age band: 6–8, 9–10 or 11–12). *(Changed by ADR-0015: originally an age-band picker.)*
-- **Everyone gets the same number of questions.** The game length is rounded to a multiple of the players (10 questions with 3 players = 3 each). A skipped question doesn't count. If someone runs out of fresh questions, they get a **review (repeat)** instead, never the same one twice running, and if a topic has nothing for their age they get the nearest age's questions, so everyone always gets the same number of turns (product decision, 2026-11-22). A repeat scores as usual but doesn't move a Leitner box up twice in a day. Endless mode uses repeats only to finish a round. A solo game ends when fresh questions run out.
+- **Everyone gets the same number of questions, planned before the game starts** (product decision, 2026-11-22). Lengths are questions *each*. If someone would run short, the last incomplete round is dropped. 0–2 each available blocks the game ("out of questions for today"), 3–4 each warns, 5 each is the minimum. If a topic has nothing for a player's age, the nearest age's questions are used. A skipped question doesn't count.
 - **Progress survives a reinstall** (ADR-0023): players, review boxes, scores, which questions the family has had and bought questions are kept in the family's own iCloud and the iPhone's Keychain, and restored automatically. Reinstalling never resets the free allowance.
 - **No Endless mode.** A game is 5, 10 or 15 questions each, and at most 50 questions in total.
-- **Up to 2 players per game for free.** Games with 3–6 players need the Family Pass (product decision, 2026-11-22). Anyone can create up to 6 player profiles.
+- **Up to 2 players per game for free.** Games with 3–6 players need BuckleUp Basic (ADR-0022). Anyone can create up to 6 player profiles.
+- **Players can't be deleted, only renamed** (ADR-0025), so each child's question history is never lost.
 
 ### 2.2 Listen mode (no voice input)
 Game loop per question:
@@ -58,7 +59,7 @@ Game loop per question:
 2. App waits for a **configurable "think time"** (default 6 seconds, range 3–20). A soft tick plays ("ding, ding, ding"), and in voice mode the app listens during it.
 3. App says "The answer is… **X**" plus an optional one-line fun fact.
 4. Short pause (2 seconds), then the next question plays automatically.
-- **Session length:** 10, 20 or 30 questions, or Endless.
+- **Session length:** 5, 10 or 15 questions each, at most 50 in a game (no Endless mode).
 - **On-screen:** large question text, a countdown ring, and the revealed answer. The screen is readable but never required.
 - **Controls:** big Pause/Resume, Skip and Repeat buttons. Also support the play/pause/next buttons on headphones and the car steering wheel via `MPRemoteCommandCenter`.
 
@@ -147,9 +148,10 @@ After the question is read:
 - Per-player stats: total correct, best streak and accuracy per topic.
 - Simple badges, for example "10 in a row" or "Space Expert" for 80% or more in Space.
 
+> §3.6–3.7 are the original plan. **Superseded by [ADR-0022](adr/0022-free-allowance-packs-and-basic-subscription.md):** free allowance, A$0.99 question packs and BuckleUp Basic (A$4.99/month, no trial), no Endless mode.
+
 ### 3.6 Unlocks
 - All topics.
-- Endless mode.
 - Custom session mix (several topics shuffled together).
 
 ### 3.7 Pricing (StoreKit 2)

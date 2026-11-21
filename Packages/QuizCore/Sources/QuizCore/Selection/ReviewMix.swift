@@ -14,8 +14,6 @@ public enum TurnKind: String, Sendable, Hashable, Codable {
 public enum ReviewMix {
     public static let ownShare = 0.10
     public static let sharedShare = 0.10
-    /// Endless sessions are planned in blocks of this many turns.
-    public static let endlessBlock = 20
     /// How far back "questions the others had recently" looks, in days.
     public static let sharedLookback = 7
 

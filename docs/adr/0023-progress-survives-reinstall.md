@@ -27,7 +27,7 @@ The backup (`ProgressSync.Backup`) holds:
 - the allowance state: questions heard, daily top-ups, Basic's daily use, credited pack
   transactions, pack questions used;
 - players (id, name, age, colour, Leitner record, stats);
-- deleted players, kept so a backup can't bring them back.
+- deleted players, kept so a backup can't bring them back. *(Amended by ADR-0025: players can't be deleted any more; the list is always empty.)*
 
 It's written a second after any change. **Merging never loses anything and never gives free
 questions twice:** questions heard are a union, packs are a union of transaction ids, usage

@@ -33,14 +33,17 @@ struct PlayerStoreTests {
         #expect(AgeBand(age: profile.currentAge(now: twoYearsLater)) == .nineToTen)
     }
 
-    @Test func updatesAndDeletes() throws {
+    @Test func renamingKeepsThePlayersProgress() throws {
         let store = PlayerStore.inMemory()
         let mia = try #require(store.add(name: "Mia", age: 7))
+        var record = LearningRecord()
+        record.record(.correct, for: "ani-0001", on: 10)
+        store.recordLearning([mia.id.uuidString: record])
         store.update(mia, name: "Mia R", age: 9, colorHex: "#00B894")
         #expect(mia.name == "Mia R")
         #expect(mia.currentAge() == 9)
-        store.delete(mia)
-        #expect(store.players.isEmpty)
+        #expect(store.players.count == 1)
+        #expect(store.learning(for: [mia])[mia.id.uuidString]?.card("ani-0001") != nil)
     }
 
     @Test func remembersEachPlayersBoxes() throws {

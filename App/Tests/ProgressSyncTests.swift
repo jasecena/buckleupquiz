@@ -53,15 +53,15 @@ struct ProgressSyncTests {
         #expect(merged.packCredits == 90, "100 bought, the larger usage (10) kept")
     }
 
-    @Test func deletedPlayersStayDeleted() throws {
+    @Test func aRenameIsKeptAndNobodyIsDuplicated() throws {
         let storage = MemoryStorage()
         let (allowance, players) = freshStores()
         let leo = try #require(players.add(name: "Leo", age: 9))
         let sync = ProgressSync(allowance: allowance, players: players, storages: [storage])
         sync.save()
-        players.delete(leo)
+        players.update(leo, name: "Leonardo", age: 9, colorHex: leo.colorHex)
         sync.save()
         sync.restore()
-        #expect(players.players.isEmpty)
+        #expect(players.players.map(\.name) == ["Leonardo"])
     }
 }

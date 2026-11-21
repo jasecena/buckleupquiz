@@ -14,7 +14,8 @@ enum PlayerEditorTarget: Identifiable {
     }
 }
 
-/// Add or edit a family member: name, age and colour (ADR-0015).
+/// Add or edit a family member: name, age and colour (ADR-0015). There's no Remove: a player
+/// can be renamed but never deleted, so their question history stays (ADR-0025).
 struct PlayerEditorView: View {
     let target: PlayerEditorTarget
     /// Called with the saved profile (new or edited).
@@ -25,7 +26,6 @@ struct PlayerEditorView: View {
     @State private var name = ""
     @State private var age = 7
     @State private var colorHex = PlayerStore.palette[0]
-    @State private var confirmDelete = false
 
     private var existing: PlayerProfile? {
         if case .edit(let profile) = target { return profile }
@@ -76,7 +76,8 @@ struct PlayerEditorView: View {
                 }
                 if existing != nil {
                     Section {
-                        Button("Remove player", role: .destructive) { confirmDelete = true }
+                    } footer: {
+                        Text("Players can't be removed, so nobody loses the questions they've had. To give this spot to someone else, change the name and age.")
                     }
                 }
             }
@@ -88,13 +89,6 @@ struct PlayerEditorView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save", action: save).disabled(trimmedName.isEmpty)
-                }
-            }
-            .confirmationDialog("Remove \(existing?.name ?? "player")?", isPresented: $confirmDelete,
-                                titleVisibility: .visible) {
-                Button("Remove", role: .destructive) {
-                    if let existing { store.delete(existing) }
-                    dismiss()
                 }
             }
             .onAppear(perform: load)

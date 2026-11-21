@@ -12,6 +12,8 @@ final class ProgressSync {
         var version = 1
         var allowance = AllowanceStore.State()
         var players: [PlayerStore.Snapshot] = []
+        /// Always empty: players can't be deleted any more (ADR-0025). Still written so builds
+        /// before 0.3.6 can read the backup.
         var deletedPlayers: Set<String> = []
         var savedAt = Date.now
     }
@@ -52,7 +54,7 @@ final class ProgressSync {
         for storage in storages {
             guard let data = storage.read(), let backup = try? decoder.decode(Backup.self, from: data) else { continue }
             allowance.merge(backup.allowance)
-            players.merge(backup.players, deleted: backup.deletedPlayers)
+            players.merge(backup.players)
         }
     }
 
@@ -67,7 +69,7 @@ final class ProgressSync {
     }
 
     func save() {
-        let backup = Backup(allowance: allowance.state, players: players.snapshot(), deletedPlayers: players.deletedIDs)
+        let backup = Backup(allowance: allowance.state, players: players.snapshot())
         guard let data = try? JSONEncoder().encode(backup) else { return }
         for storage in storages { storage.write(data) }
     }

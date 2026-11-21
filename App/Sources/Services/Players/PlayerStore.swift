@@ -4,6 +4,10 @@ import QuizCore
 import SwiftData
 
 /// Family members, persisted with SwiftData (ADR-0009, ADR-0015).
+///
+/// Players are never deleted, only renamed (ADR-0025): each one keeps the questions they've had,
+/// so the family's allowance and review boxes stay right, and there's nothing to reconcile
+/// across devices and backups.
 @MainActor
 @Observable
 final class PlayerStore {
@@ -13,21 +17,13 @@ final class PlayerStore {
     static let palette = ["#E84393", "#2E86DE", "#00B894", "#F39C12", "#6C5CE7", "#D63031"]
 
     private(set) var players: [PlayerProfile] = []
-    /// Players removed on this device, so a backup can't bring them back (ADR-0023).
-    private(set) var deletedIDs: Set<String> {
-        didSet { defaults.set(Array(deletedIDs), forKey: Self.deletedKey) }
-    }
     /// Called after any change, so the backup stays current.
     @ObservationIgnored var onChange: (() -> Void)?
-    private let defaults: UserDefaults
-    private static let deletedKey = "players.deleted"
     private let container: ModelContainer
     private var context: ModelContext { container.mainContext }
 
-    init(container: ModelContainer, defaults: UserDefaults = .standard) {
+    init(container: ModelContainer) {
         self.container = container
-        self.defaults = defaults
-        deletedIDs = Set(defaults.stringArray(forKey: Self.deletedKey) ?? [])
         reload()
     }
 
@@ -45,8 +41,7 @@ final class PlayerStore {
     static func inMemory() -> PlayerStore {
         do {
             let config = ModelConfiguration(isStoredInMemoryOnly: true)
-            return PlayerStore(container: try ModelContainer(for: PlayerProfile.self, configurations: config),
-                               defaults: UserDefaults(suiteName: "players-\(UUID())") ?? .standard)
+            return PlayerStore(container: try ModelContainer(for: PlayerProfile.self, configurations: config))
         } catch {
             fatalError("Could not create an in-memory player store: \(error)")
         }
@@ -81,12 +76,6 @@ final class PlayerStore {
         save()
     }
 
-    func delete(_ profile: PlayerProfile) {
-        deletedIDs.insert(profile.id.uuidString)
-        context.delete(profile)
-        save()
-    }
-
     // MARK: Backup (ADR-0023)
 
     /// One player as stored in the backup.
@@ -110,12 +99,8 @@ final class PlayerStore {
 
     /// Brings players back from a backup: missing ones are re-created with their progress, and
     /// existing ones keep the more recent answer for each question and the fuller scores.
-    func merge(_ snapshots: [Snapshot], deleted: Set<String>) {
-        deletedIDs.formUnion(deleted)
-        for profile in players where deletedIDs.contains(profile.id.uuidString) {
-            context.delete(profile)
-        }
-        for snap in snapshots where !deletedIDs.contains(snap.id.uuidString) {
+    func merge(_ snapshots: [Snapshot]) {
+        for snap in snapshots {
             if let profile = players.first(where: { $0.id == snap.id }) {
                 var learning = profile.learning
                 learning.mergeKeepingLatest(snap.learning)

@@ -31,3 +31,4 @@ New ADR: copy [template.md](template.md) to the next number.
 | [0022](0022-free-allowance-packs-and-basic-subscription.md) | Free allowance, question packs and the BuckleUp Basic subscription | Accepted |
 | [0023](0023-progress-survives-reinstall.md) | Progress survives a reinstall: iCloud key-value storage + Keychain | Accepted |
 | [0024](0024-sponsor-audio-for-more-questions.md) | More free questions for listening to a sponsor message | Accepted |
+| [0025](0025-accounts-admin-and-rename-only-players.md) | Accounts, the admin app, and players that can only be renamed | Accepted (rename only) / Proposed (accounts, admin) |
