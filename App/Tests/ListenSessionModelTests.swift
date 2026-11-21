@@ -199,20 +199,26 @@ struct ListenSessionModelTests {
         #expect(!speech.spoken.contains { $0.hasPrefix("Not quite") || $0.hasPrefix("Time's up") })
     }
 
-    @Test func brokenMicStillWaitsTheThinkTime() async {
+    @Test func brokenMicStillWaitsTheThinkTimeAndIsReported() async {
         let listener = FakeListener([], failure: SpeechListenerError.unavailable("no input"))
+        let telemetry = FakeTelemetry()
         let config = SessionConfig(topics: ["animals"], players: [Player(id: "mia", name: "Mia", age: 7)],
                                    length: .questions(1))
         let model = ListenSessionModel(
             bank: makeBank(questions: 1), config: config, settings: ListenSettings(), duckOthers: true,
             dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
-                                listener: listener),
+                                telemetry: telemetry, listener: listener),
             answerMode: .voice, rng: AnyRandomGenerator(seed: 1))
         model.start()
         await model.runner?.value
         #expect(cues.events.contains("think"), "falls back to the think countdown instead of answering at once")
         #expect(speech.spoken.contains { $0.hasPrefix("The answer is") })
         #expect(!model.isVoice)
+        #expect(telemetry.names == ["voice.listenFailed", "game.finished"])
+        #expect(telemetry.events[0].fields["error"] == "no input")
+        #expect(telemetry.events[1].fields["fellBackToListen"] == "true")
+        let everything = telemetry.events.flatMap { $0.fields.values }.joined(separator: " ")
+        #expect(!everything.contains("Mia"), "no names in reports")
     }
 
     @Test func silenceIsNeverMentioned() async {

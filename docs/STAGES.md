@@ -132,7 +132,10 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Internal testing group "Family" (gets every build automatically) with the account holder invited
 - [ ] Build with the iOS 27 SDK (Xcode 27) before April 2027 (App Store Connect warning 90725). The release workflow picks the newest non-beta Xcode on the runner; set `vars.MACOS_RUNNER_LABEL` if a newer image is needed
 - [ ] Real-car tests: 3 or more head units plus CarPlay, road noise, kids
-- [ ] Proxy test: zero network requests (criterion 10)
+- [x] Anonymous error reports (ADR-0020): `Telemetry` queue + batches, MetricKit crashes/hangs,
+      voice failure events, per-game voice counts, Settings toggle + Diagnostics screen
+- [ ] Deploy `infra/telemetry` and set `TELEMETRY_URL`; update the App Store privacy label (Diagnostics, not linked)
+- [ ] Proxy test: only the telemetry endpoint, only anonymous fields (criterion 10, amended by ADR-0020)
 - [ ] Name checks (IP Australia), domains and handles (FEATURES §0)
 
 **Exit:** all FEATURES §9 acceptance criteria pass, ready for App Review.

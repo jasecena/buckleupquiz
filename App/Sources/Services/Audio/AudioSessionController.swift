@@ -23,6 +23,13 @@ protocol AudioSessionControlling: AnyObject {
     /// Voice answers: play and record. Returns the microphone's name ("Using: <car>").
     func activateForVoice(duckOthers: Bool, mic: MicPreference) throws -> String?
     func deactivate()
+    /// The current microphone's kind ("BluetoothHFP", "MicrophoneBuiltIn", "CarAudio"…),
+    /// for anonymous diagnostics. Never the device's name.
+    var inputType: String? { get }
+}
+
+extension AudioSessionControlling {
+    var inputType: String? { nil }
 }
 
 /// Configures `AVAudioSession` once per session and never switches mode mid-session
@@ -58,6 +65,10 @@ final class AudioSessionController: AudioSessionControlling {
         if let preferred { try? session.setPreferredInput(preferred) }
         observe()
         return session.currentRoute.inputs.first?.portName
+    }
+
+    var inputType: String? {
+        AVAudioSession.sharedInstance().currentRoute.inputs.first?.portType.rawValue
     }
 
     func deactivate() {

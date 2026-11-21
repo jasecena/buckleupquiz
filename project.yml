@@ -58,6 +58,8 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+        # Anonymous error reports endpoint (ADR-0020). Empty keeps reports on the device.
+        BUQTelemetryURL: $(TELEMETRY_URL)
         NSMicrophoneUsageDescription: >-
           Used to hear your child's answers. Audio is processed on this device and never stored or sent anywhere.
         NSSpeechRecognitionUsageDescription: >-
@@ -69,6 +71,8 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         GENERATE_INFOPLIST_FILE: NO
+        TELEMETRY_URL: ""
+
 
   BuckleUpQuizTests:
     type: bundle.unit-test

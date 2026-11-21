@@ -1,6 +1,6 @@
 # 0004. No network, no third-party SDKs, no data collection
 
-- **Status:** Accepted
+- **Status:** Accepted, amended by [ADR-0020](0020-anonymous-error-telemetry.md) (anonymous error reports to our own endpoint)
 - **Date:** 2026-11-22
 
 ## Context

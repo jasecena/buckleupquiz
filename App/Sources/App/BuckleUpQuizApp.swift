@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct BuckleUpQuizApp: App {
     @State private var environment = AppEnvironment.live()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -11,7 +12,15 @@ struct BuckleUpQuizApp: App {
                 .environment(environment.settings)
                 .environment(environment.entitlements)
                 .environment(environment.players)
-                .task { await environment.loadContent() }
+                .environment(environment.telemetry)
+                .task {
+                    await environment.loadContent()
+                    await environment.telemetry.flush()
+                }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // Queued error reports go out when the app is put away (ADR-0020).
+            if phase == .background { Task { await environment.telemetry.flush() } }
         }
     }
 }

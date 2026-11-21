@@ -5,6 +5,7 @@ import SwiftUI
 /// FEATURES §2.5. A parental gate will guard this screen in M6 (FEATURES §5).
 struct SettingsView: View {
     @Environment(SettingsStore.self) private var store
+    @Environment(Telemetry.self) private var telemetry
     @Environment(\.dismiss) private var dismiss
     private let voices = SystemSpeechOutput.availableVoices()
 
@@ -84,9 +85,14 @@ struct SettingsView: View {
                     Text("BuckleUp Quiz plays through your car's Bluetooth or CarPlay audio, and keeps going with the screen locked.")
                 }
 
-                Section("Privacy") {
-                    Text("BuckleUp Quiz collects no data. There are no ads, no tracking and no accounts.")
-                        .font(.footnote)
+                Section {
+                    Toggle("Send anonymous error reports", isOn: $store.settings.shareDiagnostics)
+                        .onChange(of: store.settings.shareDiagnostics) { _, on in if !on { telemetry.clear() } }
+                    NavigationLink("Diagnostics") { DiagnosticsView() }
+                } header: {
+                    Text("Privacy")
+                } footer: {
+                    Text("No ads, no tracking and no accounts. Error reports help us fix problems like a microphone that won't start. They hold the app version, iPhone model and what went wrong. Never names, ages, answers, recordings or anything that identifies you.")
                 }
             }
             .navigationTitle("Settings")

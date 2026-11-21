@@ -34,6 +34,9 @@ final class SystemSpeechListener: SpeechListening {
     /// Why listening last failed, shown in Mic check so a parent can tell us.
     private(set) static var lastProblem: String?
 
+    /// Anonymous error reports (ADR-0020): which recognisers fail on which devices.
+    weak var telemetry: (any TelemetryRecording)?
+
     /// Every English recogniser that can run on the device, best first. One that fails is
     /// moved to the back, so the next turn starts with one that works.
     private var recognizers: [SFSpeechRecognizer]
@@ -79,7 +82,8 @@ final class SystemSpeechListener: SpeechListening {
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
         guard format.sampleRate > 0, format.channelCount > 0 else {
-            throw fail("No microphone input is available (the audio route has no input).")
+            throw fail("No microphone input is available (the audio route has no input, "
+                + "\(format.sampleRate) Hz, \(format.channelCount) channels).")
         }
         let feed = AudioFeed()
         input.installTap(onBus: 0, bufferSize: 1024, format: format, block: Self.tapBlock(feeding: feed))
@@ -117,6 +121,9 @@ final class SystemSpeechListener: SpeechListening {
             // quiet car, so keep listening with the same one.
             if pass.heard.isEmpty, Date.now.timeIntervalSince(passStart) < 2 {
                 problems.append("\(recognizer.locale.identifier): \(pass.problem ?? "recognition stopped")")
+                telemetry?.record("voice.recognizerFailed", [
+                    "locale": recognizer.locale.identifier, "error": pass.problem ?? "recognition stopped",
+                ])
                 recognizers.append(recognizers.removeFirst())
             }
         }

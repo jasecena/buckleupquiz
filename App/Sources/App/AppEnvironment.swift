@@ -18,40 +18,65 @@ final class AppEnvironment {
     let entitlements: EntitlementStore
     let players: PlayerStore
     let questionSource: any QuestionSource
+    /// Anonymous error reports (ADR-0020).
+    let telemetry: Telemetry
     let makeListenDependencies: @MainActor (SettingsStore) -> ListenSessionModel.Dependencies
+    @ObservationIgnored private var metricKit: MetricKitCollector?
 
     init(
         settings: SettingsStore,
         entitlements: EntitlementStore,
         players: PlayerStore,
         questionSource: any QuestionSource,
+        telemetry: Telemetry? = nil,
         makeListenDependencies: @escaping @MainActor (SettingsStore) -> ListenSessionModel.Dependencies
     ) {
         self.settings = settings
         self.entitlements = entitlements
         self.players = players
         self.questionSource = questionSource
+        self.telemetry = telemetry ?? Telemetry(endpoint: nil, fileURL: nil, isEnabled: { false })
         self.makeListenDependencies = makeListenDependencies
     }
 
     static func live() -> AppEnvironment {
-        AppEnvironment(
-            settings: SettingsStore(),
+        let settings = SettingsStore()
+        let telemetry = Telemetry(endpoint: Telemetry.configuredEndpoint,
+                                  isEnabled: { [weak settings] in settings?.settings.shareDiagnostics ?? false })
+        let environment = AppEnvironment(
+            settings: settings,
             entitlements: EntitlementStore(),
             players: PlayerStore.live(),
             questionSource: BundledContent.source(),
+            telemetry: telemetry,
             makeListenDependencies: { settings in
                 ListenSessionModel.Dependencies(
                     speech: SystemSpeechOutput(voiceSettings: { [weak settings] in settings?.settings.voice ?? VoiceSettings() }),
                     cues: EngineCuePlayer(),
                     audioSession: AudioSessionController(),
                     nowPlaying: NowPlayingController(),
+                    telemetry: telemetry,
                     // On-device recognition only (ADR-0004); nil falls back to reading answers out.
-                    listener: settings.settings.answerMode == .voice && SystemSpeechListener.hasPermission
-                        ? SystemSpeechListener() : nil
+                    listener: Self.makeListener(settings: settings, telemetry: telemetry)
                 )
             }
         )
+        environment.metricKit = MetricKitCollector(telemetry: telemetry)
+        return environment
+    }
+
+    private static func makeListener(settings: SettingsStore, telemetry: Telemetry) -> SystemSpeechListener? {
+        guard settings.settings.answerMode == .voice else { return nil }
+        guard SystemSpeechListener.hasPermission else {
+            telemetry.record("voice.noPermission", [:])
+            return nil
+        }
+        guard let listener = SystemSpeechListener() else {
+            telemetry.record("voice.noOnDeviceRecognizer", ["reason": SystemSpeechListener.lastProblem ?? "unknown"])
+            return nil
+        }
+        listener.telemetry = telemetry
+        return listener
     }
 
     var bank: QuestionBank? {
@@ -65,6 +90,7 @@ final class AppEnvironment {
             content = .loaded(try await questionSource.loadBank())
         } catch {
             content = .failed(String(describing: error))
+            telemetry.record("content.loadFailed", ["error": String(describing: error)])
         }
     }
 

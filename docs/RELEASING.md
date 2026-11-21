@@ -57,3 +57,24 @@ pipeline as the activity-tracker app ([ADR-0014](adr/0014-testflight-release-pip
 | "maximum number of certificates" | Actions → *Certificates* → `list`, then `revoke-all` (type `revoke`) |
 | "team has no devices" | Register any iPhone under Certificates, Identifiers & Profiles → Devices |
 | Upload: build number already used | Re-run the workflow (new run number) rather than re-running the failed job |
+
+## Reading error reports (ADR-0020)
+Reports land in CloudWatch Logs (`/buckleupquiz/telemetry`, ap-southeast-2). In the console,
+open **CloudWatch → Logs Insights**, pick that log group, and run, for example:
+
+```
+# What's failing, by iPhone and iOS
+fields message.name as name, message.device as device, message.os as os, message.fields.error as error
+| filter message.kind = "telemetry" and name like /Failed|noPermission|noOnDevice/
+| stats count() as n by name, device, os, error
+| sort n desc
+
+# How well voice answers are heard in real games
+fields message.fields.right as right, message.fields.wrong as wrong, message.fields.unclear as unclear,
+       message.fields.silent as silent, message.fields.input as input
+| filter message.name = "game.finished" and message.fields.mode = "voice"
+| stats count() as games, sum(right) as r, sum(wrong) as w, sum(unclear) as u, sum(silent) as s by input
+```
+
+Before the first **public** release, update the App Store privacy label to
+"Data Not Linked to You → Diagnostics (Crash Data, Performance Data, Other Diagnostic Data)".

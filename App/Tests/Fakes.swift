@@ -78,3 +78,10 @@ func makeBank(questions count: Int, olderCount: Int = 0) -> QuestionBank {
     }
     return QuestionBank(topics: [topic], questions: questions)
 }
+
+@MainActor
+final class FakeTelemetry: TelemetryRecording {
+    private(set) var events: [(name: String, fields: [String: String])] = []
+    func record(_ name: String, _ fields: [String: String]) { events.append((name, fields)) }
+    var names: [String] { events.map(\.name) }
+}

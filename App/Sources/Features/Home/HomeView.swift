@@ -218,5 +218,6 @@ private struct FamilyPassTeaser: View {
     .environment(environment.entitlements)
     .environment(environment.players)
     .environment(environment.settings)
+    .environment(environment.telemetry)
 }
 #endif

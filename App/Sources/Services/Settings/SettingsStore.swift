@@ -21,6 +21,9 @@ struct AppSettings: Codable, Equatable, Sendable {
     /// the answers out when the microphone can't be used.
     var answerMode: AnswerMode = .voice
     var micPreference: MicPreference = .automatic
+    /// Send anonymous error reports so problems like a microphone that won't start can be
+    /// fixed (ADR-0020). No names, answers, recordings or identifiers.
+    var shareDiagnostics = true
 
     var voice: VoiceSettings { VoiceSettings(identifier: voiceIdentifier, rate: speechRate) }
 
@@ -29,6 +32,7 @@ struct AppSettings: Codable, Equatable, Sendable {
     private enum CodingKeys: String, CodingKey {
         case listen, voiceIdentifier, speechRate, duckOthers, includeTalkAbout
         case selectedPlayerIDs, lastSessionLength, hasCompletedOnboarding, answerMode, micPreference
+        case shareDiagnostics
     }
 
     /// Key by key with defaults, so settings saved by older builds (testers!) never get wiped.
@@ -45,6 +49,7 @@ struct AppSettings: Codable, Equatable, Sendable {
         hasCompletedOnboarding = (try? c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding)) ?? d.hasCompletedOnboarding
         answerMode = (try? c.decodeIfPresent(AnswerMode.self, forKey: .answerMode)) ?? d.answerMode
         micPreference = (try? c.decodeIfPresent(MicPreference.self, forKey: .micPreference)) ?? d.micPreference
+        shareDiagnostics = (try? c.decodeIfPresent(Bool.self, forKey: .shareDiagnostics)) ?? d.shareDiagnostics
     }
 }
 

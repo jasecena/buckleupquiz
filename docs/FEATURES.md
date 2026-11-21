@@ -33,7 +33,7 @@
 - **Text-to-speech:** `AVSpeechSynthesizer` (on-device, free). Use an Australian English voice (`en-AU`) by default.
 - **Speech recognition:** Apple `Speech` framework (`SFSpeechRecognizer`) with `requiresOnDeviceRecognition = true`. No audio leaves the device.
 - **Payments:** StoreKit 2.
-- **Data:** a bundled JSON question bank inside the app. **No backend, no accounts, no network calls** in v1.
+- **Data:** a bundled JSON question bank inside the app. **No backend, no accounts.** The only network call is anonymous error reports (ADR-0020).
 - **Persistence:** SwiftData or `UserDefaults` for players, scores and settings. Optional iCloud sync is out of scope.
 - **Analytics/ads:** none. This is required for Apple's Kids Category.
 - **Architecture:** MVVM, with a separate `QuizEngine` (pure Swift, unit-testable) and an `AudioService` (TTS + speech recognition + audio session).
@@ -297,7 +297,7 @@ These use the same question types as 4.3 (scenario, true/false, Talk About) and 
 - No third-party analytics, ads or tracking SDKs.
 - Microphone and speech-recognition permission prompts with clear wording, for example: "Used to hear your child's answers. Audio is processed on this device and never stored or sent anywhere."
 - Never store or record audio.
-- Privacy policy page (static, hosted for free) and App Privacy label: **Data Not Collected**.
+- Privacy policy page (static, hosted for free) and App Privacy label: **Data Not Linked to You: Diagnostics** (anonymous error reports, ADR-0020).
 
 ---
 

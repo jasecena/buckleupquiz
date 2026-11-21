@@ -45,6 +45,8 @@ final class ListenSessionModel {
         var sleeper: any Sleeper = TaskSleeper()
         var audioSession: (any AudioSessionControlling)?
         var nowPlaying: (any NowPlayingUpdating)?
+        /// Anonymous error reports (ADR-0020).
+        var telemetry: (any TelemetryRecording)?
         /// nil when voice answers can't be used (no permission, or no on-device recognition).
         var listener: (any SpeechListening)?
     }
@@ -108,6 +110,9 @@ final class ListenSessionModel {
     @ObservationIgnored private var welcomeBackPending = false
     @ObservationIgnored private var voiceTipPending = false
     @ObservationIgnored private var hasAttempts = false
+    /// Voice health for the end-of-game diagnostics summary (ADR-0020): counts only.
+    @ObservationIgnored private var voiceCounts: [String: Int] = [:]
+    @ObservationIgnored private var startedInVoice = false
     /// Players who've already heard "this one's for you" this game.
     @ObservationIgnored private var introducedPlayers: Set<String> = []
     @ObservationIgnored private var feedbackRNG = SystemRandomNumberGenerator()
@@ -150,9 +155,11 @@ final class ListenSessionModel {
             do {
                 micName = try deps.audioSession?.activateForVoice(duckOthers: duckOthers, mic: mic)
                 isVoice = true
+                startedInVoice = true
                 voiceTipPending = true
             } catch {
                 audioWarning = "Couldn't turn on the microphone, so answers will be read out."
+                deps.telemetry?.record("voice.micStartFailed", Self.describe(error))
                 activateForListening()
             }
         } else {
@@ -174,6 +181,7 @@ final class ListenSessionModel {
             try deps.audioSession?.activateForListening(duckOthers: duckOthers)
         } catch {
             audioWarning = "Couldn't set up car audio. Playing through this device."
+            deps.telemetry?.record("audio.activateFailed", Self.describe(error))
         }
     }
 
@@ -421,6 +429,10 @@ final class ListenSessionModel {
             // still give the full think time. The reason shows in Settings → Mic check.
             isListening = false
             isVoice = false
+            voiceCounts["failed", default: 0] += 1
+            var fields = Self.describe(error)
+            fields["input"] = deps.audioSession?.inputType ?? "unknown"
+            deps.telemetry?.record("voice.listenFailed", fields)
             let remaining = seconds - Date.now.timeIntervalSince(started)
             if remaining >= 1 {
                 try await countdown(seconds: remaining.rounded(), ticking: true, generation: generation)
@@ -432,11 +444,17 @@ final class ListenSessionModel {
 
         switch VoiceReply.interpret(transcriptions, for: turn.presented) {
         case .command(let command):
+            voiceCounts["command", default: 0] += 1
             try await obey(command)
         case .answer(let answerOutcome, let text):
+            voiceCounts[answerOutcome == .correct ? "right" : "wrong", default: 0] += 1
             heard = text
             record(answerOutcome)
-        case .garbled, .silence:
+        case .garbled:
+            voiceCounts["unclear", default: 0] += 1
+            record(.unheard)
+        case .silence:
+            voiceCounts["silent", default: 0] += 1
             record(.unheard)
         }
     }
@@ -574,6 +592,7 @@ final class ListenSessionModel {
         isDiscussing = false
         isListening = false
         if hasAttempts { scoreboard = session.scoreboard }
+        reportSummary()
         onFinish?(SessionSummary(learning: session.learning, stats: session.scores.stats))
         onFinish = nil
         turn = nil
@@ -582,6 +601,23 @@ final class ListenSessionModel {
         deps.nowPlaying?.disable()
         deps.audioSession?.deactivate()
         deps.audioSession?.onEvent = nil
+    }
+
+    /// One anonymous line per game: how voice answers went, as counts (ADR-0020).
+    private func reportSummary() {
+        var fields = voiceCounts.mapValues(String.init)
+        fields["mode"] = startedInVoice ? "voice" : (answerMode == .voice ? "voiceUnavailable" : "listen")
+        fields["turns"] = String(session.turnsPlayed)
+        fields["players"] = String(session.config.players.count)
+        fields["input"] = deps.audioSession?.inputType ?? "unknown"
+        if startedInVoice, !isVoice { fields["fellBackToListen"] = "true" }
+        deps.telemetry?.record("game.finished", fields)
+    }
+
+    /// Error details safe to report: the system's description, domain and code.
+    static func describe(_ error: any Error) -> [String: String] {
+        let ns = error as NSError
+        return ["error": error.localizedDescription, "domain": ns.domain, "code": String(ns.code)]
     }
 
     private func updateNowPlaying() {
