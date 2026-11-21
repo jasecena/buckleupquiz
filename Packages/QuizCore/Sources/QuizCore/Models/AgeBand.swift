@@ -30,6 +30,9 @@ public enum AgeBand: String, Codable, CaseIterable, Sendable, Hashable, Comparab
         }
     }
 
+    /// Position from youngest (0) to oldest.
+    var index: Int { Self.allCases.firstIndex(of: self) ?? 0 }
+
     public static func < (lhs: AgeBand, rhs: AgeBand) -> Bool {
         lhs.ageRange.lowerBound < rhs.ageRange.lowerBound
     }

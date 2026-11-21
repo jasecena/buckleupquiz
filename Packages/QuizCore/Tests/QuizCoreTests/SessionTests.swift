@@ -79,14 +79,33 @@ struct SessionTests {
                             day: 10).questionLimit == 21)
     }
 
-    @Test func runningOutMidGameEndsItEvenly() {
+    @Test func runningOutUsesRepeatsSoEveryoneGetsTheSameNumber() {
         let mia = Player(id: "mia", name: "Mia", age: 7)
         let leo = Player(id: "leo", name: "Leo", age: 7)
-        // 5 questions for the band, shared: Mia and Leo can't both get 3 different ones.
+        // Only 3 questions for their age, but 10 turns: repeats fill in, no turn twice in a row.
         let config = SessionConfig(topics: ["geography"], players: [mia, leo], length: .questions(10))
-        var session = QuizSession(bank: sampleBank(perBand: 5), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
-        while session.advance() != nil {}
-        #expect(abs(session.turns(for: "mia") - session.turns(for: "leo")) <= 1)
+        var session = QuizSession(bank: sampleBank(perBand: 3), config: config, day: 10, rng: AnyRandomGenerator(seed: 5))
+        var lastFor: [String: String] = [:]
+        while let turn = session.advance() {
+            #expect(lastFor[turn.player.id] != turn.presented.question.id, "never the same question twice running")
+            lastFor[turn.player.id] = turn.presented.question.id
+            session.record(.correct)
+        }
+        #expect(session.turns(for: "mia") == 5 && session.turns(for: "leo") == 5)
+        let boxes = session.learning["mia"]?.cards.values.map(\.box) ?? []
+        #expect(boxes.allSatisfy { $0 <= 2 }, "a repeat doesn't move a box up twice in one day")
+    }
+
+    @Test func aTopicWithNothingForThisAgeUsesTheNearestAge() {
+        let mia = Player(id: "mia", name: "Mia", age: 7)
+        let leo = Player(id: "leo", name: "Leo", age: 11)
+        let questions = (0..<5).map { makeQuestion("g-\($0)", topic: "geography", band: .sixToEight) }
+        let bank = QuestionBank(topics: sampleBank().topics, questions: questions)
+        var session = QuizSession(bank: bank, config: SessionConfig(topics: ["geography"], players: [mia, leo],
+                                                                    length: .questions(4)),
+                                  day: 10, rng: AnyRandomGenerator(seed: 5))
+        while session.advance() != nil { session.record(.unheard) }
+        #expect(session.turns(for: "mia") == 2 && session.turns(for: "leo") == 2)
     }
 
     @Test func aGrownUpCanFixAScoreWithinRange() {

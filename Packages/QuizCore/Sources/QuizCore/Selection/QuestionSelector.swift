@@ -12,6 +12,8 @@ public struct QuestionSelector: Sendable {
     public let includeTalkAbout: Bool
     /// Question ids asked to anyone this session.
     public private(set) var askedThisSession: Set<String> = []
+    /// Question ids each player was asked this session.
+    private var askedBy: [String: Set<String>] = [:]
 
     public init(bank: QuestionBank, topics: [String], includeTalkAbout: Bool) {
         self.bank = bank
@@ -52,7 +54,40 @@ public struct QuestionSelector: Sendable {
         guard let (actual, list) = order.first(where: { !$0.1.isEmpty }),
               let pick = list.randomElement(using: &rng) else { return nil }
         askedThisSession.insert(pick.id)
+        askedBy[player.id, default: []].insert(pick.id)
         return (pick, actual)
+    }
+
+    /// When `next` has nothing left (everything for this age was played today or this session),
+    /// a repeat keeps everyone's turns equal (product decision, 2026-11-22). It looks in the
+    /// player's own age band first, then younger bands, then older ones, and prefers questions
+    /// this player hasn't heard this session, never the one they were just asked. nil only when
+    /// the topics have nothing at all for this player.
+    public mutating func repeatQuestion(
+        for player: Player, avoiding recent: String?, using rng: inout some RandomNumberGenerator
+    ) -> (Question, TurnKind)? {
+        let bands = AgeBand.allCases.sorted { a, b in
+            func order(_ band: AgeBand) -> (Int, Int) {
+                // Own band, then younger (closest first), then older (closest first).
+                band == player.ageBand ? (0, 0) : band < player.ageBand ? (1, -band.index) : (2, band.index)
+            }
+            return order(a) < order(b)
+        }
+        let heard = askedBy[player.id] ?? []
+        for band in bands {
+            let all = bank.questions(topics: topics, ageBand: band).filter { q in
+                (includeTalkAbout || q.type != .talkAbout)
+                    && (q.minAge == nil || player.age == nil || player.age! >= q.minAge!)
+                    && q.id != recent
+            }
+            let unheard = all.filter { !heard.contains($0.id) }
+            guard let pick = (unheard.isEmpty ? all : unheard).randomElement(using: &rng) else { continue }
+            let kind: TurnKind = heard.contains(pick.id) ? .ownReview : .new
+            askedThisSession.insert(pick.id)
+            askedBy[player.id, default: []].insert(pick.id)
+            return (pick, kind)
+        }
+        return nil
     }
 
     struct Candidates {

@@ -86,3 +86,12 @@ forward too. If that player got it wrong, the listener doesn't start over.
 - Content edits must keep a question's meaning when it keeps its id (CONTENT.md).
 - If the "No tap = right" default turns out wrong for families, it's one line in
   `ListenSessionModel`.
+
+## Amendment (2026-11-22): equal turns beat "no repeats"
+Every player gets the same number of questions. The game length rounds to a multiple of the
+players. With 2+ players, someone who has run out of fresh or due questions gets a repeat
+(`QuestionSelector.repeatQuestion`): their own band first, then younger, then older bands.
+It prefers questions they haven't heard this session, and is never the one they just had. A
+repeat scores normally, but a right answer doesn't move its box up a second time that day (a
+wrong one still starts over). Endless mode only uses repeats to finish a round. Solo games
+still end when fresh questions run out.

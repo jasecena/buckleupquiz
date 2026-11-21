@@ -87,6 +87,11 @@ public struct QuizSession: Sendable {
     private var turnsTaken: [String: Int] = [:]
     private var rng: AnyRandomGenerator
     private var nextPlayerIndex = 0
+    /// The last question each player was asked, so a repeat is never the same one twice running.
+    private var lastQuestion: [String: String] = [:]
+    /// The current turn is a repeat (same-day or same-session): it scores, but a right answer
+    /// doesn't move the Leitner box up again today.
+    private var currentIsRepeat = false
     private var recordedCurrent = false
 
     public init(
@@ -129,13 +134,22 @@ public struct QuizSession: Sendable {
             while (plans[player.id]?.count ?? 0) <= taken {
                 plans[player.id, default: []] += ReviewMix.plan(turns: turnsPerPlayer, using: &rng)
             }
-            guard let (question, kind) = selector.next(
-                for: player, kind: plans[player.id]![taken], family: learning, day: day, using: &rng) else {
-                // Someone who never had a turn (nothing for their age here) sits out. Someone who
-                // ran out mid-game ends it, so nobody ends up with more questions than the others.
-                if taken == 0 { continue }
-                return finish()
-            }
+            // Fresh or due questions first. With several players, someone with none left gets a
+            // repeat (or the nearest age's questions), so everyone has the same number of turns.
+            // A solo game just ends when fresh questions run out.
+            var isRepeat = false
+            let choice = selector.next(
+                for: player, kind: plans[player.id]![taken], family: learning, day: day, using: &rng)
+                ?? {
+                    guard config.players.count > 1 else { return nil }
+                    isRepeat = true
+                    return selector.repeatQuestion(for: player, avoiding: lastQuestion[player.id], using: &rng)
+                }()
+            guard let (question, kind) = choice else { continue } // the topics have nothing at all for them
+            // Endless: repeats only finish the current round; a new round needs fresh questions.
+            if isRepeat, questionLimit == nil, turnsPlayed % config.players.count == 0 { return finish() }
+            lastQuestion[player.id] = question.id
+            currentIsRepeat = isRepeat
             turnsTaken[player.id] = taken + 1
             nextPlayerIndex = (index + 1) % config.players.count
             turnsPlayed += 1
@@ -217,6 +231,11 @@ public struct QuizSession: Sendable {
     private mutating func commitCurrent() {
         guard let turn = currentTurn, turn.presented.question.type.isScored, let result = currentResult else { return }
         let question = turn.presented.question
+        // A repeat answered right doesn't move a box up twice in a day. Wrong still starts over.
+        if currentIsRepeat, result != .incorrect {
+            currentResult = nil
+            return
+        }
         learning[turn.player.id, default: LearningRecord()].record(result, for: question.id, on: day)
         if result != .incorrect {
             for other in config.players where other.id != turn.player.id && QuestionSelector.suits(question, other) {

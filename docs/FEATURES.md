@@ -47,7 +47,7 @@
 - **The free tier unlocks 3 topics**, and the rest show a lock icon. Consider making Manners & Friendship one of the free topics, because it's a strong selling point for parents.
 - Each tile shows an icon, the topic name and the question count.
 - User picks a topic, then **who's playing** (named players with ages; each gets questions for their own age band: 6–8, 9–10 or 11–12). *(Changed by ADR-0015: originally an age-band picker.)*
-- **Everyone gets the same number of questions.** The game length is rounded to a multiple of the players (10 questions with 3 players = 3 each). A skipped question doesn't count. If someone runs out of questions mid-game, the game ends there.
+- **Everyone gets the same number of questions.** The game length is rounded to a multiple of the players (10 questions with 3 players = 3 each). A skipped question doesn't count. If someone runs out of fresh questions, they get a **review (repeat)** instead, never the same one twice running, and if a topic has nothing for their age they get the nearest age's questions, so everyone always gets the same number of turns (product decision, 2026-11-22). A repeat scores as usual but doesn't move a Leitner box up twice in a day. Endless mode uses repeats only to finish a round. A solo game ends when fresh questions run out.
 - **Up to 2 players per game for free.** Games with 3–6 players need the Family Pass (product decision, 2026-11-22). Anyone can create up to 6 player profiles.
 
 ### 2.2 Listen mode (no voice input)
