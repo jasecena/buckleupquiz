@@ -18,5 +18,6 @@ accepted: to change a decision, add a new ADR that supersedes the old one.
 | [0011](0011-mvvm-observable-services.md) | MVVM with `@Observable` models and protocol-based services | Accepted |
 | [0012](0012-future-backend.md) | Future backend: Apple-native services first, AWS serverless as fallback | Proposed |
 | [0013](0013-ci-cd-github-actions.md) | CI/CD on GitHub Actions: Linux for logic, macOS for the app | Accepted |
+| [0014](0014-testflight-release-pipeline.md) | TestFlight releases: tag-triggered, cloud-managed signing | Accepted |
 
 New ADR: copy [template.md](template.md) to the next number.

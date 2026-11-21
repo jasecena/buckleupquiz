@@ -43,6 +43,8 @@ make validate          # check the question bank
 make test-core-docker  # QuizCore tests in the swift:6.1 Docker image
 ```
 
+**Release to TestFlight:** `git tag v0.1.0 && git push origin v0.1.0`. See [docs/RELEASING.md](docs/RELEASING.md).
+
 Run `make help` for every target.
 
 ## Documentation
@@ -51,6 +53,7 @@ Run `make help` for every target.
 - [Architecture](docs/ARCHITECTURE.md)
 - [Architecture decision records](docs/adr/README.md)
 - [Writing questions](docs/CONTENT.md)
+- [Releasing to TestFlight](docs/RELEASING.md)
 
 ## Licence
 No licence has been chosen yet, so all rights are reserved. Please don't reuse the code or

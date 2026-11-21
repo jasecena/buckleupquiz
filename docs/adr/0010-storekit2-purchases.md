@@ -12,7 +12,7 @@ optional and later. Restore Purchases and Family Sharing are required. There is 
 - **StoreKit 2** with `Transaction.currentEntitlements` and `Transaction.updates`.
   Verification uses the `VerificationResult` signed with Apple's JWS, on the device. There is no
   receipt server.
-- Product id: `com.jasecena.buckleupquiz.familypass`, with Family Sharing enabled.
+- Product id: `com.jcena.buckleupquiz.familypass`, with Family Sharing enabled.
 - `EntitlementStore` is the single source of truth for what is unlocked. The v1 scaffold uses a
   stored flag, and M6 swaps in StoreKit without touching the UI.
 - A **`.storekit` configuration file** lets the simulator and CI test purchases, restore and

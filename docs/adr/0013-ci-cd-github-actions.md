@@ -21,9 +21,9 @@ content) doesn't.
   renames don't break CI.
 - The `.xcresult` bundle is uploaded when tests fail.
 - `pages.yml` deploys `site/` (ADR-0005). Dependabot keeps action versions current.
-- **TestFlight (M8):** a tag-triggered workflow archives and uploads using an App Store
-  Connect API key and a distribution certificate stored as encrypted repository secrets.
-  None of these are ever committed (`.gitignore` blocks `*.p8`, `*.p12`).
+- **TestFlight:** see [ADR-0014](0014-testflight-release-pipeline.md), a tag-triggered
+  `ios-release.yml` with cloud-managed signing. Credentials are encrypted repository secrets
+  and are never committed (`.gitignore` blocks `*.p8`, `*.p12`).
 
 ## Alternatives considered
 - **Xcode Cloud** — 25 free compute hours a month, with simple signing. But it adds a second CI

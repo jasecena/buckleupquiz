@@ -1,0 +1,373 @@
+### iOS Release — archive, sign and ship to TestFlight from a GitHub-hosted macOS runner.
+#
+# Mirrors the activity-tracker app's release pipeline (ADR-0014), adapted for a
+# native XcodeGen project: no Node/CocoaPods/prebuild, the project is generated
+# from project.yml instead.
+#
+# Signing is "cloud managed": an App Store Connect API key plus
+# `-allowProvisioningUpdates` lets Xcode fetch or create the certificate and
+# provisioning profile itself. No Mac, local keychain or committed credential.
+# Certificates created by a run are revoked at the end of that run, so the
+# account never fills up (see scripts/asc-certificates.mjs).
+#
+# Setup, secrets and troubleshooting: docs/RELEASING.md.
+
+name: iOS Release
+
+on:
+  # Explicit, human-initiated release (rehearse here before tagging).
+  workflow_dispatch:
+    inputs:
+      submit_to_testflight:
+        description: 'Upload the IPA to TestFlight (uncheck for a signed build with no upload)'
+        type: boolean
+        default: true
+      run_app_tests:
+        description: 'Run the app unit tests on a simulator before archiving (~5 min)'
+        type: boolean
+        default: false
+  # Release tags only. Ordinary commits never trigger a build.
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+
+# Publishes to Apple, not GitHub, so read-only is enough.
+permissions:
+  contents: read
+
+# Never two releases of one ref at once, and never cancel one midway — a
+# half-finished upload to App Store Connect is worse than a slow one.
+concurrency:
+  group: ios-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Gate on Linux first: macOS minutes are the expensive ones, so everything
+  # that can fail cheaply fails before a macOS runner is allocated.
+  # ---------------------------------------------------------------------------
+  verify-content:
+    name: Verify content
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Validator tests + validation
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts/tests
+          python3 scripts/validate_content.py
+
+  verify-core:
+    name: Verify QuizCore
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container: swift:6.1-noble
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: QuizCore tests
+        run: swift test --package-path Packages/QuizCore
+
+  # ---------------------------------------------------------------------------
+  # Build, sign, and ship.
+  # ---------------------------------------------------------------------------
+  release:
+    name: Build & upload to TestFlight
+    needs: [verify-content, verify-core]
+    runs-on: ${{ vars.MACOS_RUNNER_LABEL || 'macos-26' }}
+    timeout-minutes: 90
+
+    # Credentials are bound to this environment so you can add required
+    # reviewers (Settings → Environments → ios-release) without editing this file.
+    environment:
+      name: ios-release
+
+    env:
+      # Non-secret configuration: repository *variables*.
+      IOS_BUNDLE_IDENTIFIER: ${{ vars.IOS_BUNDLE_IDENTIFIER }}
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Fail fast on missing configuration
+        # Secrets go through `env` and are tested by name, never interpolated
+        # into the script text, and never echoed.
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -n "${IOS_BUNDLE_IDENTIFIER:-}" ]] || missing+=("vars.IOS_BUNDLE_IDENTIFIER")
+          [[ -n "${APPLE_TEAM_ID:-}" ]] || missing+=("vars.APPLE_TEAM_ID")
+          [[ -n "${ASC_KEY_ID:-}" ]] || missing+=("secrets.APP_STORE_CONNECT_KEY_ID")
+          [[ -n "${ASC_ISSUER_ID:-}" ]] || missing+=("secrets.APP_STORE_CONNECT_ISSUER_ID")
+          [[ -n "${ASC_PRIVATE_KEY:-}" ]] || missing+=("secrets.APP_STORE_CONNECT_PRIVATE_KEY")
+          if (( ${#missing[@]} )); then
+            echo "::error::Missing required configuration: ${missing[*]} — see docs/RELEASING.md"
+            exit 1
+          fi
+          # Shape checks: a swapped Issuer ID and Key ID is the classic first-run 401.
+          malformed=()
+          [[ "$APPLE_TEAM_ID" =~ ^[A-Z0-9]{10}$ ]] || malformed+=("vars.APPLE_TEAM_ID (expected 10 alphanumerics)")
+          [[ "$IOS_BUNDLE_IDENTIFIER" =~ ^[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$ ]] || malformed+=("vars.IOS_BUNDLE_IDENTIFIER (expected reverse-DNS)")
+          [[ "$ASC_KEY_ID" =~ ^[A-Z0-9]{10}$ ]] || malformed+=("secrets.APP_STORE_CONNECT_KEY_ID (expected 10 alphanumerics — did you paste the Issuer ID?)")
+          [[ "$ASC_ISSUER_ID" =~ ^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$ ]] || malformed+=("secrets.APP_STORE_CONNECT_ISSUER_ID (expected a UUID — did you paste the Key ID?)")
+          if (( ${#malformed[@]} )); then
+            echo "::error::Malformed configuration:"; printf '  %s\n' "${malformed[@]}"; exit 1
+          fi
+          echo "All required configuration is present and well-formed."
+
+      - name: Select Xcode
+        run: |
+          set -euo pipefail
+          # Newest non-beta Xcode on the image, resolved at run time.
+          app="$(ls -d /Applications/Xcode*.app | grep -vi beta | sort -V | tail -1)"
+          echo "Using $app"
+          sudo xcode-select -switch "$app/Contents/Developer"
+          xcodebuild -version
+
+      - name: Resolve version and build number
+        id: version
+        run: |
+          set -euo pipefail
+          # A tag sets the marketing version; a manual run keeps project.yml's.
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then marketing="${GITHUB_REF_NAME#v}"; else marketing=""; fi
+          # CFBundleVersion must strictly increase per upload; run_number does.
+          echo "marketing=${marketing}" >> "$GITHUB_OUTPUT"
+          echo "build=${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "Marketing version: ${marketing:-<from project.yml>} / build ${GITHUB_RUN_NUMBER}"
+
+      - name: Generate Xcode project
+        run: |
+          set -euo pipefail
+          brew install xcodegen
+          xcodegen generate
+
+      # Same reasoning as the activity-tracker pipeline: a pinned development
+      # identity makes automatic signing ask for a device-bound development
+      # profile on archive. Removing any pin leaves automatic signing free to
+      # choose; the export below produces the distribution build.
+      - name: Unpin the development signing identity
+        run: |
+          set -euo pipefail
+          pbx="BuckleUpQuiz.xcodeproj/project.pbxproj"
+          perl -ni -e 'print unless /CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]/' "$pbx"
+          echo "Remaining pins: $(grep -c 'CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]' "$pbx" || true)"
+
+      - name: App unit tests (optional)
+        if: ${{ inputs.run_app_tests }}
+        run: |
+          set -o pipefail
+          xcodebuild test -project BuckleUpQuiz.xcodeproj -scheme BuckleUpQuiz \
+            -destination "$(scripts/ci/simulator-destination.sh)" CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify --renderer github-actions
+
+      # -----------------------------------------------------------------------
+      # Credentials: written to disk with tight permissions, never logged, and
+      # removed in the final step.
+      # -----------------------------------------------------------------------
+      - name: Install App Store Connect API key
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          set +x
+          umask 077
+          key_dir="$HOME/.appstoreconnect/private_keys"
+          mkdir -p "$key_dir"
+          key_path="${key_dir}/AuthKey_${ASC_KEY_ID}.p8"
+          printf '%s\n' "$ASC_PRIVATE_KEY" > "$key_path"
+          chmod 600 "$key_path"
+          if ! grep -q 'BEGIN PRIVATE KEY' "$key_path"; then
+            echo "::error::APP_STORE_CONNECT_PRIVATE_KEY does not look like a .p8 key (paste the whole file)."
+            exit 1
+          fi
+          echo "ASC_KEY_PATH=${key_path}" >> "$GITHUB_ENV"
+          echo "API key installed."
+
+      - name: App Store Connect preflight
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: node scripts/asc-preflight.mjs "$IOS_BUNDLE_IDENTIFIER" "BuckleUp Quiz"
+
+      - name: Create ephemeral signing keychain
+        run: |
+          set -euo pipefail
+          set +x
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          password="$(openssl rand -base64 24)"
+          echo "::add-mask::$password"
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          security default-keychain -s "$keychain"
+          echo "KEYCHAIN_PATH=$keychain" >> "$GITHUB_ENV"
+          echo "KEYCHAIN_PASSWORD=$password" >> "$GITHUB_ENV"
+
+      # Snapshot certificates so the cleanup step revokes only what this run
+      # creates (archive and export each request one, and their private keys
+      # die with the keychain).
+      - name: Snapshot existing certificates
+        id: certs_before
+        continue-on-error: true
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          node scripts/asc-certificates.mjs list --ids > "$RUNNER_TEMP/certs-before.tmp"
+          mv "$RUNNER_TEMP/certs-before.tmp" "$RUNNER_TEMP/certs-before.txt"
+          echo "Snapshot: $(wc -l < "$RUNNER_TEMP/certs-before.txt" | tr -d ' ') certificate(s) already on the account."
+
+      - name: Archive
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          MARKETING_VERSION: ${{ steps.version.outputs.marketing }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/build/App.xcarchive"
+          mkdir -p "$RUNNER_TEMP/build"
+          settings=(
+            CODE_SIGN_STYLE=Automatic
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID"
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
+          )
+          [[ -n "$MARKETING_VERSION" ]] && settings+=(MARKETING_VERSION="$MARKETING_VERSION")
+          set -o pipefail
+          xcodebuild archive \
+            -project BuckleUpQuiz.xcodeproj \
+            -scheme BuckleUpQuiz \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$archive" \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            -allowProvisioningUpdates \
+            "${settings[@]}" | tee "$RUNNER_TEMP/archive.log" | xcbeautify --renderer github-actions
+          echo "ARCHIVE_PATH=$archive" >> "$GITHUB_ENV"
+
+      - name: Validate archive
+        run: |
+          set -euo pipefail
+          app="$(find "$ARCHIVE_PATH/Products/Applications" -maxdepth 1 -name '*.app' 2>/dev/null | head -1 || true)"
+          [[ -n "$app" ]] || { echo "::error::Archive contains no .app bundle."; exit 1; }
+          plist="$ARCHIVE_PATH/Info.plist"
+          version="$(/usr/libexec/PlistBuddy -c 'Print :ApplicationProperties:CFBundleShortVersionString' "$plist")"
+          build="$(/usr/libexec/PlistBuddy -c 'Print :ApplicationProperties:CFBundleVersion' "$plist")"
+          identifier="$(/usr/libexec/PlistBuddy -c 'Print :ApplicationProperties:CFBundleIdentifier' "$plist")"
+          echo "Archived ${identifier} ${version} (${build})"
+          if [[ "$identifier" != "$IOS_BUNDLE_IDENTIFIER" ]]; then
+            echo "::error::Archive bundle id '${identifier}' does not match vars.IOS_BUNDLE_IDENTIFIER '${IOS_BUNDLE_IDENTIFIER}' (project.yml and the variable must agree)."
+            exit 1
+          fi
+          codesign --verify --deep --strict --verbose=2 "$app"
+          echo "APP_VERSION_NAME=${version}" >> "$GITHUB_ENV"
+          echo "APP_BUILD_NUMBER=${build}" >> "$GITHUB_ENV"
+
+      - name: Export signed IPA
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          export_dir="$RUNNER_TEMP/export"
+          options="$RUNNER_TEMP/ExportOptions.plist"
+          # Generated so the team id comes from configuration, not the repo.
+          cat > "$options" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>destination</key><string>export</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          PLIST
+          set -o pipefail
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$export_dir" \
+            -exportOptionsPlist "$options" \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            -allowProvisioningUpdates | tee "$RUNNER_TEMP/export.log"
+          ipa="$(find "$export_dir" -maxdepth 1 -name '*.ipa' | head -1)"
+          [[ -n "$ipa" ]] || { echo "::error::Export produced no .ipa"; exit 1; }
+          echo "IPA_PATH=$ipa" >> "$GITHUB_ENV"
+          ls -lh "$ipa"
+
+      - name: Validate IPA against App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          # Server-side checks (icons, Info.plist, entitlements) in about a
+          # minute, instead of a rejection email after processing.
+          xcrun altool --validate-app --file "$IPA_PATH" --type ios \
+            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+
+      - name: Upload to TestFlight
+        if: ${{ github.event_name == 'push' || inputs.submit_to_testflight }}
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          xcrun altool --upload-app --file "$IPA_PATH" --type ios \
+            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+          {
+            echo "### Uploaded to TestFlight"
+            echo ""
+            echo "- Version: \`${APP_VERSION_NAME} (${APP_BUILD_NUMBER})\`"
+            echo "- Bundle id: \`${IOS_BUNDLE_IDENTIFIER}\`"
+            echo ""
+            echo "Apple processes the build for 5–30 minutes before it appears in TestFlight."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Revoke only the certificates this run created (always, because a failed
+      # archive can create one too). Builds already uploaded are re-signed by
+      # Apple and unaffected.
+      - name: Revoke certificates created by this run
+        if: ${{ always() && steps.certs_before.outcome == 'success' }}
+        continue-on-error: true
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: node scripts/asc-certificates.mjs revoke --not-in "$RUNNER_TEMP/certs-before.txt" --yes
+
+      - name: Upload build artifacts
+        # Logs and dSYMs only. The signed .ipa is deliberately NOT uploaded:
+        # artifacts on a public repository are downloadable by anyone.
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ios-build-${{ github.run_number }}
+          path: |
+            ${{ runner.temp }}/*.log
+            ${{ runner.temp }}/build/App.xcarchive/dSYMs
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Remove credentials from runner
+        if: ${{ always() }}
+        run: |
+          set +e
+          security delete-keychain "${KEYCHAIN_PATH:-}" 2>/dev/null
+          rm -rf "$HOME/.appstoreconnect/private_keys"
+          echo "Credential material removed."

@@ -15,7 +15,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 | M5 | Players & scoring | ⬜ (engine side ✅) |
 | M6 | Paywall & parental gate | ⬜ |
 | M7 | Content & polish | ⬜ |
-| M8 | TestFlight & real-car testing | ⬜ |
+| M8 | TestFlight & real-car testing | 🟡 (pipeline ✅) |
 | M9 | Backend (cloud data, content packs) | ⬜ (ADR-0012 proposed) |
 
 ---
@@ -26,6 +26,8 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] CI: content validation and `QuizCore` tests on Linux, app build and tests on macOS (ADR-0013)
 - [x] GitHub Pages deploy for privacy and support pages (ADR-0005)
 - [x] Privacy manifest (`PrivacyInfo.xcprivacy`), permission strings
+- [x] Placeholder app icon (`scripts/make_icon.py`), replaced by the mascot in M3
+- [x] TestFlight pipeline `ios-release.yml` + `certificates.yml` (ADR-0014, [RELEASING.md](RELEASING.md))
 
 **Exit:** a push to `main` runs CI green.
 
@@ -106,8 +108,10 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 
 **Exit:** strict validation green and reviews signed off.
 
-## M8 — TestFlight ⬜
-- [ ] Signing + tag-triggered TestFlight workflow (ADR-0013)
+## M8 — TestFlight 🟡
+- [x] Signing + tag-triggered TestFlight workflow (ADR-0014)
+- [ ] One-time App Store Connect app record + API key secrets ([RELEASING.md](RELEASING.md))
+- [ ] First internal TestFlight build (v0.1.0)
 - [ ] Real-car tests: 3 or more head units plus CarPlay, road noise, kids
 - [ ] Proxy test: zero network requests (criterion 10)
 - [ ] Name checks (IP Australia), domains and handles (FEATURES §0)
