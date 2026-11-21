@@ -41,7 +41,9 @@ pipeline as the activity-tracker app ([ADR-0014](adr/0014-testflight-release-pip
    git tag v0.1.0 && git push origin v0.1.0
    ```
 3. After 5–30 minutes the build appears in App Store Connect → TestFlight.
-   - **Internal testers** (up to 100 team members) can install straight away.
+   - **Internal testers** in the **Family** group (gets every build automatically; add
+     people under TestFlight → Internal Testing → Family) can install straight away from the
+     TestFlight app, using the same Apple ID they were invited with.
    - **External testers** need a short Beta App Review, plus a test description and contact
      details.
 

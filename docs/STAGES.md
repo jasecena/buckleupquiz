@@ -112,7 +112,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Signing + tag-triggered TestFlight workflow (ADR-0014)
 - [x] One-time App Store Connect app record + API key secrets ([RELEASING.md](RELEASING.md))
 - [x] First TestFlight upload: 0.1.0 (2), 2026-11-22
-- [ ] Internal testing group + testers in App Store Connect
+- [x] Internal testing group "Family" (gets every build automatically) with the account holder invited
 - [ ] Build with the iOS 27 SDK (Xcode 27) before April 2027 (App Store Connect warning 90725). The release workflow picks the newest non-beta Xcode on the runner; set `vars.MACOS_RUNNER_LABEL` if a newer image is needed
 - [ ] Real-car tests: 3 or more head units plus CarPlay, road noise, kids
 - [ ] Proxy test: zero network requests (criterion 10)
