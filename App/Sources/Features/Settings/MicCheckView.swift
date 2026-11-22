@@ -22,6 +22,7 @@ struct MicCheckView: View {
                 Image(systemName: icon)
                     .font(.system(size: 96))
                     .foregroundStyle(Theme.accent)
+                    .accessibilityHidden(true)
                     .symbolEffect(.variableColor.iterative, options: .repeating, isActive: state == .listening)
                 if let micName { Label("Using: \(micName)", systemImage: "mic.fill").font(Theme.body) }
 

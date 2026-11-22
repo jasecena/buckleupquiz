@@ -32,6 +32,9 @@ in App Store Connect.
 - The scores show on screen while the ending is read out (it showed "Buckle up…" before).
 - **One speech engine:** the untested iOS 26 fallback for phones with Dictation off is gone.
   Those families see the "Turn on Dictation" guide in Mic check, as before.
+- **iPhone only** for now (iPad after launch).
+- **Large text and VoiceOver:** every font follows the phone's text size, the game screen
+  scrolls when text is large, and side-by-side buttons stack.
 - **Welcome cards:** three short cards before the first game: how it works, "say the letter",
   and the phone in a cradle with the app open (some cars show a call screen).
 - **Easier grown-ups check:** type "seven, two, nine" as 729, instead of working out 17 × 8.
@@ -109,7 +112,10 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 ### Medium (a few days of work, or tests on a real phone)
 - [ ] On a real phone in the car: a phone call during a voice game, and a 20-question voice
       game with the phone in a cradle (screen on), including saying "new game" at the end.
-- [ ] Accessibility pass (text size, VoiceOver) and iPad layout.
+- [ ] Accessibility check on a phone: the code pass is done (every font follows the text size,
+      the game screen scrolls when text is large, buttons stack, icons are hidden from
+      VoiceOver). To finish: Settings → Accessibility → Display & Text Size → Larger Text at
+      the biggest size, and VoiceOver on, then play a game and open each screen.
 - [ ] Name and trademark check.
 
 ### Big (weeks, or needs other people)
@@ -127,6 +133,7 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
       Store Connect), never our own codes (ADR-0027).
 - [ ] Remove the unused `acceptedAnswers` from the question files (ADR-0026).
 - [ ] **Progress screen for parents**: what each child has learned.
+- [ ] **iPad:** v1 is iPhone only. An iPad layout and iPad screenshots after launch.
 - [ ] **Custom topic mixes for Basic:** a parent picks which topics to mix in one game. The game
       engine already supports several topics; it needs a screen to choose them (ADR-0017).
 - [ ] **A bigger plan** (for example "Plus", with more questions a day for long trips), in the

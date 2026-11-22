@@ -21,9 +21,14 @@ struct QuizView: View {
         VStack(spacing: 24) {
             header
             if model.showsScores, model.status != .finished { scoreStrip }
-            Spacer(minLength: 0)
-            content
-            Spacer(minLength: 0)
+            // Centred, and scrolls when large text makes it taller than the screen.
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(spacing: 24) { content }
+                        .frame(maxWidth: .infinity, minHeight: geometry.size.height)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+            }
             controls
         }
         .padding()
@@ -102,6 +107,7 @@ struct QuizView: View {
                 Image(systemName: model.showsFinalScores ? "trophy.fill" : "flag.checkered")
                     .font(.system(size: 64))
                     .foregroundStyle(Theme.accent)
+                    .accessibilityHidden(true)
                 if model.showsFinalScores {
                     Text(model.outroHeadline)
                         .font(Theme.headline)
@@ -118,7 +124,7 @@ struct QuizView: View {
                         .foregroundStyle(Theme.accent)
                         .symbolEffect(.variableColor.iterative, options: .repeating)
                 }
-                HStack(spacing: 12) {
+                AdaptiveStack {
                     if model.canPlayAgain {
                         Button { model.startNextGame() } label: {
                             Label("Play again", systemImage: "arrow.clockwise")
@@ -200,6 +206,7 @@ struct QuizView: View {
         } else {
             VStack(spacing: 12) {
                 Image(systemName: "car.fill").font(.system(size: 56)).foregroundStyle(Theme.accent)
+                    .accessibilityHidden(true)
                 Text("Buckle up…").font(Theme.title)
             }
         }
@@ -253,8 +260,19 @@ struct QuizView: View {
         }
     }
 
-    /// Live points per player, in turn order.
+    /// Live points per player, in turn order. Scrolls sideways when it doesn't fit (large text,
+    /// many players).
     private var scoreStrip: some View {
+        ViewThatFits(in: .horizontal) {
+            scoreChips
+            ScrollView(.horizontal, showsIndicators: false) { scoreChips }
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(model.scoreboard.map { "\($0.player.name) \($0.points) points" }.joined(separator: ", "))
+    }
+
+    private var scoreChips: some View {
         HStack(spacing: 8) {
             ForEach(model.scoreboard, id: \.player.id) { entry in
                 HStack(spacing: 6) {
@@ -268,9 +286,6 @@ struct QuizView: View {
                 .background(Capsule().fill(Color(hex: model.playerColors[entry.player.id] ?? "#FF6919")))
             }
         }
-        .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(model.scoreboard.map { "\($0.player.name) \($0.points) points" }.joined(separator: ", "))
     }
 
     /// End-of-game scoreboard with any new badges.
@@ -346,7 +361,7 @@ struct QuizView: View {
     /// "Got it" / "Not yet" for the player whose turn it is (ADR-0016). Untapped counts as got it.
     private func markButtons(for turn: Turn) -> some View {
         let who = model.isTurnBased && !turn.player.name.isEmpty ? turn.player.name : "You"
-        return HStack(spacing: 12) {
+        return AdaptiveStack {
             Button { model.mark(.correct) } label: {
                 Label("\(who) got it", systemImage: "checkmark")
             }

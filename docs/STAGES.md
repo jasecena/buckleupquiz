@@ -79,8 +79,8 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Onboarding (FEATURES §6): three welcome cards once, then add the first player (no demo game, 2026-11-22)
 - [ ] Mascot and app icon (original, not seatbelt-themed)
 - [ ] Mixed-topic sessions (paid): custom mixes chosen by a parent, after launch (2026-11-22)
-- [ ] Accessibility pass: Dynamic Type, VoiceOver labels, contrast
-- [ ] iPad layout pass
+- [ ] Accessibility pass: Dynamic Type, VoiceOver labels, contrast (code pass done 2026-11-22; check on a phone)
+- [ ] iPad layout pass (after launch: v1 is iPhone only, 2026-11-22)
 
 **Exit:** a parent can install, choose a topic and play without instructions.
 

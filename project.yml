@@ -68,7 +68,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jcena.buckleupquiz
         PRODUCT_NAME: BuckleUpQuiz
-        TARGETED_DEVICE_FAMILY: "1,2"
+        # iPhone only for v1; iPad after launch (product decision, 2026-11-22).
+        TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         GENERATE_INFOPLIST_FILE: NO
         CODE_SIGN_ENTITLEMENTS: App/BuckleUpQuiz.entitlements

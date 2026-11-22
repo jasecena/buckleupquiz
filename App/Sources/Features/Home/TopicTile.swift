@@ -12,6 +12,7 @@ struct TopicTile: View {
             HStack {
                 Image(systemName: topic.symbol)
                     .font(.system(size: 34, weight: .bold))
+                    .accessibilityHidden(true)
                 Spacer()
                 if isLocked {
                     Image(systemName: "lock.fill")

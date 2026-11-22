@@ -32,10 +32,13 @@ struct WelcomeView: View {
         VStack(spacing: 24) {
             TabView(selection: $page) {
                 ForEach(Self.cards) { card in
+                    // Scrolls when large text makes a card taller than the screen.
+                    ScrollView {
                     VStack(spacing: 20) {
                         Image(systemName: card.symbol)
                             .font(.system(size: 72))
                             .foregroundStyle(Theme.accent)
+                            .accessibilityHidden(true)
                         Text(card.title)
                             .font(Theme.title)
                             .multilineTextAlignment(.center)
@@ -45,6 +48,9 @@ struct WelcomeView: View {
                             .foregroundStyle(.secondary)
                     }
                     .padding(.horizontal, 24)
+                    .padding(.top, 40)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
                     .tag(card.id)
                 }
             }

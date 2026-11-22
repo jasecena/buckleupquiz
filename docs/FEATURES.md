@@ -28,7 +28,7 @@
 
 ## 1. Platform & Tech Constraints
 
-- **Platform:** iOS 17+ (iPhone first, iPad compatible). Android is out of scope for v1.
+- **Platform:** iOS 17+ (iPhone only for v1; iPad after launch). Android is out of scope for v1.
 - **UI:** SwiftUI.
 - **Text-to-speech:** `AVSpeechSynthesizer` (on-device, free). Use an Australian English voice (`en-AU`) by default.
 - **Speech recognition:** Apple `Speech` framework (`SFSpeechRecognizer`) with `requiresOnDeviceRecognition = true`. No audio leaves the device.

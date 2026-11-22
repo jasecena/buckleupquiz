@@ -16,10 +16,12 @@ struct ParentalGate<Content: View>: View {
         if passed {
             content()
         } else {
+            ScrollView {
             VStack(spacing: 20) {
                 Image(systemName: "person.badge.key.fill")
                     .font(.system(size: 56))
                     .foregroundStyle(Theme.accent)
+                    .accessibilityHidden(true)
                 Text("Grown-ups only").font(Theme.title)
                 Text("Type these numbers:")
                     .font(Theme.body)
@@ -41,6 +43,8 @@ struct ParentalGate<Content: View>: View {
                     .disabled(answer.isEmpty)
             }
             .padding(32)
+            }
+            .scrollBounceBehavior(.basedOnSize)
             .onAppear { focused = true }
         }
     }

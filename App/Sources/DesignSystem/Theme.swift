@@ -5,7 +5,8 @@ enum Theme {
     static let accent = Color.accentColor
     static let background = Color("LaunchBackground")
 
-    static let hero = Font.system(size: 34, weight: .heavy, design: .rounded)
+    /// Every font follows the reader's text size (Dynamic Type).
+    static let hero = Font.system(.largeTitle, design: .rounded, weight: .heavy)
     static let title = Font.system(.title, design: .rounded, weight: .bold)
     static let headline = Font.system(.title3, design: .rounded, weight: .semibold)
     static let body = Font.system(.body, design: .rounded)
@@ -23,6 +24,21 @@ extension Color {
             green: Double((value >> 8) & 0xFF) / 255,
             blue: Double(value & 0xFF) / 255
         )
+    }
+}
+
+/// Side by side, or stacked at the largest accessibility text sizes so nothing is cut off.
+struct AdaptiveStack<Content: View>: View {
+    var spacing: CGFloat = 12
+    @ViewBuilder var content: () -> Content
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    var body: some View {
+        if typeSize.isAccessibilitySize {
+            VStack(spacing: spacing, content: content)
+        } else {
+            HStack(spacing: spacing, content: content)
+        }
     }
 }
 
