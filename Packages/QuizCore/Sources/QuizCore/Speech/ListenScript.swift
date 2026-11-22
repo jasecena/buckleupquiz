@@ -2,6 +2,8 @@
 public enum SpeechStep: Hashable, Sendable {
     public enum Purpose: String, Sendable, Hashable {
         case number, question, options, answer, followUp
+        /// Between questions ("Thinking caps on!"), or "Once more…" before a repeat.
+        case filler
     }
 
     public enum Cue: String, Sendable, Hashable {
@@ -9,6 +11,8 @@ public enum SpeechStep: Hashable, Sendable {
         case think
         /// "I'm listening" chime before the mic opens (voice mode).
         case listening
+        /// A short tune between questions (`TurnVariety`).
+        case jingle
     }
 
     case say(String, Purpose)
@@ -68,13 +72,23 @@ public struct ListenSettings: Hashable, Sendable, Codable {
 /// Turns a `Turn` into the ordered steps of Listen mode (FEATURES §2.2):
 /// read question + options, think, reveal answer (+ fun fact), pause.
 public enum ListenScript {
+    /// How long the jingle plays (the cue player's tune is this long).
+    public static let jingleLength = 1.2
+
     public static func steps(
         for turn: Turn, category: Topic.Category?, settings: ListenSettings, addressPlayer: Bool,
-        firstTurnForPlayer: Bool = true, voiceAnswers: Bool = false
+        firstTurnForPlayer: Bool = true, voiceAnswers: Bool = false, variety: TurnVariety = .none
     ) -> [SpeechStep] {
         let presented = turn.presented
         let q = presented.question
-        var steps: [SpeechStep] = [.say(Phrases.questionNumber(turn.number), .number)]
+        var steps: [SpeechStep] = []
+        switch variety.breather {
+        case .silence(let seconds): steps.append(.wait(seconds: seconds))
+        case .phrase(let text): steps.append(.say(text, .filler))
+        case .jingle: steps += [.cue(.jingle), .wait(seconds: jingleLength)]
+        case nil: break
+        }
+        steps.append(.say(Phrases.questionNumber(turn.number), .number))
         switch turn.kind {
         case .ownReview: steps.append(.say(Phrases.ownReviewIntro, .number))
         case .sharedReview: steps.append(.say(Phrases.sharedReviewIntro, .number))
@@ -90,6 +104,10 @@ public enum ListenScript {
             }
         }
         steps.append(.say(q.question, .question))
+        if variety.repeatsQuestion {
+            steps.append(.say(Phrases.onceMore, .filler))
+            steps.append(.say(q.question, .filler))
+        }
         // Every question is a choice, so the options are always read (ADR-0015). With voice
         // answers they're read by the listening step, which opens the mic as soon as they end.
         let options = Phrases.options(presented)

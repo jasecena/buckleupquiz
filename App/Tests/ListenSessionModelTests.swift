@@ -28,7 +28,8 @@ struct ListenSessionModelTests {
         #expect(model.status == .finished)
         #expect(speech.spoken.first == Phrases.intro)
         #expect(speech.spoken.filter { $0.hasPrefix("The answer is") }.count == 3)
-        #expect(speech.spoken.last == "That's the end of the ride! Great listening, everyone!")
+        #expect(speech.spoken.last == "That's the end of the game! That was 3 questions. Great listening, everyone! "
+                + Phrases.playAgain)
         #expect(cues.events.first == "start")
         #expect(cues.events.last == "end")
         #expect(cues.events.filter { $0 == "think" }.count == 3)
@@ -83,8 +84,9 @@ struct ListenSessionModelTests {
         let addressed = speech.spoken.filter { $0.contains("this one's for you") }
         #expect(addressed == ["Mia, this one's for you!", "Leo, this one's for you!"], "only on each player's first turn")
         #expect(speech.spoken.filter { $0 == "Mia." || $0 == "Leo." } == ["Mia.", "Leo."])
-        #expect(speech.spoken.last?.hasPrefix("That's the end of the ride! Great job, Mia and Leo!") == true)
-        #expect(speech.spoken.last?.hasSuffix(Phrases.scoreFixNote) == true)
+        #expect(speech.spoken.last?.hasPrefix("That's the end of the game! That was 2 questions each. Great job, Mia and Leo!") == true)
+        #expect(speech.spoken.last?.contains(Phrases.scoreFixNote) == true)
+        #expect(speech.spoken.last?.hasSuffix(Phrases.playAgain) == true, "the game is over, and another is a tap away")
         let miaCards = learned["mia"]?.cards ?? [:]
         let leoCards = learned["leo"]?.cards ?? [:]
         #expect(miaCards.count == 2)
@@ -224,6 +226,55 @@ struct ListenSessionModelTests {
         #expect(!everything.contains("Mia"), "no names in reports")
     }
 
+    @Test func varietyNeverDelaysTheStartOrTheEnd() async {
+        let config = SessionConfig(topics: ["animals"], players: [.listener(ageBand: .sixToEight)], length: .questions(5))
+        let model = ListenSessionModel(
+            bank: makeBank(questions: 5), config: config, settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio),
+            variety: true, rng: AnyRandomGenerator(seed: 3))
+        model.start()
+        await model.runner?.value
+        #expect(model.status == .finished)
+        #expect(speech.spoken.first == Phrases.intro, "the first question starts straight away")
+        #expect(speech.spoken.last?.hasPrefix(Phrases.outroPrefix) == true, "nothing between the last answer and the end")
+        #expect(speech.spoken.filter { $0.hasPrefix("The answer is") }.count == 5)
+    }
+
+    @Test func theMicIsOnForTheWholeGameSoItWorksInTheBackground() async {
+        let listener = FakeListener([[FakeListener.rightLetter]])
+        let config = SessionConfig(topics: ["animals"], players: [Player(id: "mia", name: "Mia", age: 7)],
+                                   length: .questions(1))
+        let model = ListenSessionModel(
+            bank: makeBank(questions: 1), config: config, settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
+                                listener: listener),
+            answerMode: .voice, rng: AnyRandomGenerator(seed: 1))
+        model.start()
+        #expect(listener.micOn, "started on screen: iOS won't start the mic in the background")
+        #expect(listener.micStarts == 1)
+        await model.runner?.value
+        #expect(model.status == .finished)
+        #expect(!listener.micOn, "off when the game ends")
+    }
+
+    @Test func aBusyMicIsTriedAgainNextTurn() async {
+        let listener = FakeListener([[FakeListener.rightLetter]],
+                                    failure: SpeechListenerError.micBusy("call"), failsOnce: true)
+        let config = SessionConfig(topics: ["animals"], players: [Player(id: "mia", name: "Mia", age: 7)],
+                                   length: .questions(2))
+        let model = ListenSessionModel(
+            bank: makeBank(questions: 2), config: config, settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
+                                listener: listener),
+            answerMode: .voice, rng: AnyRandomGenerator(seed: 1))
+        listener.asking = { [weak model] in model?.turn?.presented }
+        model.start()
+        await model.runner?.value
+        #expect(listener.listens == 2, "listened again after the mic was busy")
+        #expect(model.isVoice)
+        #expect(speech.spoken.contains { $0.hasPrefix("Correct") })
+    }
+
     @Test func skippingMidQuestionKeepsItTheSamePlayersTurn() async {
         let mia = Player(id: "mia", name: "Mia", age: 7)
         let leo = Player(id: "leo", name: "Leo", age: 11)
@@ -268,7 +319,7 @@ struct ListenSessionModelTests {
         #expect(model.scoreboard.first { $0.player.id == "leo" }?.points == 0)
         #expect(model.showsFinalScores)
         #expect(speech.spoken.last?.contains("Mia got 10 points") == true || speech.spoken.last?.contains("Mia wins") == true)
-        #expect(speech.spoken.last?.hasSuffix(Phrases.scoreFixNote) == true, "kids hear that scores can be fixed")
+        #expect(speech.spoken.last?.contains(Phrases.scoreFixNote) == true, "kids hear that scores can be fixed")
 
         // A grown-up fixes Leo's score: he did get his answer right.
         var adjusted: [(String, Int)] = []
@@ -312,7 +363,8 @@ struct ListenSessionModelTests {
         await model.runner?.value
         #expect(speech.spoken.contains { $0.hasPrefix("Correct!") }, "still cheered")
         #expect(!model.showsFinalScores)
-        #expect(speech.spoken.last?.hasPrefix("That's the end of the ride! Great job, Mia!") == true)
+        #expect(speech.spoken.last?.hasPrefix("That's the end of the game!") == true)
+        #expect(speech.spoken.last?.contains("Great job, Mia!") == true)
         #expect(!(speech.spoken.last ?? "").contains("points"))
     }
 

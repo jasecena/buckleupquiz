@@ -4,7 +4,7 @@
 public enum SessionLength: Hashable, Codable, Sendable {
     case questions(Int)
 
-    public static let presets: [SessionLength] = [.questions(5), .questions(10), .questions(15)]
+    public static let presets: [SessionLength] = [.questions(5), .questions(10), .questions(15), .questions(20)]
     /// The fewest questions each that makes a proper game.
     public static let minimumEach = 5
     /// The most questions in one game, all players together.

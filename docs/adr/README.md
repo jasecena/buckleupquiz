@@ -34,3 +34,4 @@ New ADR: copy [template.md](template.md) to the next number.
 | [0025](0025-accounts-admin-and-rename-only-players.md) | Accounts, the admin app, and players that can only be renamed | Accepted (rename only) / Proposed (accounts, admin) |
 | [0026](0026-letter-only-answers.md) | Answers are the letter only (A, B, C, or true/false) | Accepted |
 | [0027](0027-free-access-and-tester-reset.md) | Free access the standard way (TestFlight, offer codes, admin flag), and a tester reset | Accepted |
+| [0028](0028-mic-on-for-the-whole-game.md) | The microphone stays on for the whole game, so answers work with the screen locked | Accepted |

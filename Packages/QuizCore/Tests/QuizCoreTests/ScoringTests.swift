@@ -46,7 +46,7 @@ struct ScoringTests {
         #expect(board.map(\.player.name) == ["Leo", "Sam", "Mia"])
         #expect(board.map(\.rank) == [1, 1, 3])
         #expect(Phrases.scoreAnnouncement(board)
-            == "That's the end of the ride! Here are the scores… It's a tie! Leo and Sam both got 10 points! Great listening, Mia!")
+            == "That's the end of the game! Here are the scores… It's a tie! Leo and Sam both got 10 points! Great listening, Mia!")
     }
 
     @Test func announcesWinner() {
@@ -56,15 +56,15 @@ struct ScoringTests {
         for _ in 0..<2 { keeper.record(.correct, playerID: "mia", topic: "t") }
         keeper.record(.correct, playerID: "leo", topic: "t")
         let text = Phrases.scoreAnnouncement(Scoreboard.rank(players: [mia, leo], scores: keeper))
-        #expect(text == "That's the end of the ride! Here are the scores… Mia wins with 20 points! Leo got 10 points!")
+        #expect(text == "That's the end of the game! Here are the scores… Mia wins with 20 points! Leo got 10 points!")
     }
 
     @Test func nobodyIsAnnouncedWithZeroPoints() {
         let mia = Player(id: "mia", name: "Mia", ageBand: .sixToEight)
         let leo = Player(id: "leo", name: "Leo", ageBand: .nineToTen)
         let board = Scoreboard.rank(players: [mia, leo], scores: ScoreKeeper())
-        #expect(Phrases.scoreAnnouncement(board) == "That's the end of the ride! Great job, Mia and Leo!")
-        #expect(Phrases.scoreAnnouncement(Array(board.prefix(1))) == "That's the end of the ride! Great job, Mia!")
+        #expect(Phrases.scoreAnnouncement(board) == "That's the end of the game! Great job, Mia and Leo!")
+        #expect(Phrases.scoreAnnouncement(Array(board.prefix(1))) == "That's the end of the game! Great job, Mia!")
     }
 
     @Test func badges() {

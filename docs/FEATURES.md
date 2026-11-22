@@ -19,7 +19,7 @@
 - **App Store subtitle (≤30 chars):** `Voice trivia, manners & safety`
 - **Xcode project / target:** `BuckleUpQuiz`. **Bundle ID:** `com.<yourcompany>.buckleupquiz`.
 - **Spoken intro (TTS) when a session starts:** "Buckle up, kids… question one!"
-- **Spoken outro:** "That's the end of the ride! Here are the scores…"
+- **Spoken outro:** "That's the end of the game! That was 15 questions each. Here are the scores… If you'd like to play some more, start a new game!" ("game", not "ride": the car trip goes on). The number is what was really played.
 - **Tagline for ads:** "Turn 'are we there yet?' into 'ask me another!'"
 - **Visual identity:** a friendly, original mascot (not a seatbelt logo, to stay clear of existing "Buckle Up" road-safety campaign branding). Bright, high-contrast colours, and big rounded type.
 - **Before launch:** check the name with IP Australia, and register the `.com.au` and `.app` domains and the Instagram and TikTok handles.
@@ -49,7 +49,7 @@
 - User picks a topic, then **who's playing** (named players with ages; each gets questions for their own age band: 6–8, 9–10 or 11–12). *(Changed by ADR-0015: originally an age-band picker.)*
 - **Everyone gets the same number of questions, planned before the game starts** (product decision, 2026-11-22). Lengths are questions *each*. If someone would run short, the last incomplete round is dropped. 0–2 each available blocks the game ("out of questions for today"), 3–4 each warns, 5 each is the minimum. If a topic has nothing for a player's age, the nearest age's questions are used. A skipped question doesn't count.
 - **Progress survives a reinstall** (ADR-0023): players, review boxes, scores, which questions the family has had and bought questions are kept in the family's own iCloud and the iPhone's Keychain, and restored automatically. Reinstalling never resets the free allowance.
-- **No Endless mode.** A game is 5, 10 or 15 questions each, and at most 50 questions in total.
+- **No Endless mode.** A game is 5, 10, 15 or 20 questions each, and at most 50 questions in total.
 - **Up to 2 players per game for free.** Games with 3–6 players need BuckleUp Basic (ADR-0022). Anyone can create up to 6 player profiles.
 - **Players can't be deleted, only renamed** (ADR-0025), so each child's question history is never lost.
 
@@ -59,7 +59,12 @@ Game loop per question:
 2. App waits for a **configurable "think time"** (default 6 seconds, range 3–20). A soft tick plays ("ding, ding, ding"), and in voice mode the app listens during it.
 3. App says "The answer is… **X**" plus an optional one-line fun fact.
 4. Short pause (2 seconds), then the next question plays automatically.
-- **Session length:** 5, 10 or 15 questions each, at most 50 in a game (no Endless mode).
+- **Variety, so it feels like a person reading** (product decision 2026-11-22, `TurnVariety`):
+  before every question except the first, one of these at random: 1–2 s of quiet, a short line
+  ("Thinking caps on!", "Ooh, I like this next one."), or a little tune. Long (12+ words) or
+  hard (difficulty 3+) questions are read twice about 40% of the time ("Once more…"). Nothing
+  is added after the last answer, so the outro comes straight away.
+- **Session length:** 5, 10, 15 or 20 questions each, at most 50 in a game (no Endless mode).
 - **On-screen:** large question text, a countdown ring, and the revealed answer. The screen is readable but never required.
 - **Controls:** big Pause/Resume, Skip and Repeat buttons. Also support the play/pause/next buttons on headphones and the car steering wheel via `MPRemoteCommandCenter`.
 

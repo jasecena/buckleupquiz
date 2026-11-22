@@ -170,7 +170,8 @@ final class AppEnvironment {
             learning: players.learning(for: players.players), lifetimeStats: players.stats(for: profiles),
             day: day,
             playerColors: Dictionary(uniqueKeysWithValues: profiles.map { ($0.id.uuidString, $0.colorHex) }),
-            showScoreboard: s.showScoreboard, canFixScores: entitlements.canFixScores, budget: budget)
+            showScoreboard: s.showScoreboard, canFixScores: entitlements.canFixScores, budget: budget,
+            variety: true)
         model.onFinish = { [weak players, weak allowance] summary in
             players?.record(summary)
             allowance?.charge(summary.asked, hasBasic: hasBasic, day: day)

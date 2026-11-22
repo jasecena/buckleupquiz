@@ -14,12 +14,10 @@ final class SpeechAnalyzerListener {
     enum Problem: Error, LocalizedError {
         case notSupported
         case downloading
-        case noInput
         var errorDescription: String? {
             switch self {
             case .notSupported: "The new on-device speech recogniser isn't available for English on this iPhone."
             case .downloading: "Getting speech recognition ready (a one-time download). Try again in a minute."
-            case .noInput: "No microphone input is available."
             }
         }
     }
@@ -53,7 +51,8 @@ final class SpeechAnalyzerListener {
     }
 
     /// Same contract as `SpeechListening.listen`.
-    func listen(until end: Date, locales: [Locale],
+    /// Listens on `mic`, which is already running.
+    func listen(until end: Date, locales: [Locale], mic: MicInput,
                 isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String] {
         let locale = try await prepare(locales: locales)
         let transcriber = Self.makeTranscriber(locale)
@@ -62,14 +61,8 @@ final class SpeechAnalyzerListener {
             throw Problem.notSupported
         }
 
-        let engine = AVAudioEngine()
-        let input = engine.inputNode
-        let inputFormat = input.outputFormat(forBus: 0)
-        guard inputFormat.sampleRate > 0, inputFormat.channelCount > 0 else { throw Problem.noInput }
-
         let (inputs, builder) = AsyncStream<AnalyzerInput>.makeStream()
-        let feeder = AnalyzerFeeder(from: inputFormat, to: analyzerFormat, builder: builder)
-        input.installTap(onBus: 0, bufferSize: 1024, format: inputFormat, block: Self.tapBlock(feeding: feeder))
+        let feeder = AnalyzerFeeder(to: analyzerFormat, builder: builder)
 
         let state = TranscriptState()
         let consumer = Task { @MainActor [transcriber, state] in
@@ -82,15 +75,13 @@ final class SpeechAnalyzerListener {
             }
         }
         defer {
-            engine.stop()
-            input.removeTap(onBus: 0)
+            mic.send(to: nil)
             builder.finish()
             consumer.cancel()
         }
 
         try await analyzer.start(inputSequence: inputs)
-        engine.prepare()
-        try engine.start()
+        mic.send(to: feeder)
 
         while !state.ended {
             try await Task.sleep(for: .milliseconds(100))
@@ -103,7 +94,7 @@ final class SpeechAnalyzerListener {
                 if !speaking || Date.now >= end.addingTimeInterval(SystemSpeechListener.overrun) { break }
             }
         }
-        engine.stop()
+        mic.send(to: nil)
         builder.finish()
         let finishBy = Date.now.addingTimeInterval(0.8)
         let wrapUp = Task { try? await analyzer.finalizeAndFinishThroughEndOfInput() }
@@ -136,23 +127,27 @@ final class SpeechAnalyzerListener {
         }
     }
 
-    /// Converts microphone audio to the analyzer's format on the audio thread.
-    final class AnalyzerFeeder: @unchecked Sendable {
-        private let converter: AVAudioConverter?
+    /// Converts microphone audio to the analyzer's format on the audio thread. The converter
+    /// follows the mic's format, which changes when the car or a headset connects.
+    final class AnalyzerFeeder: MicConsumer, @unchecked Sendable {
+        private var converter: AVAudioConverter?
         private let format: AVAudioFormat
         private let builder: AsyncStream<AnalyzerInput>.Continuation
 
-        init(from source: AVAudioFormat, to target: AVAudioFormat, builder: AsyncStream<AnalyzerInput>.Continuation) {
-            converter = source == target ? nil : AVAudioConverter(from: source, to: target)
+        init(to target: AVAudioFormat, builder: AsyncStream<AnalyzerInput>.Continuation) {
             format = target
             self.builder = builder
         }
 
-        func feed(_ buffer: AVAudioPCMBuffer) {
-            guard let converter else {
+        func append(_ buffer: AVAudioPCMBuffer) {
+            if buffer.format == format {
                 builder.yield(AnalyzerInput(buffer: buffer))
                 return
             }
+            if converter?.inputFormat != buffer.format {
+                converter = AVAudioConverter(from: buffer.format, to: format)
+            }
+            guard let converter else { return }
             let ratio = format.sampleRate / buffer.format.sampleRate
             let capacity = AVAudioFrameCount((Double(buffer.frameLength) * ratio).rounded(.up)) + 32
             guard let converted = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: capacity) else { return }
@@ -171,9 +166,5 @@ final class SpeechAnalyzerListener {
                 builder.yield(AnalyzerInput(buffer: converted))
             }
         }
-    }
-
-    private nonisolated static func tapBlock(feeding feeder: AnalyzerFeeder) -> AVAudioNodeTapBlock {
-        { buffer, _ in feeder.feed(buffer) }
     }
 }

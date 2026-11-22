@@ -64,19 +64,35 @@ final class FakeListener: SpeechListening {
 
     var replies: [[String]]
     var failure: (any Error)?
+    /// The failure happens on the first listen only.
+    var failsOnce: Bool
     private(set) var listens = 0
+    /// Whether the game has the mic on (`startMic` … `stopMic`).
+    private(set) var micOn = false
+    private(set) var micStarts = 0
 
-    init(_ replies: [[String]], failure: (any Error)? = nil) {
+    init(_ replies: [[String]], failure: (any Error)? = nil, failsOnce: Bool = false) {
         self.replies = replies
         self.failure = failure
+        self.failsOnce = failsOnce
     }
+
+    func startMic() throws {
+        micOn = true
+        micStarts += 1
+    }
+
+    func stopMic() { micOn = false }
 
     func listen(for seconds: Double, hints: [String],
                 isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String] {
         listens += 1
         await Task.yield()
         try Task.checkCancellation()
-        if let failure { throw failure }
+        if let failure {
+            if failsOnce { self.failure = nil }
+            throw failure
+        }
         return replies.isEmpty ? [] : replies.removeFirst().map(resolve)
     }
 

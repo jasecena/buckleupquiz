@@ -118,6 +118,10 @@ final class ListenSessionModel {
     /// Questions each player asked for, and how many each gets (planned before the game).
     var requestedEach: Int { session.requestedEach }
     var plannedEach: Int { session.plannedEach }
+    /// Above the final scores: "That's the end of the game! That was 15 questions each."
+    var outroHeadline: String {
+        Phrases.outroOpening(each: plannedEach, players: session.config.players.count)
+    }
 
     /// Whether turns are addressed to named players.
     var isTurnBased: Bool { session.config.isTurnBased }
@@ -154,6 +158,10 @@ final class ListenSessionModel {
     @ObservationIgnored private var discussionTimer: Task<Void, Never>?
     /// Bumped on every (re)launch so a cancelled runner can't touch the new one's state.
     @ObservationIgnored private var generation = 0
+    /// Breathers between questions and long or hard questions read twice (`TurnVariety`).
+    /// The app turns it on; tests leave it off so the script is predictable.
+    private let addsVariety: Bool
+    @ObservationIgnored private var varietyRNG: AnyRandomGenerator
 
     /// Called once when the session ends (finished or stopped), so boxes and scores can be saved.
     @ObservationIgnored var onFinish: ((SessionSummary) -> Void)?
@@ -166,7 +174,9 @@ final class ListenSessionModel {
          learning: [String: LearningRecord] = [:], lifetimeStats: [String: PlayerStats] = [:],
          day: Int = LearningDay.number(), playerColors: [String: String] = [:], showScoreboard: Bool = true,
          canFixScores: Bool = true, budget: FreshBudget = .unlimited,
-         rng: AnyRandomGenerator = .system()) {
+         variety: Bool = false, rng: AnyRandomGenerator = .system()) {
+        self.addsVariety = variety
+        self.varietyRNG = rng
         self.showScoreboard = showScoreboard
         self.bank = bank
         self.session = QuizSession(bank: bank, config: config, learning: learning, day: day, budget: budget, rng: rng)
@@ -192,6 +202,8 @@ final class ListenSessionModel {
         if answerMode == .voice, deps.listener != nil {
             do {
                 micName = try deps.audioSession?.activateForVoice(duckOthers: duckOthers, mic: mic)
+                // On now, while the app is on screen, so answers are heard in the background too.
+                try deps.listener?.startMic()
                 isVoice = true
                 startedInVoice = true
                 voiceTipPending = true
@@ -401,9 +413,13 @@ final class ListenSessionModel {
         thinkRemaining = 0
         category = bank.topic(id: next.presented.question.topic)?.category
         let firstTurn = introducedPlayers.insert(next.player.id).inserted
+        // No breather before the first question, or before "Here's another one" after a skip.
+        let variety = addsVariety
+            ? TurnVariety.random(for: next, firstQuestion: next.number == 1 || samePlayer, using: &varietyRNG)
+            : .none
         steps = ListenScript.steps(for: next, category: category, settings: settings,
                                    addressPlayer: session.config.isTurnBased, firstTurnForPlayer: firstTurn,
-                                   voiceAnswers: isVoice)
+                                   voiceAnswers: isVoice, variety: variety)
         if samePlayer, next.player.id == previousPlayer, case .say(_, .number) = steps.first {
             steps[0] = .say(Phrases.anotherOne, .number)
         }
@@ -426,6 +442,8 @@ final class ListenSessionModel {
             break // the tick runs during `.think`
         case .cue(.listening):
             deps.cues.play(.listening)
+        case .cue(.jingle):
+            deps.cues.play(.jingle)
         case .think(let seconds):
             try await countdown(seconds: seconds, ticking: true, generation: generation)
         case .listen(let seconds, let options):
@@ -514,8 +532,10 @@ final class ListenSessionModel {
             deps.cues.stopThinking()
             // The mic or recogniser can't be used: quietly carry on reading answers out, but
             // still give the full think time. The reason shows in Settings → Mic check.
+            // A busy mic (a phone call, or a car that took the audio) can come back, so it's
+            // tried again next turn. Anything else (Dictation off) stays off for this game.
             isListening = false
-            isVoice = false
+            if case SpeechListenerError.micBusy = error {} else { isVoice = false }
             if let guide = FixGuide.guide(for: error) {
                 voiceOffHint = "Not listening. \(guide.problem): \(guide.path)"
             }
@@ -530,6 +550,7 @@ final class ListenSessionModel {
             return
         }
         isListening = false
+        voiceOffHint = nil
         guard generation == self.generation else { return }
         let transcriptions = raw
 
@@ -657,18 +678,19 @@ final class ListenSessionModel {
             // With the scoreboard off, just "Great job, Mia and Leo!" (badges are still cheered).
             scoreboard = session.scoreboard
             earnedBadges = newlyEarnedBadges()
-            let ending = showScoreboard ? Phrases.scoreAnnouncement(scoreboard)
-                : Phrases.listenOutro(players: session.config.players)
+            let ending = showScoreboard ? Phrases.scoreAnnouncement(scoreboard, each: session.plannedEach)
+                : Phrases.listenOutro(players: session.config.players, each: session.plannedEach)
             closingMessage = ([ending] + earnedBadges.map { Phrases.badgeEarned($0.badge, by: $0.player) })
                 .joined(separator: " ")
         } else {
             scoreboard = session.scoreboard
-            closingMessage = Phrases.listenOutro(players: session.config.players)
+            closingMessage = Phrases.listenOutro(players: session.config.players, each: session.plannedEach)
         }
         // Voice detection can miss answers: say how to fix the scores, so nobody argues.
         if showsFinalScores, canFixScores, let ending = closingMessage {
             closingMessage = ending + " " + Phrases.scoreFixNote
         }
+        closingMessage = (closingMessage ?? Phrases.outroPrefix) + " " + Phrases.playAgain
         if let closingMessage { try await deps.speech.speak(closingMessage) }
         tearDown()
     }
@@ -699,6 +721,7 @@ final class ListenSessionModel {
         if closingMessage == nil { closingMessage = Phrases.outroPrefix }
         deps.cues.endSession()
         deps.nowPlaying?.disable()
+        deps.listener?.stopMic()
         deps.audioSession?.deactivate()
         deps.audioSession?.onEvent = nil
     }

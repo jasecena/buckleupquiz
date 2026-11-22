@@ -80,6 +80,9 @@ struct QuizView: View {
                     .font(.system(size: 64))
                     .foregroundStyle(Theme.accent)
                 if model.showsFinalScores {
+                    Text(model.outroHeadline)
+                        .font(Theme.headline)
+                        .multilineTextAlignment(.center)
                     finalScores
                 } else {
                     Text(model.closingMessage ?? Phrases.outroPrefix)

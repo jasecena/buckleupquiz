@@ -12,6 +12,17 @@ protocol SpeechListening: AnyObject {
     /// recogniser can't be used at all. Cancelling the calling task stops listening at once.
     func listen(for seconds: Double, hints: [String],
                 isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String]
+    /// Turns the mic on for a whole game, while the app is on screen (ADR-0028): iOS won't let
+    /// it start in the background, only keep running. Without this, each `listen` turns the
+    /// mic on and off again.
+    func startMic() throws
+    /// Turns the mic off at the end of the game.
+    func stopMic()
+}
+
+extension SpeechListening {
+    func startMic() throws {}
+    func stopMic() {}
 }
 
 enum SpeechListenerError: Error, LocalizedError {
@@ -100,9 +111,39 @@ final class SystemSpeechListener: SpeechListening {
     private var analyzer: AnyObject?
     private var analyzerFailed = false
 
+    private let mic = MicInput()
+    /// A game is on: the mic stays on between answers.
+    private var keepMicOn = false
+
+    func startMic() throws {
+        do {
+            try mic.start()
+        } catch {
+            Self.lastProblem = error.localizedDescription
+            throw error
+        }
+        keepMicOn = true
+    }
+
+    func stopMic() {
+        keepMicOn = false
+        mic.stop()
+    }
+
     func listen(for seconds: Double, hints: [String],
                 isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String] {
         let end = Date.now.addingTimeInterval(seconds)
+        // Already running during a game. Otherwise (Mic check) on for this listen only.
+        do {
+            try mic.start()
+        } catch {
+            Self.lastProblem = error.localizedDescription
+            throw error
+        }
+        defer {
+            mic.send(to: nil)
+            if !keepMicOn { mic.stop() }
+        }
         if #available(iOS 26.0, *), let analyzer = analyzer as? SpeechAnalyzerListener {
             return try await listen(with: analyzer, until: end, isConclusive: isConclusive)
         }
@@ -122,7 +163,8 @@ final class SystemSpeechListener: SpeechListening {
     private func listen(with analyzer: SpeechAnalyzerListener, until end: Date,
                         isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String] {
         do {
-            let heard = try await analyzer.listen(until: end, locales: Self.defaultLocales, isConclusive: isConclusive)
+            let heard = try await analyzer.listen(until: end, locales: Self.defaultLocales, mic: mic,
+                                                  isConclusive: isConclusive)
             Self.lastProblem = nil
             return heard
         } catch is CancellationError {
@@ -143,26 +185,11 @@ final class SystemSpeechListener: SpeechListening {
 
     private func listenWithRecognizer(until end: Date, hints: [String],
                                       isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String] {
-        let engine = AVAudioEngine()
-        let input = engine.inputNode
-        let format = input.outputFormat(forBus: 0)
-        guard format.sampleRate > 0, format.channelCount > 0 else {
-            Self.lastProblem = "No microphone input (\(format.sampleRate) Hz, \(format.channelCount) channels)."
-            throw SpeechListenerError.micBusy(Self.lastProblem ?? "")
-        }
         let feed = AudioFeed()
-        input.installTap(onBus: 0, bufferSize: 1024, format: format, block: Self.tapBlock(feeding: feed))
+        mic.send(to: feed)
         defer {
-            engine.stop()
-            input.removeTap(onBus: 0)
+            mic.send(to: nil)
             feed.set(nil)
-        }
-        engine.prepare()
-        do {
-            try engine.start()
-        } catch {
-            Self.lastProblem = error.localizedDescription
-            throw SpeechListenerError.micBusy(error.localizedDescription)
         }
 
         var problems: [String] = []
@@ -297,8 +324,8 @@ final class SystemSpeechListener: SpeechListening {
         }
     }
 
-    /// Hands audio buffers from the audio thread to whichever recognition request is current.
-    final class AudioFeed: @unchecked Sendable {
+    /// Hands the mic's audio to whichever recognition request is current.
+    final class AudioFeed: MicConsumer, @unchecked Sendable {
         private let lock = NSLock()
         private var request: SFSpeechAudioBufferRecognitionRequest?
 
@@ -311,11 +338,7 @@ final class SystemSpeechListener: SpeechListening {
         }
     }
 
-    // These run on audio and recogniser threads, so they're built outside the main actor.
-    private nonisolated static func tapBlock(feeding feed: AudioFeed) -> AVAudioNodeTapBlock {
-        { buffer, _ in feed.append(buffer) }
-    }
-
+    // This runs on a recogniser thread, so it's built outside the main actor.
     private nonisolated static func resultHandler(
         _ continuation: AsyncStream<RecognitionEvent>.Continuation
     ) -> @Sendable (SFSpeechRecognitionResult?, (any Error)?) -> Void {

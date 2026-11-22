@@ -12,7 +12,11 @@ protocol CuePlaying: AnyObject {
     func play(_ cue: CueSound)
 }
 
-enum CueSound: Sendable { case listening }
+enum CueSound: Sendable {
+    case listening
+    /// A short rising tune between questions, now and then (`TurnVariety`).
+    case jingle
+}
 
 /// Generates its sounds in code (no audio assets) and plays them through `AVAudioEngine`.
 @MainActor
@@ -29,6 +33,16 @@ final class EngineCuePlayer: CuePlaying {
         let freq = t < 0.15 ? 660.0 : 990.0
         let envelope = max(0, 1 - (t.truncatingRemainder(dividingBy: 0.175)) / 0.175)
         return Float(sin(2 * .pi * freq * t) * envelope * 0.25)
+    }
+    /// Four soft rising notes, about a second (`ListenScript.jingleLength` leaves room for it).
+    private lazy var jingle = Self.buffer(format: format, seconds: 1.0) { t in
+        let notes = [523.25, 659.25, 783.99, 1046.5]
+        let step = 0.2
+        let index = min(Int(t / step), notes.count - 1)
+        let start = Double(index) * step
+        let length = index == notes.count - 1 ? 1.0 - start : step
+        let envelope = max(0, 1 - (t - start) / length)
+        return Float(sin(2 * .pi * notes[index] * t) * envelope * 0.2)
     }
     private var isRunning = false
     /// Whether the tick should be playing, so it comes back after the engine restarts.
@@ -92,7 +106,11 @@ final class EngineCuePlayer: CuePlaying {
 
     func play(_ cue: CueSound) {
         guard isRunning else { return }
-        player.scheduleBuffer(chime, at: nil, options: .interrupts)
+        let sound = switch cue {
+        case .listening: chime
+        case .jingle: jingle
+        }
+        player.scheduleBuffer(sound, at: nil, options: .interrupts)
         player.scheduleBuffer(silence, at: nil, options: .loops)
     }
 

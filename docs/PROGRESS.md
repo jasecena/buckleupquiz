@@ -13,21 +13,25 @@ The website, domain and anonymous error reports are live on AWS. Paid features a
 the App Store agreement, banking and tax are done; they can be sold once the products are created
 in App Store Connect.
 
-## What's new in 0.3.6
+## What's new in 0.3.7
 
 ### New features
-- **Reset all data** for testers (Settings → Testing, TestFlight only): back to a fresh install,
-  including the iCloud and Keychain backup. Purchases stay with the Apple ID (ADR-0027).
+- **20 questions each** is now a game length, next to 5, 10 and 15. A game still has at most 50
+  questions, so 3 or more players get fewer each (3 players: 16 each).
+- **Variety between questions:** before each question except the first, the app picks at random
+  1–2 seconds of quiet, a short line ("Thinking caps on!") or a little tune. Long or hard
+  questions are sometimes read twice ("Once more…").
 
 ### Changes and fixes
-- **Answers are the letter only:** A, B or C, or "true" / "false". "Correct!" is only said for
-  the right letter, and the answer's words are never checked, so a wrong answer is never called
-  right. If the recogniser isn't sure which letter it heard, it keeps listening (ADR-0026).
-- The tip at the start of a game now says "Say the letter, A, B or C, as soon as you know it!",
-  and the note in Settings → Answers no longer mentions a beep.
-- Players can only be renamed, never deleted (ADR-0025).
-- Clean-up: the listening time is fixed (leftover "moving deadline" code removed), and Endless
-  mode leftovers are gone. Nothing you see changes.
+- **Voice answers work with the screen locked.** The microphone now stays on for the whole game
+  (ADR-0028). Before, iOS refused to start it in the background, and the game stopped listening.
+  The orange mic dot now shows for the whole game.
+- If the microphone is busy for one answer (a phone call), the game tries again on the next
+  question, instead of stopping listening for the rest of the game.
+- **The ending is clearer:** "That's the end of the game! That was 15 questions each. … If you'd
+  like to play some more, start a new game!" It said "end of the ride", which sounded like the
+  car trip. The number is what was really played: when there aren't enough new questions left
+  today, a game can be shorter than chosen.
 
 ## Decisions for you
 
@@ -123,14 +127,18 @@ Each removes extra code that can go wrong. All are low risk, and recommended.
 ### Playing
 - Topic grid. One tap starts a game with the players and length from last time.
 - Named players (up to 6), each getting questions for their own age.
-- Every player gets the same number of questions, planned before the game starts. Games are 5, 10
-  or 15 questions each, 50 at most.
+- Every player gets the same number of questions, planned before the game starts. Games are 5, 10,
+  15 or 20 questions each, 50 at most.
 - The app reads the question and all the options, then listens straight away for 6 s, with a
   tick sound and a countdown.
-- Answers by letter (see 0.3.6). There is never a "wrong" sound or "not quite": if nothing clear
-  is heard, the answer is shared and the game moves on.
+- Answers by letter: A, B or C, or true / false (ADR-0026). There is never a "wrong" sound or
+  "not quite": if nothing clear is heard, the answer is shared and the game moves on.
 - "Mia, this one's for you!" on each player's first turn, then just "Mia."
 - Skip before the answer gives the same player a new question.
+- Variety between questions (quiet, a short line or a tune), and long or hard questions sometimes
+  read twice.
+- The ending says how many questions were played and invites a new game.
+- Voice answers keep working with the screen locked (the mic stays on for the game).
 - Scoreboard during the game (can be turned off). Scores are read out at the end, with streaks
   and badges.
 - Talk About prompts (Parent mode, off by default, 30 s timer).

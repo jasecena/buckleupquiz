@@ -2,7 +2,10 @@
 /// English only for v1; this is the seam for localisation later.
 public enum Phrases {
     public static let intro = "Buckle up, kids… question one!"
-    public static let outroPrefix = "That's the end of the ride!"
+    /// "Game", not "ride": the car trip goes on, only the quiz has ended.
+    public static let outroPrefix = "That's the end of the game!"
+    /// Said last, so everyone knows the quiz is over and another game is a tap away.
+    public static let playAgain = "If you'd like to play some more, start a new game!"
     public static let welcomeBack = "Welcome back! Let's keep going."
     public static let listening = "I'm listening."
     public static let greatChat = "Great chat!"
@@ -13,6 +16,17 @@ public enum Phrases {
     public static let sharedReviewIntro = "This one came up for someone else. Let's see!"
     /// Answers are judged by the letter only (ADR-0026), so that's what the kids are asked for.
     public static let voiceTip = "Say the letter, A, B or C, as soon as you know it!"
+    /// Between questions now and then (`TurnVariety`), so the game has some breathing room.
+    public static let betweenQuestions = [
+        "Okay, here comes the next one…",
+        "Ready? Let's keep going!",
+        "Ooh, I like this next one.",
+        "Thinking caps on!",
+        "Let's see who knows this one…",
+        "Here we go again!",
+    ]
+    /// Before a long or hard question is read a second time.
+    public static let onceMore = "Once more…"
     public static let pausedByVoice = "Paused. Press play when you're ready."
     public static let talkItOver = "Take your time and talk it over. Press next when you're ready."
 
@@ -85,11 +99,21 @@ public enum Phrases {
         player.name.isEmpty ? "You earned the \(badge.title) badge!" : "\(player.name) earned the \(badge.title) badge!"
     }
 
-    /// End of a Listen-mode session (no scores): "That's the end of the ride! Great job, Mia and Leo!"
-    public static func listenOutro(players: [Player]) -> String {
+    /// "That's the end of the game! That was 15 questions each." The number is how many were
+    /// really played, which is fewer than asked for when there weren't enough new questions.
+    public static func outroOpening(each: Int?, players: Int) -> String {
+        guard let each, each > 0 else { return outroPrefix }
+        let questions = each == 1 ? "1 question" : "\(each) questions"
+        return "\(outroPrefix) That was \(questions)\(players > 1 ? " each" : "")."
+    }
+
+    /// End of a game without scores: "That's the end of the game! That was 10 questions each.
+    /// Great job, Mia and Leo!"
+    public static func listenOutro(players: [Player], each: Int? = nil) -> String {
+        let opening = outroOpening(each: each, players: players.count)
         let names = players.map(\.name).filter { !$0.isEmpty }
-        guard !names.isEmpty else { return "\(outroPrefix) Great listening, everyone!" }
-        return "\(outroPrefix) Great job, \(listJoined(names))!"
+        guard !names.isEmpty else { return "\(opening) Great listening, everyone!" }
+        return "\(opening) Great job, \(listJoined(names))!"
     }
 
     /// Said after the scores: voice detection can miss answers, so the kids know it can be fixed.
@@ -97,13 +121,16 @@ public enum Phrases {
 
     /// End-of-session announcement, e.g. "Mia wins with 80 points! Leo got 60 points!"
     /// Nobody is ever announced with zero points: they get "Great listening" instead.
-    public static func scoreAnnouncement(_ entries: [ScoreboardEntry]) -> String {
+    public static func scoreAnnouncement(_ entries: [ScoreboardEntry], each: Int? = nil) -> String {
         let named = entries.filter { !$0.player.name.isEmpty }
-        guard named.contains(where: { $0.points > 0 }) else { return listenOutro(players: named.map(\.player)) }
-        if named.count == 1 {
-            return "\(outroPrefix) \(named[0].player.name) got \(points(named[0].points))!"
+        guard named.contains(where: { $0.points > 0 }) else {
+            return listenOutro(players: named.map(\.player), each: each)
         }
-        var parts = ["\(outroPrefix) Here are the scores…"]
+        let opening = outroOpening(each: each, players: entries.count)
+        if named.count == 1 {
+            return "\(opening) \(named[0].player.name) got \(points(named[0].points))!"
+        }
+        var parts = ["\(opening) Here are the scores…"]
         let winners = named.filter { $0.rank == 1 }
         if winners.count > 1 {
             let names = listJoined(winners.map(\.player.name))

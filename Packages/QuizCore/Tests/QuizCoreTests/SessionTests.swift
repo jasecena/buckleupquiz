@@ -353,12 +353,28 @@ struct ListenScriptTests {
         }
     }
 
+    @Test func theOutroSaysHowManyQuestionsWerePlayed() {
+        let mia = Player(id: "mia", name: "Mia", age: 7)
+        let leo = Player(id: "leo", name: "Leo", age: 11)
+        #expect(Phrases.listenOutro(players: [mia, leo], each: 15)
+            == "That's the end of the game! That was 15 questions each. Great job, Mia and Leo!")
+        #expect(Phrases.outroOpening(each: 1, players: 1) == "That's the end of the game! That was 1 question.")
+        #expect(Phrases.outroOpening(each: nil, players: 2) == Phrases.outroPrefix)
+        #expect(!Phrases.outroPrefix.contains("ride"), "the car trip isn't over, only the game")
+    }
+
+    @Test func twentyEachIsAChoice() {
+        #expect(SessionLength.presets.contains(.questions(20)))
+        #expect(SessionLength.questions(20).each(players: 2) == 20)
+        #expect(SessionLength.questions(20).each(players: 3) == 16, "a game stays within 50 questions")
+    }
+
     @Test func listenOutroNamesThePlayers() {
         let mia = Player(id: "m", name: "Mia", age: 7)
         let leo = Player(id: "l", name: "Leo", age: 11)
-        #expect(Phrases.listenOutro(players: [mia, leo]) == "That's the end of the ride! Great job, Mia and Leo!")
+        #expect(Phrases.listenOutro(players: [mia, leo]) == "That's the end of the game! Great job, Mia and Leo!")
         #expect(Phrases.listenOutro(players: [.listener(ageBand: .sixToEight)])
-            == "That's the end of the ride! Great listening, everyone!")
+            == "That's the end of the game! Great listening, everyone!")
     }
 
     @Test func settingsFromOlderBuildsStillDecode() throws {
