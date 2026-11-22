@@ -4,7 +4,7 @@ A plain-language view of what's done and what's left. The detailed engineering c
 [STAGES.md](STAGES.md), and the decisions are in [adr/](adr/). Every list is ordered with the
 quickest wins first.
 
-**Last updated:** 2026-11-22. **Latest build:** v0.3.7 (build 11) on TestFlight.
+**Last updated:** 2026-11-22. **Latest build:** v0.3.8 (build 12) on TestFlight.
 
 ## Where we are
 The app plays a full hands-free game in the car: it reads questions, listens for answers, keeps
