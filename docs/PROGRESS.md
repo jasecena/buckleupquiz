@@ -96,9 +96,12 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
       (ADR-0022).
 - [ ] App Store listing: description (it must explain the subscription), age rating, Kids
       Category age band and App Review contact details (ADR-0022).
-- [ ] Privacy label (Diagnostics, not linked) and the final privacy policy (ADR-0020).
-- [ ] Network check: the app only talks to api.buckleupquiz.com, and only sends anonymous error
-      reports (ADR-0004, ADR-0020).
+- [ ] Privacy label in App Store Connect: Diagnostics only (crash data, performance data,
+      other diagnostic data), not linked to identity, not used for tracking. The privacy policy
+      is final (22 November 2026).
+- [ ] Network check: the code was checked on 22 November 2026 (only anonymous error reports to
+      api.buckleupquiz.com, plus Apple's purchases and iCloud). To finish: turn on Settings →
+      Privacy & Security → App Privacy Report, play a game, and check the domains listed.
 - [ ] Build with Xcode 27 before April 2027 (a setting, once GitHub has it).
 
 ### Medium (a few days of work, or tests on a real phone)
