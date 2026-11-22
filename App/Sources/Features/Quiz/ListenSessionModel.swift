@@ -93,7 +93,22 @@ final class ListenSessionModel {
     var showsScores: Bool { showScoreboard && (isTurnBased || scoreboard.contains { $0.points > 0 } || hasAttempts) }
     /// The final scoreboard (with the pencil to fix scores) for named players, even if nobody
     /// was heard: detection can miss answers, and a grown-up can put the scores right.
-    var showsFinalScores: Bool { showScoreboard && (isTurnBased || scoreboard.contains { $0.points > 0 }) }
+    var showsFinalScores: Bool {
+        showScoreboard && resultsAreReliable && (isTurnBased || scoreboard.contains { $0.points > 0 })
+    }
+
+    /// Voice games only announce the scores and the winner when they can be trusted (product
+    /// decision, 2026-11-22): never if the game went to the background (answers there are read
+    /// out, not heard, ADR-0029), and never if more than `maxUnheardForResults` answers weren't
+    /// heard. Otherwise the game just ends with "Great job, Mia and Leo!", and nothing is said
+    /// about why. Points still count towards badges and stats. Listen mode is scored by taps.
+    var resultsAreReliable: Bool {
+        !startedInVoice || (!wentToBackground && unheardAnswers <= Self.maxUnheardForResults)
+    }
+    static let maxUnheardForResults = 2
+    @ObservationIgnored private var wentToBackground = false
+    /// Answers not heard in a voice game: silence, mumbles, a mic that failed, or the background.
+    @ObservationIgnored private var unheardAnswers = 0
 
     /// Called when a grown-up fixes a score after the game: player id and the change in points.
     @ObservationIgnored var onScoreAdjusted: ((String, Int) -> Void)?
@@ -249,6 +264,7 @@ final class ListenSessionModel {
     func movedToBackground() {
         guard !isInBackground, status != .finished else { return }
         isInBackground = true
+        if startedInVoice { wentToBackground = true }
         if isVoice { deps.listener?.stopMic() }
     }
 
@@ -565,6 +581,7 @@ final class ListenSessionModel {
         guard isVoice, !isInBackground, let listener = deps.listener, let turn else {
             // Voice is off, the recogniser broke, or the app is in the background, where speech
             // recognition doesn't work (ADR-0029): behave like Listen mode.
+            if startedInVoice { unheardAnswers += 1 }
             try await countdown(seconds: seconds, ticking: true, generation: generation)
             return
         }
@@ -606,6 +623,7 @@ final class ListenSessionModel {
                 voiceOffHint = "Not listening. \(guide.problem): \(guide.path)"
             }
             voiceCounts["failed", default: 0] += 1
+            unheardAnswers += 1
             var fields = Self.describe(error)
             fields["input"] = deps.audioSession?.inputType ?? "unknown"
             deps.telemetry?.record("voice.listenFailed", fields)
@@ -630,9 +648,11 @@ final class ListenSessionModel {
             record(answerOutcome)
         case .garbled:
             voiceCounts["unclear", default: 0] += 1
+            unheardAnswers += 1
             record(.unheard)
         case .silence:
             voiceCounts["silent", default: 0] += 1
+            unheardAnswers += 1
             record(.unheard)
         }
     }
@@ -744,7 +764,8 @@ final class ListenSessionModel {
             // With the scoreboard off, just "Great job, Mia and Leo!" (badges are still cheered).
             scoreboard = session.scoreboard
             earnedBadges = newlyEarnedBadges()
-            let ending = showScoreboard ? Phrases.scoreAnnouncement(scoreboard, each: session.plannedEach)
+            let ending = showScoreboard && resultsAreReliable
+                ? Phrases.scoreAnnouncement(scoreboard, each: session.plannedEach)
                 : Phrases.listenOutro(players: session.config.players, each: session.plannedEach)
             closingMessage = ([ending] + earnedBadges.map { Phrases.badgeEarned($0.badge, by: $0.player) })
                 .joined(separator: " ")
@@ -799,6 +820,7 @@ final class ListenSessionModel {
         var fields = voiceCounts.mapValues(String.init)
         fields["mode"] = startedInVoice ? "voice" : (answerMode == .voice ? "voiceUnavailable" : "listen")
         fields["turns"] = String(session.turnsPlayed)
+        fields["resultsAnnounced"] = String(resultsAreReliable)
         fields["players"] = String(session.config.players.count)
         fields["input"] = deps.audioSession?.inputType ?? "unknown"
         if startedInVoice, !isVoice { fields["fellBackToListen"] = "true" }

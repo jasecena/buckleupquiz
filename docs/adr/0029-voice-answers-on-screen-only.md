@@ -22,6 +22,12 @@ other apps, but it can stop the screen from locking by itself.
 - **Back on screen** the mic comes on again, and the next question is answered out loud.
 - The rest of ADR-0028 stands: on screen the mic runs for the whole game, a phone call gives
   it back afterwards, and a long pause turns it off.
+- **No winner after the background:** if a voice game went to the background at any point,
+  the scores and the winner aren't announced or shown at the end, because answers there weren't
+  heard. The same goes for a game where more than 2 answers weren't heard (silence, mumbles, a
+  failed mic). The game ends with "Great job, Mia and Leo!" and nothing is said about why
+  ("joy, not correction"). Points still count towards badges and stats. Listen mode is scored
+  by taps, so it always shows its scores.
 - Settings → Answers and the "Keep playing in the background?" question say that answers are
   only heard while the app is on screen.
 

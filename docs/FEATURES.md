@@ -70,6 +70,7 @@ Game loop per question:
 
 ### 2.3 Hands-free, car-friendly audio
 - Audio plays through car Bluetooth or CarPlay audio, or AirPods.
+- **Scores only when they're reliable:** a voice game that went to the background, or where more than 2 answers weren't heard, ends without the scores or a winner ("Great job, Mia and Leo!"), with nothing said about why.
 - **Background audio mode:** the quiz keeps running with the screen locked. Voice answers are only heard while the app is on screen (Apple speech recognition does not run in the background), so during a voice game the screen stays on, and in the background the answers are read out (ADR-0029).
 - Shows lock-screen "Now Playing" info (topic and question number) via `MPNowPlayingInfoCenter`.
 - Handles interruptions such as phone calls and navigation prompts: it pauses, then resumes or repeats the current question.

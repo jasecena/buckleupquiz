@@ -23,6 +23,9 @@ in App Store Connect.
   - **In the background** (screen locked by hand, or another app open) the mic is off (no
     orange dot) and the answers are read out, as in "Just listen".
   - **Back on screen** it listens again from the next question.
+- **No winner when the scores can't be trusted:** a voice game that went to the background, or
+  where more than 2 answers weren't heard, ends with "Great job, Mia and Leo!" instead of the
+  scores and the winner. Points still count towards badges.
 
 ## What's new in 0.3.7
 

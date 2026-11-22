@@ -325,6 +325,50 @@ struct ListenSessionModelTests {
         #expect(!listener.micOn)
     }
 
+    @Test func twoMissedAnswersStillAnnounceTheScores() async {
+        let (model, _) = makeVoiceModel([[FakeListener.rightLetter]], questions: 3, length: 3)
+        model.start()
+        await model.runner?.value
+        #expect(model.resultsAreReliable)
+        #expect(model.showsFinalScores)
+        #expect(speech.spoken.last?.contains("Mia got 10 points") == true)
+    }
+
+    @Test func moreThanTwoMissedAnswersMeansNoScoresOrWinner() async {
+        let (model, _) = makeVoiceModel([[FakeListener.rightLetter]], questions: 4, length: 4)
+        model.start()
+        await model.runner?.value
+        #expect(!model.resultsAreReliable, "3 answers weren't heard")
+        #expect(!model.showsFinalScores)
+        let ending = speech.spoken.last ?? ""
+        #expect(ending.contains("Great job, Mia!"))
+        #expect(!ending.contains("points") && !ending.contains("wins") && !ending.contains(Phrases.scoreFixNote))
+        #expect(!ending.contains("heard"), "nothing is said about why")
+        #expect(model.scoreboard.first?.points == 10, "the point still counts")
+    }
+
+    @Test func goingToTheBackgroundMeansNoScoresOrWinner() async {
+        let (model, _) = makeVoiceModel([[FakeListener.rightLetter], [FakeListener.rightLetter]], questions: 2, length: 2)
+        model.start()
+        model.movedToBackground()
+        model.movedToForeground()
+        await model.runner?.value
+        #expect(!model.resultsAreReliable)
+        #expect(!model.showsFinalScores)
+        let ending = speech.spoken.last ?? ""
+        #expect(ending.contains("Great job, Mia!"))
+        #expect(!ending.contains("points"))
+        #expect((model.scoreboard.first?.points ?? 0) > 0, "points still count")
+    }
+
+    @Test func listenModeScoresAreAlwaysAnnounced() {
+        let model = makeModel()
+        model.start()
+        model.movedToBackground()
+        #expect(model.resultsAreReliable, "tapped scores don't depend on hearing")
+        model.stop()
+    }
+
     @Test func aBusyMicIsTriedAgainNextTurn() async {
         let listener = FakeListener([[FakeListener.rightLetter]],
                                     failure: SpeechListenerError.micBusy("call"), failsOnce: true)
