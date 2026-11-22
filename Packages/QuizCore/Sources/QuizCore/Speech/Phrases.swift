@@ -11,7 +11,8 @@ public enum Phrases {
     /// Said before a review question, so it feels like a callback, not a repeat.
     public static let ownReviewIntro = "Here's one from before. Do you remember?"
     public static let sharedReviewIntro = "This one came up for someone else. Let's see!"
-    public static let voiceTip = "Say your answer as soon as you know it!"
+    /// Answers are judged by the letter only (ADR-0026), so that's what the kids are asked for.
+    public static let voiceTip = "Say the letter, A, B or C, as soon as you know it!"
     public static let pausedByVoice = "Paused. Press play when you're ready."
     public static let talkItOver = "Take your time and talk it over. Press next when you're ready."
 

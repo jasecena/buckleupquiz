@@ -68,6 +68,12 @@ final class ProgressSync {
         }
     }
 
+    /// Deletes every saved copy (the tester reset). Changes after this are saved as usual.
+    func eraseBackup() {
+        pendingSave?.cancel()
+        for storage in storages { storage.erase() }
+    }
+
     func save() {
         let backup = Backup(allowance: allowance.state, players: players.snapshot())
         guard let data = try? JSONEncoder().encode(backup) else { return }
@@ -80,6 +86,7 @@ final class ProgressSync {
 protocol BackupStorage {
     func read() -> Data?
     func write(_ data: Data)
+    func erase()
 }
 
 /// The family's own iCloud (key-value storage, up to 1 MB). Follows their Apple ID to a new
@@ -98,6 +105,8 @@ struct ICloudKeyValueStorage: BackupStorage {
         guard data.count < 900_000 else { return }
         store.set(data, forKey: Self.key)
     }
+
+    func erase() { store.removeObject(forKey: Self.key) }
 }
 
 /// This iPhone's Keychain, which iOS keeps when the app is deleted, so reinstalling doesn't
@@ -131,4 +140,6 @@ struct KeychainStorage: BackupStorage {
             SecItemAdd(item as CFDictionary, nil)
         }
     }
+
+    func erase() { SecItemDelete(query as CFDictionary) }
 }

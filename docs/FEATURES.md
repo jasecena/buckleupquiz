@@ -135,12 +135,11 @@ After the question is read:
   up one of the game's questions. After the answer, Next moves on to the next player.
 
 ### 3.4 Answer matching (in `QuizEngine`, unit-tested)
-- Normalise both sides: lowercase, strip punctuation, ignore "the/a/an", trim.
-- Accept any entry in the question's `acceptedAnswers` list.
-- Number handling: "seven" equals "7", and "twenty one" equals "21".
-- Fuzzy match using Levenshtein distance, with a threshold scaled to answer length, for example ≤1 for short words and ≤2 for words longer than 6 letters.
-- Multiple choice: accept the option letter ("B"), the option text, or "option B".
-- Keep all of the speech recognizer's alternative transcriptions and accept a match from any of them.
+- Letters only ([ADR-0026](adr/0026-letter-only-answers.md)): multiple choice accepts the option
+  letter ("B", "option B", "I think it's B"); true/false accepts "true" or "false". The option's
+  words are never checked, so a wrong answer can't be called right.
+- The speech recognizer's alternative transcriptions must agree on the letter; if they don't,
+  keep listening.
 
 ### 3.5 Scoring
 - +10 points for a correct answer, with a streak bonus of +5 for each correct answer after the first two in a row.

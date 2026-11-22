@@ -1,6 +1,6 @@
 # 0018. Hands-free voice answers with turn-based scoring
 
-- **Status:** Accepted
+- **Status:** Accepted. Amended by [ADR-0026](0026-letter-only-answers.md): only the option letter (or true/false) counts as an answer.
 - **Date:** 2026-11-22
 - **Amends:** [ADR-0008](0008-audio-architecture.md) (voice session mode); FEATURES §3.2–3.5; [ADR-0016](0016-leitner-spaced-repetition.md) (voice grades the boxes)
 

@@ -1,6 +1,7 @@
 import Testing
 @testable import QuizCore
 
+/// Letters only (ADR-0026): "Correct!" is said only when the child names the right option's letter.
 @Suite("Answer matching")
 struct AnswerMatcherTests {
     let matcher = AnswerMatcher()
@@ -9,128 +10,66 @@ struct AnswerMatcherTests {
         matcher.match(transcriptions: heard, to: present(q))
     }
 
-    // MARK: Saying the option text instead of the letter
-
+    /// Hobart is option A.
     var tasmania: Question { makeQuestion(answer: "Hobart", accepted: ["hobart city"]) }
 
-    @Test(arguments: ["Hobart", "hobart.", "The Hobart", "Hobert", "hobart city", "I think it's Hobart", "A", "option A"])
-    func acceptsOptionTextVariants(heard: String) {
+    // MARK: The letter
+
+    @Test(arguments: ["A", "a", "A.", "A!", "Ay", "Aye", "Option A", "option a", "It's A", "I think it's A",
+                      "I said A", "Yeah A", "Umm A", "answer A", "letter A"])
+    func acceptsTheRightLetter(heard: String) {
         #expect(judge([heard], tasmania) == .correct(heard: heard))
     }
 
-    @Test(arguments: ["Launceston", "Darwin", "Melbourne", "Ho", "Hobart or Darwin", "B", "D"])
-    func rejectsWrongOptions(heard: String) {
+    @Test(arguments: ["B", "Bee", "option B", "C", "see", "I think it's C"])
+    func otherLettersAreWrong(heard: String) {
         #expect(judge([heard], tasmania) == .incorrect(heard: heard))
     }
 
-    // MARK: The letter alone or the answer alone is enough
-
-    /// "Which state is Perth in?" with Western Australia as option B.
-    var perth: PresentedQuestion {
-        PresentedQuestion(
-            question: makeQuestion(text: "Which state is Perth in?", options: ["Queensland", "Western Australia", "Victoria"],
-                                   answer: "Western Australia", accepted: ["wa"]),
-            options: ["Queensland", "Western Australia", "Victoria"], correctOptionIndex: 1)
-    }
-
-    @Test(arguments: [
-        "B", "b", "B.", "Bee", "Be", "Bea", "Option B", "It's B", "I said B", "B!", "Yeah B",
-        "Western Australia", "western australia", "Western Australia.", "It's Western Australia",
-        "Western Australian", "West Australia", "WA", "W.A.", "W A",
-        "B Western Australia", "B, Western Australia", "Western Australia B",
-    ])
-    func letterOrAnswerAloneIsEnough(heard: String) {
-        #expect(matcher.match(transcriptions: [heard], to: perth) == .correct(heard: heard))
-    }
-
-    @Test(arguments: ["A", "Queensland", "C", "Victoria", "South Australia"])
-    func otherStatesAreNotWesternAustralia(heard: String) {
-        #expect(matcher.match(transcriptions: [heard], to: perth) != .correct(heard: heard))
-    }
-
-    @Test func numbersMatchWordsAndDigits() {
-        let q = makeQuestion(options: ["20", "21", "22"], answer: "21")
-        for heard in ["twenty one", "twenty-one", "21", "B"] {
-            #expect(judge([heard], q) == .correct(heard: heard), "\(heard)")
-        }
-        let seven = makeQuestion(options: ["six", "seven", "eight"], answer: "seven")
-        #expect(judge(["7"], seven) == .correct(heard: "7"))
-    }
-
-    @Test func numbersAreNeverFuzzy() {
-        let q = makeQuestion(options: ["20", "21", "22"], answer: "21")
-        #expect(judge(["22"], q) == .incorrect(heard: "22"))
-        #expect(judge(["twenty two"], q) == .incorrect(heard: "twenty two"))
-        #expect(judge(["23"], q) == .incorrect(heard: "23"))
-    }
-
-    @Test func shortWordsMustBeExact() {
-        let q = makeQuestion(options: ["cat", "bat", "dog"], answer: "cat")
-        #expect(judge(["bat"], q) == .incorrect(heard: "bat"))
-        #expect(judge(["cap"], q) == .incorrect(heard: "cap"))
-        #expect(judge(["cat"], q) == .correct(heard: "cat"))
-    }
-
-    @Test func longWordsAllowTwoEdits() {
-        let q = makeQuestion(options: ["Kookaburra", "Cockatoo", "Magpie"], answer: "Kookaburra")
-        #expect(judge(["cookaburra"], q) == .correct(heard: "cookaburra"))
-        #expect(judge(["kookaburro"], q) == .correct(heard: "kookaburro"))
-        #expect(judge(["cockatoo"], q) == .incorrect(heard: "cockatoo"))
-    }
-
-    @Test func anyAlternativeTranscriptionCounts() {
-        #expect(judge(["low bat", "hobart"], tasmania) == .correct(heard: "hobart"))
-    }
-
-    @Test func silenceIsNoAnswer() {
-        #expect(judge([], makeQuestion()) == .noAnswer)
-        #expect(judge(["", "  ", "?!"], makeQuestion()) == .noAnswer)
-    }
-
-    // MARK: Multiple choice
-
-    var ocean: Question {
-        makeQuestion(type: .multipleChoice, options: ["Indian", "Pacific", "Atlantic"], answer: "Pacific")
-    }
-
-    @Test(arguments: ["B", "b", "option B", "Option bee", "I think it's B", "Pacific", "the pacific", "pacific ocean"])
-    func acceptsChoiceByLetterOrText(heard: String) {
-        var q = ocean
-        q.acceptedAnswers = ["pacific ocean"]
+    @Test(arguments: ["B", "b", "Be", "Bee", "Bea", "Option B", "It's B"])
+    func letterHomophones(heard: String) {
+        let q = makeQuestion(answer: "Launceston")
         #expect(judge([heard], q) == .correct(heard: heard))
     }
 
-    @Test(arguments: ["A", "option C", "Atlantic", "Pacific or Atlantic", "E"])
-    func rejectsWrongOrHedgedChoices(heard: String) {
-        #expect(judge([heard], ocean) == .incorrect(heard: heard))
-    }
-
-    @Test func letterFollowsShuffledOrder() {
+    @Test func lettersFollowTheOptionsReadOut() {
+        #expect(judge(["D"], tasmania) == .incorrect(heard: "D"), "there's no option D")
         var rng = SeededGenerator(seed: 42)
-        let presented = PresentedQuestion(question: ocean, shuffleOptions: true, using: &rng)
+        let presented = PresentedQuestion(question: tasmania, shuffleOptions: true, using: &rng)
         let index = try! #require(presented.correctOptionIndex)
-        #expect(presented.options?[index] == "Pacific")
+        #expect(presented.options?[index] == "Hobart")
         let letter = PresentedQuestion.letters[index]
         #expect(matcher.match(transcriptions: [letter], to: presented) == .correct(heard: letter))
     }
 
-    // MARK: Scenario
+    // MARK: Words are never checked
 
-    var kindness: Question {
-        makeQuestion(
-            topic: "manners", type: .multipleChoice,
-            options: ["Laugh", "Help them up and ask if they're okay", "Keep playing"],
-            answer: "Help them up and ask if they're okay")
+    @Test(arguments: ["Hobart", "hobart city", "I think it's Hobart", "A Hobart", "Hobart A", "A, Hobart"])
+    func theAnswersWordsDontCount(heard: String) {
+        #expect(judge([heard], tasmania) == .incorrect(heard: heard))
     }
 
-    @Test(arguments: ["B", "help them up", "help them up and ask if they're okay", "ask if they are okay"])
-    func acceptsScenarioParaphrase(heard: String) {
-        #expect(judge([heard], kindness) == .correct(heard: heard))
+    @Test(arguments: ["A or B", "A B", "A, B, C", "not B", "Hey"])
+    func moreThanALetterIsNotAnAnswer(heard: String) {
+        #expect(judge([heard], tasmania) != .correct(heard: heard))
     }
 
-    @Test(arguments: ["laugh", "keep playing", "C"])
-    func rejectsUnkindScenarioChoices(heard: String) {
-        #expect(judge([heard], kindness) == .incorrect(heard: heard))
+    // MARK: The recogniser's guesses must agree
+
+    @Test func agreeingGuessesCount() {
+        #expect(judge(["A", "a", "aye"], tasmania) == .correct(heard: "A"))
+        #expect(judge(["hey A", "A"], tasmania) == .correct(heard: "A"), "guesses that name no option are ignored")
+    }
+
+    @Test func disagreeingGuessesAreNeverRight() {
+        #expect(judge(["B", "A"], tasmania) == .incorrect(heard: "B"))
+        #expect(judge(["A", "B"], tasmania) == .incorrect(heard: "A"))
+        #expect(matcher.chosenOption(transcriptions: ["A", "B"], presented: present(tasmania)) == nil)
+    }
+
+    @Test func silenceIsNoAnswer() {
+        #expect(judge([], tasmania) == .noAnswer)
+        #expect(judge(["", "  ", "?!"], tasmania) == .noAnswer)
     }
 
     // MARK: True/false
@@ -141,13 +80,13 @@ struct AnswerMatcherTests {
                      answer: "True")
     }
 
-    @Test(arguments: ["true", "True!", "yes", "it's true"])
+    @Test(arguments: ["true", "True!", "it's true", "I think it's true"])
     func acceptsTrue(heard: String) {
         #expect(judge([heard], angerOK) == .correct(heard: heard))
     }
 
-    @Test(arguments: ["false", "no", "not true", "true or false", "A"])
-    func rejectsFalseOrHedge(heard: String) {
+    @Test(arguments: ["false", "it's false", "not true", "true or false", "yes", "right", "A"])
+    func onlyTheWordTrueIsRight(heard: String) {
         #expect(judge([heard], angerOK) == .incorrect(heard: heard))
     }
 

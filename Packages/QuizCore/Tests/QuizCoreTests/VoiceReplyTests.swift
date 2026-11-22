@@ -6,13 +6,24 @@ struct VoiceReplyTests {
     let tasmania = present(makeQuestion(options: ["Hobart", "Launceston", "Darwin"], answer: "Hobart"))
 
     @Test func rightAndWrongAnswers() {
-        #expect(VoiceReply.interpret(["I think it's Hobart"], for: tasmania) == .answer(.correct, heard: "I think it's Hobart"))
+        #expect(VoiceReply.interpret(["I think it's A"], for: tasmania) == .answer(.correct, heard: "I think it's A"))
         #expect(VoiceReply.interpret(["a"], for: tasmania) == .answer(.correct, heard: "a"))
-        #expect(VoiceReply.interpret(["Darwin"], for: tasmania) == .answer(.incorrect, heard: "Darwin"))
+        #expect(VoiceReply.interpret(["C"], for: tasmania) == .answer(.incorrect, heard: "C"))
     }
 
     @Test func anyAlternativeTranscriptionCounts() {
-        #expect(VoiceReply.interpret(["hold it", "Hobart"], for: tasmania) == .answer(.correct, heard: "Hobart"))
+        #expect(VoiceReply.interpret(["hold it", "A"], for: tasmania) == .answer(.correct, heard: "A"))
+    }
+
+    @Test func answerWordsAreNotAnswers() {
+        #expect(VoiceReply.interpret(["Hobart"], for: tasmania) == .garbled, "say the letter")
+        #expect(VoiceReply.interpret(["Darwin"], for: tasmania) == .garbled)
+        #expect(!VoiceReply.interpret(["Hobart"], for: tasmania).isConclusive, "keeps listening for the letter")
+    }
+
+    @Test func guessesThatDisagreeKeepListening() {
+        #expect(VoiceReply.interpret(["B", "A"], for: tasmania) == .garbled)
+        #expect(VoiceReply.interpret(["C", "see"], for: tasmania) == .answer(.incorrect, heard: "C"))
     }
 
     @Test func commandsBeatAnswers() {
@@ -31,17 +42,20 @@ struct VoiceReplyTests {
     @Test func chatterAndEchoAreNotWrongAnswers() {
         #expect(VoiceReply.interpret(["Mum can we stop"], for: tasmania) == .garbled)
         #expect(VoiceReply.interpret(["what is the capital of Tasmania"], for: tasmania) == .garbled)
-        #expect(VoiceReply.interpret(["Hobart or Darwin"], for: tasmania) == .garbled, "a hedge isn't a wrong answer")
+        #expect(VoiceReply.interpret(["A or C"], for: tasmania) == .garbled, "a hedge isn't a wrong answer")
         #expect(!VoiceReply.garbled.isConclusive && !VoiceReply.silence.isConclusive)
-        #expect(VoiceReply.interpret(["Darwin"], for: tasmania).isConclusive)
+        #expect(VoiceReply.interpret(["C"], for: tasmania).isConclusive)
         #expect(VoiceReply.interpret(["next"], for: tasmania).isConclusive)
     }
 
     @Test func trueFalseByVoice() {
         let q = present(makeQuestion(type: .trueFalse, text: "Koalas are bears.", answer: "False"))
-        #expect(VoiceReply.interpret(["no"], for: q) == .answer(.correct, heard: "no"))
+        #expect(VoiceReply.interpret(["false"], for: q) == .answer(.correct, heard: "false"))
         #expect(VoiceReply.interpret(["true"], for: q) == .answer(.incorrect, heard: "true"))
+        #expect(VoiceReply.interpret(["no"], for: q) == .garbled, "only true or false")
         #expect(VoiceReply.hints(for: q).contains("false"))
+        #expect(VoiceReply.hints(for: tasmania).contains("B"))
+        #expect(!VoiceReply.hints(for: tasmania).contains("Hobart"))
     }
 
     @Test func voiceStepsListenThenGiveFeedback() {

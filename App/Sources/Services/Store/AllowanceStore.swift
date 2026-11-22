@@ -78,6 +78,11 @@ final class AllowanceStore {
     /// Called after any change, so the backup (iCloud and Keychain) stays current.
     @ObservationIgnored var onChange: (() -> Void)?
 
+    /// Back to a fresh install's allowance (the TestFlight reset, ADR-0027).
+    func reset() {
+        state = State()
+    }
+
     /// Brings in a copy from iCloud, the Keychain or another device.
     func merge(_ other: State) {
         state = state.merged(with: other)

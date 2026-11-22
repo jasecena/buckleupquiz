@@ -59,18 +59,3 @@ struct NumberWordsTests {
         }
     }
 }
-
-@Suite("Levenshtein")
-struct LevenshteinTests {
-    @Test func distances() {
-        #expect(Levenshtein.distance("kitten", "sitting") == 3)
-        #expect(Levenshtein.distance("", "abc") == 3)
-        #expect(Levenshtein.distance("same", "same") == 0)
-    }
-
-    @Test func thresholdScalesWithLength() {
-        #expect(Levenshtein.threshold(forLength: 3) == 0)
-        #expect(Levenshtein.threshold(forLength: 5) == 1)
-        #expect(Levenshtein.threshold(forLength: 9) == 2)
-    }
-}

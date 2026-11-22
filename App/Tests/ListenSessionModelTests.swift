@@ -150,11 +150,12 @@ struct ListenSessionModelTests {
             dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
                                 listener: listener),
             answerMode: .voice, rng: AnyRandomGenerator(seed: 1))
+        listener.asking = { [weak model] in model?.turn?.presented }
         return (model, listener)
     }
 
     @Test func rightSpokenAnswerScoresForThePlayerWhoseTurnItIs() async {
-        let (model, _) = makeVoiceModel([["I think it's answer 0"]])
+        let (model, _) = makeVoiceModel([["I think it's " + FakeListener.rightLetter]])
         var summary: SessionSummary?
         model.onFinish = { summary = $0 }
         model.start()
@@ -170,7 +171,7 @@ struct ListenSessionModelTests {
     }
 
     @Test func wrongAnswerJustSharesTheAnswerAndStartsOver() async {
-        let (model, _) = makeVoiceModel([["another"]])
+        let (model, _) = makeVoiceModel([[FakeListener.wrongLetter]])
         var summary: SessionSummary?
         model.onFinish = { summary = $0 }
         model.start()
@@ -226,7 +227,7 @@ struct ListenSessionModelTests {
     @Test func skippingMidQuestionKeepsItTheSamePlayersTurn() async {
         let mia = Player(id: "mia", name: "Mia", age: 7)
         let leo = Player(id: "leo", name: "Leo", age: 11)
-        let listener = FakeListener([["skip"], ["answer 1"], []])
+        let listener = FakeListener([["skip"], [FakeListener.rightLetter], []])
         let model = ListenSessionModel(
             bank: makeBank(questions: 3, olderCount: 3), config: SessionConfig(topics: ["animals"], players: [mia, leo],
                                                                                 length: .questions(1)),
@@ -234,6 +235,7 @@ struct ListenSessionModelTests {
             dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
                                 listener: listener),
             answerMode: .voice, rng: AnyRandomGenerator(seed: 2))
+        listener.asking = { [weak model] in model?.turn?.presented }
         model.start()
         for _ in 0..<20000 where model.status != .finished { await Task.yield() }
         #expect(model.status == .finished)
@@ -295,7 +297,7 @@ struct ListenSessionModelTests {
     }
 
     @Test func scoreboardCanBeTurnedOff() async {
-        let listener = FakeListener([["answer 0"]])
+        let listener = FakeListener([[FakeListener.rightLetter]])
         let model = ListenSessionModel(
             bank: makeBank(questions: 1), config: SessionConfig(topics: ["animals"],
                                                                 players: [Player(id: "mia", name: "Mia", age: 7)],
@@ -304,6 +306,7 @@ struct ListenSessionModelTests {
             dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
                                 listener: listener),
             answerMode: .voice, showScoreboard: false, rng: AnyRandomGenerator(seed: 1))
+        listener.asking = { [weak model] in model?.turn?.presented }
         #expect(!model.showsScores)
         model.start()
         await model.runner?.value

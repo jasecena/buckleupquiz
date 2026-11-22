@@ -21,7 +21,7 @@ flowchart TB
   subgraph Core["QuizCore (pure Swift, Linux-testable)"]
     QS["QuizSession<br/>turns · selection · scoring"]
     Script["ListenScript + Phrases"]
-    Match["AnswerMatcher<br/>TextNormalizer · NumberWords · Levenshtein"]
+    Match["AnswerMatcher<br/>letters · TextNormalizer"]
     Source["QuestionSource → QuestionBank"]
   end
   Content[("Content/<br/>topics.json<br/>questions/*.json")]

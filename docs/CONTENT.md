@@ -14,7 +14,7 @@ Questions live in `Content/questions/<topic>.json`, one JSON array per topic. To
 | `question` | ✅ | must read aloud in ≤12 s (about 30 words, *including* options) |
 | `options` | multipleChoice | **exactly 3** options. `null` for trueFalse and talkAbout |
 | `answer` | quiz questions | must be one of `options` for multipleChoice; `"True"`/`"False"` for trueFalse; `null` for talkAbout |
-| `acceptedAnswers` | — | other ways to say the *correct option* (`["hobart city"]`). **Never** put option letters here, because options are shuffled |
+| `acceptedAnswers` | — | not used by the app since [ADR-0026](adr/0026-letter-only-answers.md) (answers are the letter only). Optional; **never** put option letters here |
 | `funFact` | — | one short sentence, read after the answer (can be turned off) |
 | `explanation` | values topics | one *kind* sentence on why it's the good choice; always read |
 | `difficulty` | — | 1–5 |

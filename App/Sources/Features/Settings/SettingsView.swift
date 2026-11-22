@@ -8,7 +8,9 @@ struct SettingsView: View {
     @Environment(Telemetry.self) private var telemetry
     @Environment(EntitlementStore.self) private var entitlements
     @Environment(AllowanceStore.self) private var allowance
+    @Environment(AppEnvironment.self) private var environment
     @State private var showPlans = false
+    @State private var confirmReset = false
     @Environment(\.dismiss) private var dismiss
     private let voices = SystemSpeechOutput.availableVoices()
 
@@ -52,7 +54,7 @@ struct SettingsView: View {
                     Text("Answers")
                 } footer: {
                     Text(store.settings.answerMode == .voice
-                         ? "After each question there's a beep. Whoever's turn it is says the answer, and the app keeps score. Say \"skip\", \"repeat\", \"pause\" or \"stop\" any time. Speech is understood on this iPhone and never recorded or sent anywhere. Needs Dictation turned on (Settings → General → Keyboard); Siri can stay off."
+                         ? "After the options are read, whoever's turn it is says the letter (A, B or C, or true or false), and the app keeps score. Say \"skip\", \"repeat\", \"pause\" or \"stop\" any time. Speech is understood on this iPhone and never recorded or sent anywhere. Needs Dictation turned on (Settings → General → Keyboard); Siri can stay off."
                          : "The app reads each answer after the think time. No score is kept.")
                 }
 
@@ -121,10 +123,19 @@ struct SettingsView: View {
                 if entitlements.isTestBuild {
                     Section {
                         Toggle("BuckleUp Basic (testing)", isOn: $entitlements.testerUnlock)
+                        Button("Reset all data", role: .destructive) { confirmReset = true }
+                            .confirmationDialog("Reset all data?", isPresented: $confirmReset, titleVisibility: .visible) {
+                                Button("Reset all data", role: .destructive) {
+                                    environment.resetAllData()
+                                    dismiss()
+                                }
+                            } message: {
+                                Text("Deletes every player, their progress and scores, the questions used and the settings, on this iPhone and in its iCloud backup. The app starts as if it was just installed. This can't be undone.")
+                            }
                     } header: {
                         Text("Testing")
                     } footer: {
-                        Text("TestFlight only, until purchases are added. Unlocks every topic, 40 new questions each day the app is opened, fixing scores and games with up to \(PlayerStore.maxPlayers) players.")
+                        Text("TestFlight only. BuckleUp Basic (testing) unlocks every topic, 40 new questions each day the app is opened, fixing scores and games with up to \(PlayerStore.maxPlayers) players. Reset all data starts again from a fresh install; another iPhone on the same iCloud account can bring its own copy back.")
                     }
                 }
 

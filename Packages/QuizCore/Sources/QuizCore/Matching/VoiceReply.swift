@@ -20,30 +20,24 @@ public enum VoiceReply: Equatable, Sendable {
         }
     }
 
-    /// Interprets every alternative transcription of one reply. A wrong answer has to name one
-    /// of the other options; random words never count against a child (ADR-0018).
+    /// Interprets every alternative transcription of one reply. An answer has to name an option
+    /// by its letter (or true/false); anything else is never counted against a child (ADR-0026).
     public static func interpret(
         _ transcriptions: [String], for presented: PresentedQuestion, matcher: AnswerMatcher = AnswerMatcher()
     ) -> VoiceReply {
         let heard = transcriptions.filter { !TextNormalizer.tokens($0).isEmpty }
         guard !heard.isEmpty else { return .silence }
         if let command = VoiceCommand.parse(heard) { return .command(command) }
-        if case .correct(let text) = matcher.match(transcriptions: heard, to: presented) {
-            return .answer(.correct, heard: text)
-        }
-        if let options = presented.options,
-           let picked = heard.first(where: { matcher.chosenOption($0, options: options, presented: presented) != nil }) {
-            return .answer(.incorrect, heard: picked)
-        }
-        return .garbled
+        guard let choice = matcher.chosenOption(transcriptions: heard, presented: presented) else { return .garbled }
+        return .answer(choice.index == presented.correctOptionIndex ? .correct : .incorrect, heard: choice.heard)
     }
 
     /// Words worth biasing the recogniser towards for this question.
     public static func hints(for presented: PresentedQuestion) -> [String] {
         var words = ["skip", "next", "repeat", "pause", "stop"]
         switch presented.question.type {
-        case .trueFalse: words += ["true", "false", "yes", "no"]
-        case .multipleChoice: words += presented.optionLetters + (presented.options ?? [])
+        case .trueFalse: words += ["true", "false"]
+        case .multipleChoice: words += presented.optionLetters
         case .talkAbout: words += ["we're done", "all done", "finished"]
         }
         return words

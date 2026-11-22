@@ -86,6 +86,11 @@ final class SettingsStore {
         }
     }
 
+    /// Back to a fresh install's settings (the TestFlight reset, ADR-0027).
+    func reset() {
+        settings = AppSettings()
+    }
+
     private func save() {
         if let data = try? JSONEncoder().encode(settings) { defaults.set(data, forKey: key) }
     }

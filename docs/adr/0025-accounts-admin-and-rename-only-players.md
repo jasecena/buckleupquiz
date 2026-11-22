@@ -1,7 +1,9 @@
 # 0025. Accounts, the admin app, and players that can only be renamed
 
 - **Status:** Accepted for rename-only players (built in 0.3.6). Proposed for accounts and the
-  admin app (later, with M9).
+  admin app (later, with M9). Amended by [ADR-0027](0027-free-access-and-tester-reset.md): free
+  access uses TestFlight now and App Store offer codes after launch, until accounts exist; and
+  TestFlight builds have a "Reset all data" button, the one place players are deleted.
 - **Date:** 2026-11-22
 - **Relates to:** [ADR-0012](0012-future-backend.md) (backend), [ADR-0016](0016-leitner-spaced-repetition.md) (boxes),
   [ADR-0022](0022-free-allowance-packs-and-basic-subscription.md) (allowance), [ADR-0023](0023-progress-survives-reinstall.md) (backup),

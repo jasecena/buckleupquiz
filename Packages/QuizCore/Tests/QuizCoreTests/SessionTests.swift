@@ -399,9 +399,10 @@ struct RepositoryContentTests {
             if q.type.hasOptions {
                 #expect(presented.correctOptionIndex != nil, "\(q.id): answer must be an option")
             }
-            // The canonical answer must always be accepted when said back.
-            let answer = try #require(q.answer)
-            #expect(matcher.match(transcriptions: [answer], to: presented) == .correct(heard: answer), "\(q.id)")
+            // The right letter (or "true"/"false") is always accepted (ADR-0026).
+            let index = try #require(presented.correctOptionIndex)
+            let said = q.type == .trueFalse ? try #require(q.answer) : PresentedQuestion.letters[index]
+            #expect(matcher.match(transcriptions: [said], to: presented) == .correct(heard: said), "\(q.id)")
         }
     }
 }

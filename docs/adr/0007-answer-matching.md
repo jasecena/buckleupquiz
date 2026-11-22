@@ -1,6 +1,6 @@
 # 0007. Answer-matching rules
 
-- **Status:** Accepted. Amended by [ADR-0015](0015-choice-questions-and-named-players.md): there are no open questions any more, so rule 3 now applies to saying an option's text.
+- **Status:** Accepted. Mostly superseded by [ADR-0026](0026-letter-only-answers.md): answers are the letter only (or true/false), and the option text, fuzzy matching and key-word overlap are gone. Amended by [ADR-0015](0015-choice-questions-and-named-players.md): there are no open questions any more, so rule 3 now applies to saying an option's text.
 - **Date:** 2026-11-22
 
 ## Context

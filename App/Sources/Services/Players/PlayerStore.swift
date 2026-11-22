@@ -76,6 +76,13 @@ final class PlayerStore {
         save()
     }
 
+    /// Deletes every player and their progress. Only for the TestFlight "Reset all data" button
+    /// (ADR-0027): the one place players are removed rather than renamed (ADR-0025).
+    func eraseAll() {
+        for profile in players { context.delete(profile) }
+        save()
+    }
+
     // MARK: Backup (ADR-0023)
 
     /// One player as stored in the backup.

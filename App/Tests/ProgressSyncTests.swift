@@ -8,6 +8,7 @@ final class MemoryStorage: BackupStorage {
     var data: Data?
     func read() -> Data? { data }
     func write(_ data: Data) { self.data = data }
+    func erase() { data = nil }
 }
 
 @MainActor
@@ -36,6 +37,26 @@ struct ProgressSyncTests {
         #expect(newPlayers.players.first?.learning.card("ani-0001")?.box == 2)
         #expect(newAllowance.state.unlocked.isSuperset(of: ["ani-0001", "ani-0002"]), "no free questions twice")
         #expect(newAllowance.state.packCredits == 50)
+    }
+
+    @Test func testerResetDoesNotComeBackAfterAReinstall() throws {
+        let keychain = MemoryStorage()
+        let (allowance, players) = freshStores()
+        players.add(name: "Mia", age: 7)
+        allowance.charge(["ani-0001": .topic], hasBasic: false, day: 10)
+        let sync = ProgressSync(allowance: allowance, players: players, storages: [keychain])
+        sync.save()
+
+        sync.eraseBackup()
+        players.eraseAll()
+        allowance.reset()
+        #expect(players.players.isEmpty)
+        #expect(allowance.state.unlocked.isEmpty)
+        #expect(keychain.data == nil)
+
+        let (newAllowance, newPlayers) = freshStores()
+        ProgressSync(allowance: newAllowance, players: newPlayers, storages: [keychain]).restore()
+        #expect(newPlayers.players.isEmpty, "nothing to bring back")
     }
 
     @Test func twoCopiesMergeWithoutLosingAnything() {

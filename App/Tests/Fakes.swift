@@ -55,8 +55,13 @@ final class FakeAudioSession: AudioSessionControlling {
 }
 
 /// Replies with scripted transcriptions, one per `listen` call ([] = silence).
+/// `FakeListener.rightLetter` and `.wrongLetter` stand for the letter of the right (or a wrong)
+/// option of whatever is being asked, since options are shuffled.
 @MainActor
 final class FakeListener: SpeechListening {
+    static let rightLetter = "<right letter>"
+    static let wrongLetter = "<wrong letter>"
+
     var replies: [[String]]
     var failure: (any Error)?
     private(set) var listens = 0
@@ -66,13 +71,24 @@ final class FakeListener: SpeechListening {
         self.failure = failure
     }
 
-    func listen(until deadline: @escaping @MainActor () -> Date, hints: [String],
+    func listen(for seconds: Double, hints: [String],
                 isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String] {
         listens += 1
         await Task.yield()
         try Task.checkCancellation()
         if let failure { throw failure }
-        return replies.isEmpty ? [] : replies.removeFirst()
+        return replies.isEmpty ? [] : replies.removeFirst().map(resolve)
+    }
+
+    /// The question being asked, so `rightLetter` / `wrongLetter` can be turned into a letter.
+    var asking: (@MainActor () -> PresentedQuestion?)?
+
+    private func resolve(_ text: String) -> String {
+        guard let presented = asking?(), let right = presented.correctOptionIndex else { return text }
+        let letters = presented.optionLetters
+        return text
+            .replacingOccurrences(of: Self.rightLetter, with: letters[right])
+            .replacingOccurrences(of: Self.wrongLetter, with: letters[(right + 1) % letters.count])
     }
 }
 

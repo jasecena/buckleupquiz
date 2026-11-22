@@ -98,6 +98,20 @@ final class AppEnvironment {
         return listener
     }
 
+    /// TestFlight only (ADR-0027): back to a fresh install. Deletes the players and their
+    /// progress, the questions used, packs credited, settings and the Basic test switch, here and
+    /// in the iCloud and Keychain backup, so a reinstall doesn't bring them back. Purchases stay
+    /// with the Apple ID (StoreKit).
+    func resetAllData() {
+        guard entitlements.isTestBuild else { return }
+        sync?.eraseBackup()
+        players.eraseAll()
+        allowance.reset()
+        settings.reset()
+        entitlements.testerUnlock = false
+        refreshAllowance()
+    }
+
     var bank: QuestionBank? {
         if case .loaded(let bank) = content { return bank }
         return nil

@@ -39,8 +39,8 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 ## M1 — Engine ✅
 - [x] Models: `Question` (FEATURES §4.1 schema), `Topic` catalogue, `AgeBand`, `Player`
 - [x] `QuestionSource` + `DirectoryQuestionSource` (bundled JSON), `QuestionBank` index
-- [x] `AnswerMatcher`: normalisation, number words, Levenshtein, choice letters,
-      true/false synonyms, scenario key-word overlap, hedge detection (ADR-0007)
+- [x] `AnswerMatcher`: option letters and true/false only, recogniser guesses must agree
+      (ADR-0007, ADR-0026)
 - [x] `VoiceCommand` parsing
 - [x] `QuestionSelector`: once per player per session, Leitner due-first then new, `minAge`, Talk About toggle
 - [x] `PresentedQuestion`: shuffled options, correct letter
@@ -124,7 +124,8 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
       BuckleUp Basic (A$4.99/month: all topics, 40 new each day the app is opened, 6 players, fix scores)
 - [x] Games planned up front; 0–2 each blocks, 3–4 warns, 5 each minimum; lengths are questions each
 - [x] StoreKit 2 store (products, purchase, restore, Transaction.updates), plans screen, parental gate
-- [ ] Create the products in App Store Connect; Paid Applications agreement (account holder)
+- [x] Paid Applications agreement, banking and tax (account holder); launch prices A$0.99 pack, A$4.99/month Basic
+- [ ] Create the products in App Store Connect
 - [x] Progress survives a reinstall: iCloud key-value storage + Keychain backup, merged at launch (ADR-0023)
 - [x] No Endless mode; games are 5/10/15 each, at most 50 questions
 - [ ] Parental gate before settings, links and support email
@@ -150,6 +151,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] One-time App Store Connect app record + API key secrets ([RELEASING.md](RELEASING.md))
 - [x] First TestFlight upload: 0.1.0 (2), 2026-11-22
 - [x] Internal testing group "Family" (gets every build automatically) with the account holder invited
+- [x] Tester "Reset all data" in Settings → Testing, TestFlight and debug only (ADR-0027)
 - [ ] Build with the iOS 27 SDK (Xcode 27) before April 2027 (App Store Connect warning 90725). The release workflow picks the newest non-beta Xcode on the runner; set `vars.MACOS_RUNNER_LABEL` if a newer image is needed
 - [ ] Real-car tests: 3 or more head units plus CarPlay, road noise, kids
 - [x] Anonymous error reports (ADR-0020): `Telemetry` queue + batches, MetricKit crashes/hangs,
@@ -157,6 +159,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Terraform for AWS: bootstrap (state bucket), domain (buckleupquiz.com, zone, certificate), platform (CloudFront, content bucket, reports Lambda) (ADR-0021)
 - [x] Applied bootstrap (state bucket, least-privilege deployer role + boundary) and platform; `TELEMETRY_URL` set (CloudFront address)
 - [x] buckleupquiz.com registered (Route 53), certificate issued, platform on api.buckleupquiz.com, site on buckleupquiz.com
+- [x] Domain contact verified; buckleupquiz.com verified in App Store Connect
 - [ ] Update the App Store privacy label (Diagnostics, not linked) before the public release
 - [ ] Proxy test: only the telemetry endpoint, only anonymous fields (criterion 10, amended by ADR-0020)
 - [ ] Name checks (IP Australia), domains and handles (FEATURES §0)
