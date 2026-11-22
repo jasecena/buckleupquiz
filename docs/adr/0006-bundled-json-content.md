@@ -1,6 +1,6 @@
 # 0006. Bundled JSON content with a topic catalogue and CI validation
 
-- **Status:** Accepted
+- **Status:** Accepted. Extended by [ADR-0031](0031-downloaded-question-updates.md): the same files are also published as signed downloads; the bundled set is the offline fallback.
 - **Date:** 2026-11-22
 
 ## Context

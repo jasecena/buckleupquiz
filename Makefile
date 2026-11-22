@@ -1,7 +1,7 @@
 # Common tasks. On Linux only the Swift package and content targets work;
 # the iOS app needs macOS + Xcode.
 .PHONY: help generate open test test-core test-core-docker test-content validate validate-strict test-app clean \
-	infra-bootstrap infra-domain infra-platform infra-plan infra-check
+	infra-bootstrap infra-domain infra-platform infra-plan infra-check content-signing-key
 
 SWIFT_IMAGE ?= swift:6.1-noble
 
@@ -70,3 +70,18 @@ infra-platform: ## Content bucket, CloudFront and the error-report function
 infra-plan: ## Show pending changes in every stack
 	$(TF)/domain $(TF_INIT) >/dev/null && $(TF)/domain plan
 	$(TF)/platform $(TF_INIT) >/dev/null && $(TF)/platform plan
+
+# Question updates (ADR-0031). The private key goes only into the GitHub secret; the public half
+# goes into project.yml so the app can check what it downloads.
+content-signing-key: ## Once: make the question-signing key (GitHub secret) and put its public key in project.yml
+	@grep -q 'CONTENT_PUBLIC_KEY: ""' project.yml || [ -n "$(ROTATE)" ] || { \
+		echo "project.yml already has a public key. ROTATE=1 replaces it (apps with the old key stop updating)."; \
+		exit 1; }
+	@set -eu; dir="$$(mktemp -d)"; chmod 700 "$$dir"; key="$$dir/key.pem"; \
+	openssl genpkey -algorithm ed25519 -out "$$key"; \
+	gh secret set CONTENT_SIGNING_KEY < "$$key"; \
+	pub="$$(openssl pkey -in "$$key" -pubout -outform DER | tail -c 32 | base64)"; \
+	shred -u "$$key" 2>/dev/null || rm -P "$$key" 2>/dev/null || rm "$$key"; rmdir "$$dir"; \
+	sed -i.bak "s|CONTENT_PUBLIC_KEY: \".*\"|CONTENT_PUBLIC_KEY: \"$$pub\"|" project.yml; rm project.yml.bak; \
+	echo "Private key: saved only as the GitHub secret CONTENT_SIGNING_KEY."; \
+	echo "Public key written to project.yml ($$pub). Commit and push it."

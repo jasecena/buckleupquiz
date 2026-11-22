@@ -162,7 +162,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] buckleupquiz.com registered (Route 53), certificate issued, platform on api.buckleupquiz.com, site on buckleupquiz.com
 - [x] Domain contact verified; buckleupquiz.com verified in App Store Connect
 - [ ] Update the App Store privacy label (Diagnostics, not linked) before the public release
-- [ ] Proxy test: only the telemetry endpoint, only anonymous fields (criterion 10, amended by ADR-0020)
+- [ ] Proxy test: only the telemetry endpoint (anonymous fields) and question downloads (plain GETs), criterion 10, amended by ADR-0020 and ADR-0031
 - [ ] Name checks (IP Australia), domains and handles (FEATURES §0)
 
 **Exit:** all FEATURES §9 acceptance criteria pass, ready for App Review.
@@ -180,8 +180,10 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [ ] Never in BuckleUp Basic
 
 ## M9 — Backend (later) ⬜
-- [ ] Accept ADR-0012 (CloudKit sync + remote content packs; AWS only if needed)
-- [ ] Remote `QuestionSource` with signed, versioned content packs
+- [ ] Accept ADR-0012 for cloud data (CloudKit sync; AWS only if needed). Content packs are decided by ADR-0031
+- [x] Remote `QuestionSource` with signed, versioned content packs: downloaded question updates,
+      built early for 0.4.0 (ADR-0031). Still to do: the owner's one-time setup (signing key,
+      publisher role) and the first publish
 - [ ] SwiftData CloudKit sync toggle
 - [ ] Privacy label, policy and parental consent updates
 - [ ] Accounts (random account id; players' name and age; question history per player) and the

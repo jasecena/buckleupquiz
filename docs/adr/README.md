@@ -37,3 +37,4 @@ New ADR: copy [template.md](template.md) to the next number.
 | [0028](0028-mic-on-for-the-whole-game.md) | The microphone stays on for the whole game, so answers work with the screen locked | Accepted |
 | [0029](0029-voice-answers-on-screen-only.md) | Voice answers only while the app is on screen; the screen stays on during a voice game | Accepted |
 | [0030](0030-family-questions.md) | Family questions: parents add their own, with on-device AI help and their own voice | Proposed (after launch) |
+| [0031](0031-downloaded-question-updates.md) | New questions without an app update: signed question files downloaded from our CDN | Accepted |

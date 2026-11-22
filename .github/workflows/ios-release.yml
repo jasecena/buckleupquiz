@@ -240,6 +240,8 @@ jobs:
             CODE_SIGN_STYLE=Automatic
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID"
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
+            # The bundled questions' version (ADR-0031): a downloaded set must be newer.
+            CONTENT_VERSION="$(git log -1 --format=%ct)"
           )
           [[ -n "$MARKETING_VERSION" ]] && settings+=(MARKETING_VERSION="$MARKETING_VERSION")
           set -o pipefail

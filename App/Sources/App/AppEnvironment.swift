@@ -23,6 +23,8 @@ final class AppEnvironment {
     /// New questions the family can have, and purchases (ADR-0022).
     let allowance: AllowanceStore
     let store: StoreService
+    /// New questions without an app update (ADR-0031). nil when this build has downloads off.
+    let contentUpdater: ContentUpdater?
     let makeListenDependencies: @MainActor (SettingsStore) -> ListenSessionModel.Dependencies
     @ObservationIgnored private var metricKit: MetricKitCollector?
     /// Progress kept in iCloud and the Keychain, so a reinstall picks up where it left off.
@@ -36,6 +38,7 @@ final class AppEnvironment {
         telemetry: Telemetry? = nil,
         allowance: AllowanceStore = AllowanceStore(defaults: UserDefaults(suiteName: "preview") ?? .standard),
         store: StoreService = StoreService(),
+        contentUpdater: ContentUpdater? = nil,
         makeListenDependencies: @escaping @MainActor (SettingsStore) -> ListenSessionModel.Dependencies
     ) {
         self.settings = settings
@@ -45,6 +48,7 @@ final class AppEnvironment {
         self.telemetry = telemetry ?? Telemetry(endpoint: nil, fileURL: nil, isEnabled: { false })
         self.allowance = allowance
         self.store = store
+        self.contentUpdater = contentUpdater
         self.makeListenDependencies = makeListenDependencies
     }
 
@@ -57,14 +61,16 @@ final class AppEnvironment {
         let store = StoreService()
         store.onPackBought = { [weak allowance] id in allowance?.creditPack(transactionID: id) }
         store.onSubscriptionChanged = { [weak entitlements] active in entitlements?.subscribed = active }
+        let contentUpdater = ContentUpdater.live(telemetry: telemetry)
         let environment = AppEnvironment(
             settings: settings,
             entitlements: entitlements,
             players: PlayerStore.live(),
-            questionSource: BundledContent.source(),
+            questionSource: BundledContent.source(downloaded: contentUpdater?.preferredSet(), telemetry: telemetry),
             telemetry: telemetry,
             allowance: allowance,
             store: store,
+            contentUpdater: contentUpdater,
             makeListenDependencies: { settings in
                 ListenSessionModel.Dependencies(
                     speech: SystemSpeechOutput(voiceSettings: { [weak settings] in settings?.settings.voice ?? VoiceSettings() }),
@@ -134,6 +140,18 @@ final class AppEnvironment {
             content = .failed(String(describing: error))
             telemetry.record("content.loadFailed", ["error": String(describing: error)])
         }
+    }
+
+    /// Checks for newer questions (ADR-0031), at most every 12 hours. A new set replaces the bank
+    /// for the next game; a game already playing keeps the bank it started with.
+    func updateContent() async {
+        guard let contentUpdater, bank != nil else { return }
+        guard case .installed(let folder) = await contentUpdater.checkIfDue() else { return }
+        guard let newBank = try? DirectoryQuestionSource(root: folder).loadBankSync(), !newBank.questions.isEmpty else {
+            return
+        }
+        content = .loaded(newBank)
+        refreshAllowance()
     }
 
     /// How many questions each the players would get today, planned exactly as the game would

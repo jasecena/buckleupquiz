@@ -1,0 +1,121 @@
+# Publish questions (ADR-0031): sends the questions on main to every family's app, with no app
+# update. Run by hand (Actions → Publish questions → Run workflow) after the content pull
+# request is merged and CI is green on main.
+#
+# Needs (docs/RELEASING.md → "Publishing questions"):
+#   secret   CONTENT_SIGNING_KEY       Ed25519 private key (make content-signing-key)
+#   variable CONTENT_PUBLISH_ROLE_ARN  output of the bootstrap stack (content_publisher_role_arn)
+name: Publish questions
+
+on:
+  workflow_dispatch:
+    inputs:
+      min_app_version:
+        description: 'Oldest app version that can read these questions'
+        type: string
+        default: '0.4.0'
+
+permissions:
+  contents: read
+  id-token: write # GitHub's OIDC token, exchanged for the publisher role (no stored AWS keys)
+  actions: read # to check CI passed on this commit
+
+concurrency:
+  group: content-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Validate, sign and upload
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.ref == 'refs/heads/main'
+    env:
+      BASE_URL: https://api.buckleupquiz.com/content/v1
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: CI passed on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          conclusion="$(gh run list --workflow ci.yml --commit "$GITHUB_SHA" --json conclusion,status \
+            -q '[.[] | select(.status == "completed")][0].conclusion')"
+          if [[ "$conclusion" != "success" ]]; then
+            echo "::error::CI hasn't passed on $GITHUB_SHA (got '${conclusion:-none}'). Wait for it, then run again."
+            exit 1
+          fi
+
+      - name: Validate
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts/tests
+          python3 scripts/validate_content.py
+
+      - name: Build and sign
+        env:
+          CONTENT_SIGNING_KEY: ${{ secrets.CONTENT_SIGNING_KEY }}
+          MIN_APP_VERSION: ${{ inputs.min_app_version }}
+        run: |
+          set -euo pipefail
+          [[ -n "$CONTENT_SIGNING_KEY" ]] || { echo "::error::Secret CONTENT_SIGNING_KEY is missing (make content-signing-key)."; exit 1; }
+          key="$RUNNER_TEMP/signing.pem"
+          umask 077
+          printf '%s\n' "$CONTENT_SIGNING_KEY" > "$key"
+          version="$(git log -1 --format=%ct)"
+          published="$(curl -fsS "$BASE_URL/current.json" \
+            | python3 -c 'import sys; sys.path.insert(0, "scripts"); import publish_content as p; print(p.read_current(sys.stdin.buffer.read())["version"])' \
+            || echo 0)"
+          if (( version <= published )); then
+            echo "::notice::Version $published is already published; nothing newer on this commit."
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+          python3 scripts/publish_content.py --out "$RUNNER_TEMP/publish" --version "$version" \
+            --min-app-version "$MIN_APP_VERSION" --key "$key"
+          rm -f "$key"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Sign in to AWS
+        if: env.SKIP != '1'
+        env:
+          ROLE_ARN: ${{ vars.CONTENT_PUBLISH_ROLE_ARN }}
+        run: |
+          set -euo pipefail
+          [[ -n "$ROLE_ARN" ]] || { echo "::error::Variable CONTENT_PUBLISH_ROLE_ARN is missing (bootstrap output)."; exit 1; }
+          token="$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')"
+          creds="$(aws sts assume-role-with-web-identity --role-arn "$ROLE_ARN" \
+            --role-session-name "publish-$GITHUB_RUN_ID" --web-identity-token "$token" --duration-seconds 900 \
+            --query Credentials --output json)"
+          for pair in AWS_ACCESS_KEY_ID:AccessKeyId AWS_SECRET_ACCESS_KEY:SecretAccessKey AWS_SESSION_TOKEN:SessionToken; do
+            value="$(python3 -c "import json,sys; print(json.loads(sys.argv[1])[sys.argv[2]])" "$creds" "${pair#*:}")"
+            echo "::add-mask::$value"
+            echo "${pair%%:*}=$value" >> "$GITHUB_ENV"
+          done
+          account="$(echo "$ROLE_ARN" | cut -d: -f5)"
+          echo "BUCKLE_BUCKET=buckleupquiz-content-$account" >> "$GITHUB_ENV"
+          echo "AWS_DEFAULT_REGION=ap-southeast-2" >> "$GITHUB_ENV"
+
+      - name: Upload (questions first, then current.json)
+        if: env.SKIP != '1'
+        run: |
+          set -euo pipefail
+          src="$RUNNER_TEMP/publish/content/v1"
+          dest="s3://$BUCKLE_BUCKET/content/v1"
+          # A set never changes once published, so phones and CloudFront can keep it.
+          aws s3 cp --recursive "$src/sets/$VERSION" "$dest/sets/$VERSION" \
+            --content-type application/json --cache-control "public, max-age=31536000, immutable" --only-show-errors
+          # Last: current.json (the signed manifest) is what tells phones there's something new.
+          # Short cache, so phones see it within minutes.
+          aws s3 cp "$src/current.json" "$dest/current.json" --content-type application/json \
+            --cache-control "public, max-age=300" --only-show-errors
+
+      - name: Summary
+        if: env.SKIP != '1'
+        run: |
+          {
+            echo "### Questions published"
+            echo "Version \`$VERSION\` (commit ${GITHUB_SHA::7}), for app ${{ inputs.min_app_version }} and later."
+            echo "Phones pick it up within about 12 hours of opening the app."
+          } >> "$GITHUB_STEP_SUMMARY"

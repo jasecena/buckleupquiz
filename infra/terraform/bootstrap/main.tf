@@ -294,3 +294,71 @@ output "deployer_role_arn" {
 output "service_boundary_arn" {
   value = aws_iam_policy.service_boundary.arn
 }
+
+# ---------------------------------------------------------------------------------------------
+# Publishing questions from GitHub Actions (ADR-0031). The "Publish questions" workflow signs in
+# with GitHub's OIDC token (no stored AWS keys) and may only write under content/ in the content
+# bucket, and only from the main branch of this repository.
+# ---------------------------------------------------------------------------------------------
+
+variable "github_repository" {
+  description = "owner/name of the GitHub repository allowed to publish questions."
+  type        = string
+  default     = "jasecena/buckleupquiz"
+}
+
+variable "github_oidc_provider_arn" {
+  description = "An existing GitHub Actions OIDC provider in this account (there can be only one). Empty creates it."
+  type        = string
+  default     = ""
+}
+
+resource "aws_iam_openid_connect_provider" "github" {
+  count          = var.github_oidc_provider_arn == "" ? 1 : 0
+  url            = "https://token.actions.githubusercontent.com"
+  client_id_list = ["sts.amazonaws.com"]
+}
+
+locals {
+  github_oidc_arn = var.github_oidc_provider_arn != "" ? var.github_oidc_provider_arn : aws_iam_openid_connect_provider.github[0].arn
+}
+
+resource "aws_iam_role" "content_publisher" {
+  name                 = "buckleupquiz-content-publisher"
+  path                 = local.service_path
+  description          = "GitHub Actions: publish question sets (ADR-0031)"
+  max_session_duration = 3600
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Federated = local.github_oidc_arn }
+      Action    = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+          "token.actions.githubusercontent.com:sub" = "repo:${var.github_repository}:ref:refs/heads/main"
+        }
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "content_publisher" {
+  name = "write-question-sets"
+  role = aws_iam_role.content_publisher.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid      = "WriteContent"
+      Effect   = "Allow"
+      Action   = ["s3:PutObject"]
+      Resource = "arn:aws:s3:::buckleupquiz-content-${local.account}/content/*"
+    }]
+  })
+}
+
+output "content_publisher_role_arn" {
+  description = "Set as the GitHub variable CONTENT_PUBLISH_ROLE_ARN."
+  value       = aws_iam_role.content_publisher.arn
+}

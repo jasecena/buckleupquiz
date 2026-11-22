@@ -63,7 +63,7 @@ The account (ap-southeast-2) also hosts other projects, so:
 | URL | Method | Behind it |
 |---|---|---|
 | `https://api.buckleupquiz.com/v1/reports` | POST | Lambda function URL → CloudWatch Logs `/buckleupquiz/telemetry` (90 days) |
-| `https://api.buckleupquiz.com/content/…` | GET | S3 (private, CloudFront OAC only): signed question packs, later |
+| `https://api.buckleupquiz.com/content/v1/…` | GET | S3 (private, CloudFront OAC only): signed question sets (ADR-0031), written by the `buckleupquiz-content-publisher` role from GitHub Actions |
 | `https://api.buckleupquiz.com/voices/…` | GET | S3: natural voice packs (ADR-0019), later |
 | `https://buckleupquiz.com` | GET | GitHub Pages: privacy policy and support (free) |
 

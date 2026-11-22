@@ -60,6 +60,11 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         # Anonymous error reports endpoint (ADR-0020). Empty keeps reports on the device.
         BUQTelemetryURL: $(TELEMETRY_URL)
+        # Downloaded question updates (ADR-0031). An empty URL or key turns downloads off.
+        BUQContentURL: $(CONTENT_URL)
+        BUQContentPublicKey: $(CONTENT_PUBLIC_KEY)
+        # The bundled questions' version: the release workflow sets the commit time.
+        BUQContentVersion: $(CONTENT_VERSION)
         NSMicrophoneUsageDescription: >-
           Used to hear your child's answers. Audio is processed on this device and never stored or sent anywhere.
         NSSpeechRecognitionUsageDescription: >-
@@ -76,6 +81,11 @@ targets:
         # Error reports (ADR-0020/0021). Builds before v0.3.5 use the CloudFront address, which
         # keeps working.
         TELEMETRY_URL: "https://api.buckleupquiz.com/v1/reports"
+        # Question updates (ADR-0031). The public key comes from `make content-signing-key`;
+        # until it's set, the app plays only its bundled questions.
+        CONTENT_URL: "https://api.buckleupquiz.com/content/v1/"
+        CONTENT_PUBLIC_KEY: ""
+        CONTENT_VERSION: "0"
 
 
   BuckleUpQuizTests:

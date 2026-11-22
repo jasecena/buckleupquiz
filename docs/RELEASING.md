@@ -47,6 +47,36 @@ pipeline as the activity-tracker app ([ADR-0014](adr/0014-testflight-release-pip
    - **External testers** need a short Beta App Review, plus a test description and contact
      details.
 
+## Publishing questions (ADR-0031)
+
+New and fixed questions reach phones without an app update. Apps from 0.4.0 check at most every
+12 hours and use the new questions from the next game.
+
+### One-time setup
+1. **Signing key:** `make content-signing-key`. It saves the private key only as the GitHub
+   secret `CONTENT_SIGNING_KEY`, and writes the public key into `project.yml`
+   (`CONTENT_PUBLIC_KEY`). Commit and push that, then release an app build. Builds without the
+   public key never download.
+2. **AWS publisher role:** `make infra-bootstrap`, with your admin sign-in. It adds GitHub's
+   OIDC sign-in and the `buckleupquiz-content-publisher` role, which can only write under
+   `content/` in the content bucket, and only from `main`. If the account already has a GitHub
+   OIDC provider (another project), pass it:
+   `terraform -chdir=infra/terraform/bootstrap apply -var github_oidc_provider_arn=<arn>`.
+3. **GitHub variable:** the bootstrap output `content_publisher_role_arn`:
+   ```sh
+   gh variable set CONTENT_PUBLISH_ROLE_ARN --body "$(terraform -chdir=infra/terraform/bootstrap output -raw content_publisher_role_arn)"
+   ```
+
+### Each time
+1. Merge the content pull request and wait for CI on `main` to pass.
+2. Actions → **Publish questions** → *Run workflow*. Keep the app version at `0.4.0` unless the
+   questions use something only a newer app can read.
+3. To check: `curl -s https://api.buckleupquiz.com/content/v1/current.json` shows the signed
+   manifest. On a phone, questions arrive the next time the app is opened (12 hours at most).
+
+To undo a bad question, revert the commit and publish again. A set that fails any check on the
+phone is thrown away, and the app keeps the questions it had (it reports `content.updateRefused`).
+
 ## Troubleshooting
 
 | Symptom | Fix |

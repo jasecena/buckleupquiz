@@ -4,7 +4,8 @@ A plain-language view of what's done and what's left. The detailed engineering c
 [STAGES.md](STAGES.md), and the decisions are in [adr/](adr/). Every list is ordered with the
 quickest wins first.
 
-**Last updated:** 2026-11-22. **Latest build:** v0.3.8 (build 12) on TestFlight. 0.3.9 is ready to publish.
+**Last updated:** 2026-11-22. **Latest build:** v0.3.9 (build 13) on TestFlight. 0.4.0 (question
+updates without an app update) is built and waits for the one-time setup below.
 
 ## Where we are
 The app plays a full hands-free game in the car: it reads questions, listens for answers, keeps
@@ -12,6 +13,19 @@ score per child and remembers what each child has learned. It is on TestFlight f
 The website, domain and anonymous error reports are live on AWS. Paid features are built, and
 the App Store agreement, banking and tax are done; they can be sold once the products are created
 in App Store Connect.
+
+## What's new in 0.4.0 (not released yet)
+
+### New features
+- **New questions without an app update** (ADR-0031). When the phone is online, the app checks
+  our server at most every 12 hours and downloads new or fixed questions for the next game. A
+  game already playing never changes, and with no signal the app plays what it has.
+  - Only questions we signed are used. Anything changed, unreadable or meant for a newer app is
+    thrown away, and the app keeps the questions it had.
+  - Only changed files are downloaded. The request sends nothing about the family.
+  - Publishing: merge the questions, wait for CI, then run **Publish questions** in GitHub
+    Actions (docs/RELEASING.md).
+  - The privacy policy has a new "Question updates" paragraph.
 
 ## What's new in 0.3.9
 
@@ -92,23 +106,30 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
       nickname plus age is fine to keep on our server (ADR-0025).
 - [ ] **Sponsor messages:** find sponsors (or use a message about Basic instead), and get a legal
       and App Review check of the flow before it's built (ADR-0024).
-- [ ] **Backend:** accept the backend plan when that work is scheduled. It is still only a
-      proposal (ADR-0012).
+- [ ] **Backend:** accept the cloud-data half of the backend plan (players synced through the
+      family's iCloud) when that work is scheduled (ADR-0012). The content half is decided:
+      question updates are signed downloads (ADR-0031, 2026-11-22).
 
 ## To do before launch
 
 ### Quick (clicks in App Store Connect, or a small change)
+- [ ] **Turn on question updates** (ADR-0031, about 10 minutes, steps in docs/RELEASING.md →
+      "Publishing questions"). Then I release 0.4.0 and run the first publish:
+  1. `make content-signing-key` (makes the signing key; the private half goes only into GitHub).
+  2. `make infra-bootstrap` with your admin AWS sign-in (adds the publisher role).
+  3. `gh variable set CONTENT_PUBLISH_ROLE_ARN` with the role from step 2.
+- [ ] Network check: the code was checked on 22 November 2026 (anonymous error reports and
+      question updates, both on api.buckleupquiz.com, plus Apple's purchases and iCloud). To
+      finish: turn on Settings → Privacy & Security → App Privacy Report, play a game, and check
+      the domains listed.
+- [ ] Privacy label in App Store Connect: Diagnostics only (crash data, performance data,
+      other diagnostic data), not linked to identity, not used for tracking. Question updates
+      don't change it. The privacy policy is final (22 November 2026, with question updates).
 - [ ] Create the subscription and packs in App Store Connect (price, description and a review
       screenshot each; turn on Family Sharing for Basic), then test buying in the sandbox
       (ADR-0022).
 - [ ] App Store listing: description (it must explain the subscription), age rating, Kids
       Category age band and App Review contact details (ADR-0022).
-- [ ] Privacy label in App Store Connect: Diagnostics only (crash data, performance data,
-      other diagnostic data), not linked to identity, not used for tracking. The privacy policy
-      is final (22 November 2026).
-- [ ] Network check: the code was checked on 22 November 2026 (only anonymous error reports to
-      api.buckleupquiz.com, plus Apple's purchases and iCloud). To finish: turn on Settings →
-      Privacy & Security → App Privacy Report, play a game, and check the domains listed.
 - [ ] Build with Xcode 27 before April 2027 (a setting, once GitHub has it).
 
 ### Medium (a few days of work, or tests on a real phone)
@@ -125,16 +146,18 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
       register (tmsearch.uspto.gov) in classes 9 (apps) and 41 (education and entertainment).
 
 ### Big (weeks, or needs other people)
+- [ ] **Grow every topic from about 15 to about 60 questions per age group** (Claude, in
+      progress, one topic at a time; `make validate-strict` shows the gap). All 10 of Basic's
+      topics have questions now. Started with Aussie History, using the citizenship test
+      resource as a fact source (docs/CONTENT.md). Once question updates are on, new batches
+      reach phones without an app update.
+- [ ] Parent or teacher review of the values and safety questions (Manners, and Honesty &
+      Fairness), and a fact check of the new knowledge questions, batch by batch.
 - [ ] Real-car tests: 3 or more cars plus CarPlay, road noise, kids. Tune listening and speech
       speed (ADR-0008, ADR-0018).
 - [ ] Record about 100 real answers (quiet and with road noise) and turn them into tests for
       letter matching (ADR-0007, ADR-0026).
 - [ ] Mascot, app icon, sounds and App Store screenshots.
-- [ ] Parent or teacher review of the values and safety questions (Manners, and Honesty &
-      Fairness, which is new), and a fact check of the new knowledge questions.
-- [ ] Grow every topic from about 15 to about 60 questions per age group (`make
-      validate-strict` shows the gap). All 10 of Basic's topics have questions now. For Aussie
-      History, use the citizenship test resource as a fact source (docs/CONTENT.md).
 
 ## After launch
 - [ ] **Free access for chosen people** with Apple offer codes for BuckleUp Basic (clicks in App
@@ -155,8 +178,6 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
       same subscription group (ADR-0022).
 - [ ] **Players synced through the family's iCloud (CloudKit)**, needed once the backup passes
       1 MB (ADR-0012, ADR-0023).
-- [ ] **Question packs downloaded** instead of all bundled in the app, so the app stays small
-      (ADR-0012).
 - [ ] **Natural voices** (ElevenLabs): plans and costs agreed (ADR-0019).
 - [ ] **Sponsor messages** for extra free questions, opt-in, never in Basic (ADR-0024).
 - [ ] **Accounts and admin app** (ADR-0025):
@@ -171,6 +192,53 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
   - **Before this ships:** a privacy check.
 - [ ] **Kids' plug-in microphones**, only if phone and car microphones aren't good enough
       (ADR-0018).
+
+## Decisions (ADRs)
+Every decision record in [adr/](adr/), in plain words, ordered by what still needs doing: first
+the ones not built yet, then built ones with something left, then the finished ones.
+
+### Not built yet
+| ADR | Decision | State | What's next |
+|---|---|---|---|
+| [0019](adr/0019-natural-voice-packs.md) | Natural voices (pre-recorded audio, downloaded 10 questions at a time) | Proposed | Listening test with the kids, then pick voices (M10) |
+| [0030](adr/0030-family-questions.md) | Family questions: parents add their own, with on-device AI and their own voice | Proposed | After launch; privacy policy first |
+| [0012](adr/0012-future-backend.md) | Backend: the family's iCloud for cloud data, AWS only if needed | Proposed | Players synced through iCloud once the backup passes 1 MB. Content downloads are decided by 0031 |
+| [0025](adr/0025-accounts-admin-and-rename-only-players.md) | Accounts and the admin app | Proposed (rename-only players are built) | Privacy check, then build (M9) |
+| [0024](adr/0024-sponsor-audio-for-more-questions.md) | More free questions for listening to a sponsor message | Accepted, not built | Find sponsors; legal and App Review check (M12) |
+
+### Built, with something left
+| ADR | Decision | What's left |
+|---|---|---|
+| [0031](adr/0031-downloaded-question-updates.md) | New questions without an app update (signed downloads) | Your one-time setup, release 0.4.0, first publish |
+| [0006](adr/0006-bundled-json-content.md) | Questions as JSON files, checked by CI | Grow to about 60 per age group per topic |
+| [0022](adr/0022-free-allowance-packs-and-basic-subscription.md) | Free allowance, question packs, BuckleUp Basic | Create the products in App Store Connect |
+| [0004](adr/0004-privacy-no-network-no-sdks.md) | Privacy: no tracking, no third-party SDKs | App Privacy Report check; privacy label |
+| [0018](adr/0018-hands-free-voice-answers.md) | Hands-free voice answers, scored by turn | Real-car tests and tuning |
+| [0008](adr/0008-audio-architecture.md) | Audio: one session mode per game, no listening while speaking | Tuned with the real-car tests |
+| [0007](adr/0007-answer-matching.md) | Answer-matching rules | 100 recorded answers as tests |
+| [0026](adr/0026-letter-only-answers.md) | Answers are the letter only (A, B, C, true/false) | After launch: remove the unused `acceptedAnswers` |
+| [0021](adr/0021-aws-infrastructure-terraform.md) | AWS with Terraform: domain, content CDN, error reports | Re-run bootstrap for the question publisher role |
+| [0027](adr/0027-free-access-and-tester-reset.md) | Free access the standard way, and a tester reset | Apple offer codes after launch |
+| [0016](adr/0016-leitner-spaced-repetition.md) | Each player learns with Leitner boxes | Progress screen for parents (M11) |
+| [0014](adr/0014-testflight-release-pipeline.md) | TestFlight releases from a tag | Build with Xcode 27 before April 2027 |
+
+### Done
+| ADR | Decision |
+|---|---|
+| [0029](adr/0029-voice-answers-on-screen-only.md) | Voice answers only while the app is on screen; the screen stays on |
+| [0028](adr/0028-mic-on-for-the-whole-game.md) | The mic stays on for the whole game (limited by 0029 to the app on screen) |
+| [0023](adr/0023-progress-survives-reinstall.md) | Progress survives a reinstall (iCloud key-value storage and Keychain) |
+| [0020](adr/0020-anonymous-error-telemetry.md) | Anonymous error reports to our own server |
+| [0017](adr/0017-one-tap-start.md) | One tap to play, with the setup remembered |
+| [0015](adr/0015-choice-questions-and-named-players.md) | Every question is a choice; players picked by name and age |
+| [0013](adr/0013-ci-cd-github-actions.md) | CI on GitHub Actions: Linux for logic, macOS for the app |
+| [0011](adr/0011-mvvm-observable-services.md) | MVVM with `@Observable` models |
+| [0009](adr/0009-persistence.md) | Where data is saved on the phone |
+| [0005](adr/0005-static-hosting-github-pages.md) | Website on GitHub Pages |
+| [0003](adr/0003-repository-layout.md) | One repository, XcodeGen, platform-free `QuizCore` |
+| [0002](adr/0002-native-ios-swiftui.md) | Native iOS 17+ with SwiftUI and Swift 6 |
+| [0001](adr/0001-record-architecture-decisions.md) | Record decisions as ADRs |
+| [0010](adr/0010-storekit2-purchases.md) | Lifetime pass: replaced by 0022 |
 
 ## Done (what the app does today)
 
@@ -229,6 +297,7 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 ### Reliability and support
 - Mic check screen with fix guides for known problems (for example, Dictation turned off).
 - Anonymous error reports to our own server (api.buckleupquiz.com): no names, answers or ids.
+- New questions without an app update (built for 0.4.0; on once the setup above is done).
 - Automatic tests on every change. Tagging a version uploads it to TestFlight.
 
 ### Infrastructure

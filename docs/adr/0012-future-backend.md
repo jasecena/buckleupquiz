@@ -1,6 +1,6 @@
 # 0012. Future backend: Apple-native services first, AWS serverless as fallback
 
-- **Status:** Proposed
+- **Status:** Proposed. Content packs decided by [ADR-0031](0031-downloaded-question-updates.md): signed static files on our CDN, for every iOS version (built for 0.4.0). Cloud data is still proposed.
 - **Date:** 2026-11-22
 
 ## Context
