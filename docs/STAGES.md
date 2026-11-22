@@ -78,7 +78,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
       Game setup only first time or via Change (ADR-0017)
 - [ ] Onboarding (FEATURES §6): welcome, 3-question demo, add the first player
 - [ ] Mascot and app icon (original, not seatbelt-themed)
-- [ ] Mixed-topic sessions (paid)
+- [ ] Mixed-topic sessions (paid): custom mixes chosen by a parent, after launch (2026-11-22)
 - [ ] Accessibility pass: Dynamic Type, VoiceOver labels, contrast
 - [ ] iPad layout pass
 
@@ -130,7 +130,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [x] Progress survives a reinstall: iCloud key-value storage + Keychain backup, merged at launch (ADR-0023)
 - [x] No Endless mode; games are 5/10/15 each, at most 50 questions
 - [x] Parental gate before settings, links and support email (typed numbers, 2026-11-22)
-- [ ] Locked topics and custom mixes enforced
+- [x] Locked topics enforced (custom mixes: after launch, 2026-11-22)
 - [x] Free games: up to 2 players; BuckleUp Basic: up to 6 (Game setup note + alert). TestFlight-only switch to try Basic until purchases land
 
 **Exit:** acceptance criterion 9 passes in the StoreKit sandbox.

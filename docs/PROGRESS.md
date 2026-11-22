@@ -105,8 +105,8 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 - [ ] Build with Xcode 27 before April 2027 (a setting, once GitHub has it).
 
 ### Medium (a few days of work, or tests on a real phone)
-- [ ] Locked topics enforced, and mixed-topic games for Basic (ADR-0017, ADR-0022).
-- [ ] Phone-call interruption and a 20-question locked-screen game on a real device.
+- [ ] On a real phone in the car: a phone call during a voice game, and a 20-question voice
+      game with the phone in a cradle (screen on), including saying "new game" at the end.
 - [ ] Onboarding: welcome, a 3-question demo, add the first player. Teach "say the letter"
       (ADR-0026), explain that some cars show a phone-call screen while the mic is on
       (ADR-0008), and that voice answers need the app on screen, ideally in a cradle (ADR-0029).
@@ -128,6 +128,8 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
       Store Connect), never our own codes (ADR-0027).
 - [ ] Remove the unused `acceptedAnswers` from the question files (ADR-0026).
 - [ ] **Progress screen for parents**: what each child has learned.
+- [ ] **Custom topic mixes for Basic:** a parent picks which topics to mix in one game. The game
+      engine already supports several topics; it needs a screen to choose them (ADR-0017).
 - [ ] **A bigger plan** (for example "Plus", with more questions a day for long trips), in the
       same subscription group (ADR-0022).
 - [ ] **Players synced through the family's iCloud (CloudKit)**, needed once the backup passes
@@ -192,6 +194,7 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 - BuckleUp Basic: A$4.99/month. Gives 10 topics, 40 new questions each day the app is opened,
   6 players and fixing scores. No free trial.
 - Out of questions: 0–2 each blocks the game, 3–4 each warns, 5 each is the minimum.
+- Locked topics open the BuckleUp Basic sheet; Play only picks unlocked topics.
 - Parental gate in front of purchases and Settings: type three numbers written as words
   ("seven, two, nine"). It was a sum like 17 × 8, which was too hard in the car.
 - Paid Applications agreement accepted, with banking and tax. Launch prices agreed.
