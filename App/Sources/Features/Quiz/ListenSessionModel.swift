@@ -240,6 +240,34 @@ final class ListenSessionModel {
         }
     }
 
+    /// Apple's speech recognition doesn't hear while the app is in the background: the mic
+    /// runs, but nothing is recognised (tested on a phone, 2026-11-22, ADR-0029). So in the
+    /// background the mic is off and answers are read out, as in Listen mode. Back on screen,
+    /// the mic comes on again and the next question is answered out loud.
+    private(set) var isInBackground = false
+
+    func movedToBackground() {
+        guard !isInBackground, status != .finished else { return }
+        isInBackground = true
+        if isVoice { deps.listener?.stopMic() }
+    }
+
+    func movedToForeground() {
+        guard isInBackground, status != .finished else { return }
+        isInBackground = false
+        // After a long pause the mic comes back with play (`takeAudioBack`).
+        guard isVoice, !needsAudioBack else { return }
+        do {
+            try deps.listener?.startMic()
+        } catch {
+            // The next answer tries again.
+            deps.telemetry?.record("voice.micResumeFailed", Self.describe(error))
+        }
+    }
+
+    /// Voice answers need the app on screen, so the screen stays on during a voice game.
+    var keepsScreenOn: Bool { startedInVoice && status != .finished }
+
     func pause() {
         guard status == .playing else { return }
         status = .paused
@@ -276,7 +304,8 @@ final class ListenSessionModel {
         guard isVoice else { return activateForListening() }
         do {
             _ = try deps.audioSession?.activateForVoice(duckOthers: duckOthers, mic: mic)
-            try deps.listener?.startMic()
+            // In the background the mic stays off (ADR-0029); it's turned on back on screen.
+            if !isInBackground { try deps.listener?.startMic() }
         } catch {
             deps.telemetry?.record("voice.micResumeFailed", Self.describe(error))
         }
@@ -533,8 +562,9 @@ final class ListenSessionModel {
     private func listenForAnswer(seconds: Double, options: String?, generation: Int) async throws {
         if let options { try await deps.speech.speak(options) }
         try await deps.sleeper.sleep(seconds: 0.3)
-        guard isVoice, let listener = deps.listener, let turn else {
-            // Voice is off (or the recogniser broke): behave like Listen mode.
+        guard isVoice, !isInBackground, let listener = deps.listener, let turn else {
+            // Voice is off, the recogniser broke, or the app is in the background, where speech
+            // recognition doesn't work (ADR-0029): behave like Listen mode.
             try await countdown(seconds: seconds, ticking: true, generation: generation)
             return
         }
@@ -667,7 +697,7 @@ final class ListenSessionModel {
                 self.finishDiscussion()
             }
         }
-        if isVoice, deps.listener != nil { try await listenForDiscussionCommands() }
+        if isVoice, !isInBackground, deps.listener != nil { try await listenForDiscussionCommands() }
         while true { try await Task.sleep(for: .seconds(3600)) }
     }
 

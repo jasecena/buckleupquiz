@@ -297,6 +297,34 @@ struct ListenSessionModelTests {
         #expect(!listener.micOn)
     }
 
+    @Test func inTheBackgroundTheMicIsOffAndAnswersAreReadOut() async {
+        let listener = FakeListener([[FakeListener.rightLetter]])
+        let model = makePausableVoiceModel(listener)
+        listener.asking = { [weak model] in model?.turn?.presented }
+        model.start()
+        #expect(model.keepsScreenOn, "voice games keep the screen on")
+        model.movedToBackground()
+        #expect(!listener.micOn, "no orange dot while nothing can hear")
+        await model.runner?.value
+        #expect(model.status == .finished)
+        #expect(listener.listens == 0, "speech recognition doesn't work in the background")
+        #expect(speech.spoken.contains { $0.hasPrefix("The answer is") })
+        #expect(model.isVoice, "voice comes back on screen")
+        #expect(!model.keepsScreenOn)
+    }
+
+    @Test func backOnScreenTheMicComesBackOn() async {
+        let listener = FakeListener([])
+        let model = makePausableVoiceModel(listener)
+        model.start()
+        model.movedToBackground()
+        model.movedToForeground()
+        #expect(listener.micOn)
+        #expect(listener.micStarts == 2)
+        model.stop()
+        #expect(!listener.micOn)
+    }
+
     @Test func aBusyMicIsTriedAgainNextTurn() async {
         let listener = FakeListener([[FakeListener.rightLetter]],
                                     failure: SpeechListenerError.micBusy("call"), failsOnce: true)

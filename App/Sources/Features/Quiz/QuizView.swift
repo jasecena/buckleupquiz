@@ -1,5 +1,6 @@
 import QuizCore
 import SwiftUI
+import UIKit
 
 /// The in-game screen: readable, but never required (FEATURES §2.2).
 struct QuizView: View {
@@ -27,16 +28,31 @@ struct QuizView: View {
         }
         .padding()
         .background(Theme.background.ignoresSafeArea())
-        .onAppear { model.start() }
-        .onDisappear { model.stop() }
+        .onAppear {
+            model.start()
+            updateScreenLock()
+        }
+        .onDisappear {
+            model.stop()
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+        .onChange(of: model.status) { _, _ in updateScreenLock() }
         .persistentSystemOverlays(.hidden)
         .onChange(of: scenePhase) { _, phase in handle(phase) }
         .alert("Keep playing in the background?", isPresented: $askAboutBackground) {
             Button("Yes, keep playing") { settingsStore.settings.backgroundPlay = true }
             Button("No, pause it") { settingsStore.settings.backgroundPlay = false }
         } message: {
-            Text("BuckleUp Quiz can keep playing when you lock the screen or switch apps, which is handy in the car. You can change this later in Settings.")
+            Text(model.keepsScreenOn
+                 ? "BuckleUp Quiz can keep playing when you lock the screen or switch apps. Answers are only heard while the app is on screen, so in the background it reads the answers out. You can change this later in Settings."
+                 : "BuckleUp Quiz can keep playing when you lock the screen or switch apps, which is handy in the car. You can change this later in Settings.")
         }
+    }
+
+    /// Voice answers only work with the app on screen (ADR-0029), so the screen doesn't
+    /// auto-lock during a voice game. It locks normally again when the game ends.
+    private func updateScreenLock() {
+        UIApplication.shared.isIdleTimerDisabled = model.keepsScreenOn
     }
 
     /// Background play (Settings → Audio): pause when it's off; ask once when it's never been set.
@@ -45,8 +61,10 @@ struct QuizView: View {
         switch phase {
         case .background:
             wentToBackground = true
+            model.movedToBackground()
             if settingsStore.settings.backgroundPlay == false { model.pause() }
         case .active:
+            model.movedToForeground()
             if wentToBackground, settingsStore.settings.backgroundPlay == nil { askAboutBackground = true }
             wentToBackground = false
         default:

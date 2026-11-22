@@ -13,6 +13,17 @@ The website, domain and anonymous error reports are live on AWS. Paid features a
 the App Store agreement, banking and tax are done; they can be sold once the products are created
 in App Store Connect.
 
+## What's new in 0.3.8
+
+### Changes and fixes
+- **Voice answers need the app on screen.** In 0.3.7 the mic stayed on with the screen locked,
+  but nothing was heard: Apple's speech recognition doesn't work in the background (ADR-0029).
+  - **Screen stays on:** during a voice game the screen doesn't lock by itself, so keep the phone
+    in a cradle with the app open (and charging).
+  - **In the background** (screen locked by hand, or another app open) the mic is off (no
+    orange dot) and the answers are read out, as in "Just listen".
+  - **Back on screen** it listens again from the next question.
+
 ## What's new in 0.3.7
 
 ### New features
@@ -23,9 +34,8 @@ in App Store Connect.
   questions are sometimes read twice ("Once more…").
 
 ### Changes and fixes
-- **Voice answers work with the screen locked.** The microphone now stays on for the whole game
-  (ADR-0028). Before, iOS refused to start it in the background, and the game stopped listening.
-  The orange mic dot now shows for the whole game.
+- The microphone stays on for the whole game (ADR-0028), but this didn't make answers heard
+  with the screen locked (see 0.3.8).
 - If the microphone is busy for one answer (a phone call), the game tries again on the next
   question, instead of stopping listening for the rest of the game.
 - **After a phone call** the app takes the audio and the mic back before carrying on.
@@ -84,8 +94,8 @@ Each removes extra code that can go wrong. All are low risk, and recommended.
 - [ ] Locked topics enforced, and mixed-topic games for Basic (ADR-0017, ADR-0022).
 - [ ] Phone-call interruption and a 20-question locked-screen game on a real device.
 - [ ] Onboarding: welcome, a 3-question demo, add the first player. Teach "say the letter"
-      (ADR-0026), and explain that some cars show a phone-call screen while the mic is on
-      (ADR-0008).
+      (ADR-0026), explain that some cars show a phone-call screen while the mic is on
+      (ADR-0008), and that voice answers need the app on screen, ideally in a cradle (ADR-0029).
 - [ ] Accessibility pass (text size, VoiceOver) and iPad layout.
 - [ ] Name and trademark check.
 
@@ -141,7 +151,8 @@ Each removes extra code that can go wrong. All are low risk, and recommended.
 - Variety between questions (quiet, a short line or a tune), and long or hard questions sometimes
   read twice.
 - The ending says how many questions were played and invites a new game.
-- Voice answers keep working with the screen locked (the mic stays on for the game).
+- Voice answers while the app is on screen; the screen stays on during a voice game. In the
+  background the answers are read out (ADR-0029).
 - Scoreboard during the game (can be turned off). Scores are read out at the end, with streaks
   and badges.
 - Talk About prompts (Parent mode, off by default, 30 s timer).

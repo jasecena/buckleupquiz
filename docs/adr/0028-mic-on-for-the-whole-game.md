@@ -1,6 +1,6 @@
 # 0028. The microphone stays on for the whole game
 
-- **Status:** Accepted
+- **Status:** Accepted. Amended by [ADR-0029](0029-voice-answers-on-screen-only.md): in the background the mic is off and answers are read out.
 - **Date:** 2026-11-22
 - **Amends:** [ADR-0018](0018-hands-free-voice-answers.md) (how the mic is opened for each answer)
 

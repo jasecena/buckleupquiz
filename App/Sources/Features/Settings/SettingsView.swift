@@ -54,7 +54,7 @@ struct SettingsView: View {
                     Text("Answers")
                 } footer: {
                     Text(store.settings.answerMode == .voice
-                         ? "After the options are read, whoever's turn it is says the letter (A, B or C, or true or false), and the app keeps score. Say \"skip\", \"repeat\", \"pause\" or \"stop\" any time. Speech is understood on this iPhone and never recorded or sent anywhere. Needs Dictation turned on (Settings → General → Keyboard); Siri can stay off."
+                         ? "After the options are read, whoever's turn it is says the letter (A, B or C, or true or false), and the app keeps score. Say \"skip\", \"repeat\", \"pause\" or \"stop\" any time. Answers are only heard while the app is on screen, so the screen stays on during the game; in the background the answers are read out. Speech is understood on this iPhone and never recorded or sent anywhere. Needs Dictation turned on (Settings → General → Keyboard); Siri can stay off."
                          : "The app reads each answer after the think time. No score is kept.")
                 }
 
