@@ -44,6 +44,15 @@ and "it first/around/again".
 - All of this content needs parent or teacher review before release. First Nations content must
   be written or reviewed with Aboriginal and Torres Strait Islander input.
 
+## Sources
+- **Aussie History:** the official citizenship test resource, *Australian Citizenship: Our
+  Common Bond* (Department of Home Affairs), is a good, safe source of facts about Australia's
+  history, symbols, democracy and laws (product decision, 2026-11-22). Use it for the facts and
+  write our own questions in our own words; don't copy its practice questions. Keep to civics
+  facts, never party politics. Its First Nations content follows the First Nations rule above.
+- Check every fact against a second reliable source (a museum, a government site or an
+  encyclopedia) before it goes in.
+
 ## Checks the validator runs
 - Schema, ids and duplicates
 - No `open` or `scenario` types; answers must be one of the options; exactly 3 options for multiple choice

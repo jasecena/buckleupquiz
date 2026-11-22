@@ -133,13 +133,21 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 - [ ] Parent or teacher review of the values and safety questions (Manners, and Honesty &
       Fairness, which is new), and a fact check of the new knowledge questions.
 - [ ] Grow every topic from about 15 to about 60 questions per age group (`make
-      validate-strict` shows the gap). All 10 of Basic's topics have questions now.
+      validate-strict` shows the gap). All 10 of Basic's topics have questions now. For Aussie
+      History, use the citizenship test resource as a fact source (docs/CONTENT.md).
 
 ## After launch
 - [ ] **Free access for chosen people** with Apple offer codes for BuckleUp Basic (clicks in App
       Store Connect), never our own codes (ADR-0027).
 - [ ] Remove the unused `acceptedAnswers` from the question files (ADR-0026).
 - [ ] **Progress screen for parents**: what each child has learned.
+- [ ] **Family questions** (ADR-0030, proposed): parents add their own questions ("What is
+      Jenny's birthday?") by talking to the phone. On-device AI suggests the wording and the
+      options, and the parent approves them. Optionally, the parent records their own voice for
+      the question. Everything stays on the phone. Needs a privacy policy update first.
+- [ ] **Younger and older players:** players can be 4 to 14, but questions are written for 6–12.
+      A 4-year-old gets the 6–8 questions and a 14-year-old the 11–12 ones. Consider a 4–5 group
+      and a 13+ group once the 6–12 groups are full.
 - [ ] **iPad:** v1 is iPhone only. An iPad layout and iPad screenshots after launch.
 - [ ] **Custom topic mixes for Basic:** a parent picks which topics to mix in one game. The game
       engine already supports several topics; it needs a screen to choose them (ADR-0017).

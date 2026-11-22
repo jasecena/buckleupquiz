@@ -36,3 +36,4 @@ New ADR: copy [template.md](template.md) to the next number.
 | [0027](0027-free-access-and-tester-reset.md) | Free access the standard way (TestFlight, offer codes, admin flag), and a tester reset | Accepted |
 | [0028](0028-mic-on-for-the-whole-game.md) | The microphone stays on for the whole game, so answers work with the screen locked | Accepted |
 | [0029](0029-voice-answers-on-screen-only.md) | Voice answers only while the app is on screen; the screen stays on during a voice game | Accepted |
+| [0030](0030-family-questions.md) | Family questions: parents add their own, with on-device AI help and their own voice | Proposed (after launch) |
