@@ -6,6 +6,11 @@ public enum Phrases {
     public static let outroPrefix = "That's the end of the game!"
     /// Said last, so everyone knows the quiz is over and another game is a tap away.
     public static let playAgain = "If you'd like to play some more, start a new game!"
+    /// Said last instead, when the app has been hearing the players well (a voice game, on
+    /// screen): they can start the next game hands-free (`PlayAgainReply`).
+    public static let playAgainByVoice = "If you'd like to play some more, just say \"new game\"!"
+    /// Heard "new game": the next one starts straight away.
+    public static let newGameStarting = "Let's go! Here comes a new game."
     public static let welcomeBack = "Welcome back! Let's keep going."
     public static let listening = "I'm listening."
     public static let greatChat = "Great chat!"

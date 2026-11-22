@@ -19,7 +19,7 @@
 - **App Store subtitle (≤30 chars):** `Voice trivia, manners & safety`
 - **Xcode project / target:** `BuckleUpQuiz`. **Bundle ID:** `com.<yourcompany>.buckleupquiz`.
 - **Spoken intro (TTS) when a session starts:** "Buckle up, kids… question one!"
-- **Spoken outro:** "That's the end of the game! That was 15 questions each. Here are the scores… If you'd like to play some more, start a new game!" ("game", not "ride": the car trip goes on). The number is what was really played.
+- **Spoken outro:** "That's the end of the game! That was 15 questions each. Here are the scores… If you'd like to play some more, start a new game!" ("game", not "ride": the car trip goes on). The number is what was really played. When the app has been hearing the players well, it ends "…just say "new game"!" and listens for 10 s, so the next game starts hands-free (ADR-0029). The finished screen has "Play again" too.
 - **Tagline for ads:** "Turn 'are we there yet?' into 'ask me another!'"
 - **Visual identity:** a friendly, original mascot (not a seatbelt logo, to stay clear of existing "Buckle Up" road-safety campaign branding). Bright, high-contrast colours, and big rounded type.
 - **Before launch:** check the name with IP Australia, and register the `.com.au` and `.app` domains and the Instagram and TikTok handles.

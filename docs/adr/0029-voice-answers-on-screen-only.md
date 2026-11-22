@@ -28,6 +28,14 @@ other apps, but it can stop the screen from locking by itself.
   failed mic). The game ends with "Great job, Mia and Leo!" and nothing is said about why
   ("joy, not correction"). Points still count towards badges and stats. Listen mode is scored
   by taps, so it always shows its scores.
+- **"New game" by voice:** when the app has clearly been hearing the players (a voice game,
+  on screen, at least one answer heard, and the results reliable as above), the outro ends
+  "If you'd like to play some more, just say "new game"!" instead of asking for a tap. The
+  mic stays on for up to 10 s after the outro to hear the reply, then turns off. "New game",
+  "play again", "one more" and similar start the same topic, players and length again; "no"
+  always wins, and cheers ("Yes, I won!") and chatter do nothing. It isn't offered after a
+  spoken "stop", or when there aren't enough questions left today for a full game. Silence
+  just ends the game; the finished screen has a "Play again" button either way.
 - Settings → Answers and the "Keep playing in the background?" question say that answers are
   only heard while the app is on screen.
 

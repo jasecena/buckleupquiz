@@ -34,9 +34,9 @@ struct QuizView: View {
         }
         .onDisappear {
             model.stop()
-            UIApplication.shared.isIdleTimerDisabled = false
+            ScreenAwake.set(false, for: model.id)
         }
-        .onChange(of: model.status) { _, _ in updateScreenLock() }
+        .onChange(of: model.keepsScreenOn) { _, _ in updateScreenLock() }
         .persistentSystemOverlays(.hidden)
         .onChange(of: scenePhase) { _, phase in handle(phase) }
         .alert("Keep playing in the background?", isPresented: $askAboutBackground) {
@@ -52,12 +52,17 @@ struct QuizView: View {
     /// Voice answers only work with the app on screen (ADR-0029), so the screen doesn't
     /// auto-lock during a voice game. It locks normally again when the game ends.
     private func updateScreenLock() {
-        UIApplication.shared.isIdleTimerDisabled = model.keepsScreenOn
+        ScreenAwake.set(model.keepsScreenOn, for: model.id)
     }
 
     /// Background play (Settings → Audio): pause when it's off; ask once when it's never been set.
     private func handle(_ phase: ScenePhase) {
-        guard model.status == .playing || model.status == .paused else { return }
+        guard model.status == .playing || model.status == .paused else {
+            // After the game: listening for "new game" stops in the background.
+            if phase == .background { model.movedToBackground() }
+            if phase == .active { model.movedToForeground() }
+            return
+        }
         switch phase {
         case .background:
             wentToBackground = true
@@ -107,8 +112,22 @@ struct QuizView: View {
                         .font(Theme.title)
                         .multilineTextAlignment(.center)
                 }
-                Button("Done") { dismiss() }
-                    .buttonStyle(BigButtonStyle())
+                if model.isListeningForNewGame {
+                    Label("Say \"new game\" to play again", systemImage: "waveform")
+                        .font(Theme.headline)
+                        .foregroundStyle(Theme.accent)
+                        .symbolEffect(.variableColor.iterative, options: .repeating)
+                }
+                HStack(spacing: 12) {
+                    if model.canPlayAgain {
+                        Button { model.startNextGame() } label: {
+                            Label("Play again", systemImage: "arrow.clockwise")
+                        }
+                        .buttonStyle(BigButtonStyle())
+                    }
+                    Button("Done") { dismiss() }
+                        .buttonStyle(BigButtonStyle(prominent: !model.canPlayAgain))
+                }
             }
         } else if let turn = model.turn {
             VStack(spacing: 24) {
@@ -372,5 +391,18 @@ struct QuizView: View {
     private func progressText(_ number: Int) -> String {
         if let total = model.questionCount { return "Question \(number) of \(total)" }
         return "Question \(number)"
+    }
+}
+
+/// Keeps the screen awake while any game wants it (ADR-0029). When "Play again" swaps one game
+/// for the next, the old screen may go after the new one has appeared: this keeps the new
+/// game's choice, whichever order they come in.
+@MainActor
+enum ScreenAwake {
+    private static var holders: Set<ObjectIdentifier> = []
+
+    static func set(_ awake: Bool, for id: ObjectIdentifier) {
+        if awake { holders.insert(id) } else { holders.remove(id) }
+        UIApplication.shared.isIdleTimerDisabled = !holders.isEmpty
     }
 }

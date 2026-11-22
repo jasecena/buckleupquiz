@@ -497,4 +497,125 @@ struct ListenSessionModelTests {
         #expect(model.status == .finished)
         #expect(speech.spoken.filter { $0.hasPrefix("The answer is") }.count == 2)
     }
+
+    // MARK: Play again by voice
+
+    /// Counts the next games started from the end of this one.
+    final class NextGames {
+        var started = 0
+        var available = true
+        func hook() -> ListenSessionModel.PlayAgain {
+            .init(isAvailable: { self.available }, start: { self.started += 1 })
+        }
+    }
+
+    @Test func whenTheAppHearsThePlayersTheySayNewGame() async {
+        let (model, listener) = makeVoiceModel([[FakeListener.rightLetter], ["New game!"]])
+        let next = NextGames()
+        model.playAgain = next.hook()
+        model.start()
+        await model.runner?.value
+
+        #expect(speech.spoken.contains { $0.hasSuffix(Phrases.playAgainByVoice) })
+        #expect(speech.spoken.last == Phrases.newGameStarting)
+        #expect(listener.listens == 2, "one answer, then the reply")
+        #expect(next.started == 1)
+        #expect(!listener.micOn && !audio.active, "the next game takes the mic and audio over")
+        #expect(!model.isListeningForNewGame)
+    }
+
+    @Test func silenceOrNoJustEndsTheGame() async {
+        for reply in [[String](), ["No thanks"], ["Yes, I won!"]] {
+            let (model, listener) = makeVoiceModel([[FakeListener.rightLetter], reply])
+            let next = NextGames()
+            model.playAgain = next.hook()
+            model.start()
+            await model.runner?.value
+            #expect(speech.spoken.last?.hasSuffix(Phrases.playAgainByVoice) == true, "nothing more is said")
+            #expect(next.started == 0)
+            #expect(model.canPlayAgain, "the button is still there")
+            #expect(!listener.micOn && !audio.active)
+        }
+    }
+
+    @Test func playAgainByTapAfterTheGame() async {
+        let (model, _) = makeVoiceModel([[FakeListener.rightLetter]])
+        let next = NextGames()
+        model.playAgain = next.hook()
+        model.start()
+        await model.runner?.value
+        model.startNextGame()
+        #expect(next.started == 1)
+    }
+
+    @Test func notOfferedByVoiceWhenHearingWasUnreliable() async {
+        let (model, listener) = makeVoiceModel([[FakeListener.rightLetter]], questions: 4, length: 4)
+        let next = NextGames()
+        model.playAgain = next.hook()
+        model.start()
+        await model.runner?.value
+        #expect(speech.spoken.last?.hasSuffix(Phrases.playAgain) == true, "start a new game by tap")
+        #expect(listener.listens == 4, "no listening after the outro")
+        #expect(model.canPlayAgain)
+    }
+
+    @Test func notOfferedWhenNothingWasHeardAllGame() async {
+        let (model, listener) = makeVoiceModel([[]])
+        model.playAgain = NextGames().hook()
+        model.start()
+        await model.runner?.value
+        #expect(speech.spoken.last?.hasSuffix(Phrases.playAgain) == true)
+        #expect(listener.listens == 1)
+    }
+
+    @Test func notOfferedWhenTodaysQuestionsHaveRunOut() async {
+        let (model, listener) = makeVoiceModel([[FakeListener.rightLetter]])
+        let next = NextGames()
+        next.available = false
+        model.playAgain = next.hook()
+        model.start()
+        await model.runner?.value
+        #expect(speech.spoken.last?.hasSuffix(Phrases.playAgain) == true)
+        #expect(listener.listens == 1)
+        #expect(!model.canPlayAgain)
+        model.startNextGame()
+        #expect(next.started == 0)
+    }
+
+    @Test func sayingStopIsNotAskedToPlayMore() async {
+        let (model, listener) = makeVoiceModel([["stop"]], questions: 2, length: 2)
+        model.playAgain = NextGames().hook()
+        model.start()
+        await model.runner?.value
+        #expect(model.status == .finished)
+        #expect(speech.spoken.last?.hasSuffix(Phrases.playAgain) == true)
+        #expect(listener.listens == 1)
+    }
+
+    @Test func doneDuringTheOutroTurnsTheMicOff() async {
+        let (model, listener) = makeVoiceModel([[FakeListener.rightLetter], ["new game"]])
+        let next = NextGames()
+        model.playAgain = next.hook()
+        speech.holdWhen = { $0.hasSuffix(Phrases.playAgainByVoice) }
+        model.start()
+        for _ in 0..<5000 where !speech.isHolding { await Task.yield() }
+        #expect(model.status == .finished, "the finished screen shows during the outro")
+        #expect(listener.micOn && audio.active, "still on, to hear \"new game\"")
+        model.stop()
+        #expect(!listener.micOn && !audio.active)
+        speech.release()
+        await model.runner?.value
+        #expect(listener.listens == 1, "no listening after Done")
+        #expect(next.started == 0)
+    }
+
+    @Test func listenModeKeepsTheTapLineButCanPlayAgain() async {
+        let model = makeModel()
+        let next = NextGames()
+        model.playAgain = next.hook()
+        model.start()
+        await model.runner?.value
+        #expect(speech.spoken.last?.hasSuffix(Phrases.playAgain) == true)
+        #expect(model.canPlayAgain)
+    }
 }

@@ -4,7 +4,7 @@ A plain-language view of what's done and what's left. The detailed engineering c
 [STAGES.md](STAGES.md), and the decisions are in [adr/](adr/). Every list is ordered with the
 quickest wins first.
 
-**Last updated:** 2026-11-22. **Latest build:** v0.3.8 (build 12) on TestFlight.
+**Last updated:** 2026-11-22. **Latest build:** v0.3.8 (build 12) on TestFlight. 0.3.9 is ready to publish.
 
 ## Where we are
 The app plays a full hands-free game in the car: it reads questions, listens for answers, keeps
@@ -12,6 +12,24 @@ score per child and remembers what each child has learned. It is on TestFlight f
 The website, domain and anonymous error reports are live on AWS. Paid features are built, and
 the App Store agreement, banking and tax are done; they can be sold once the products are created
 in App Store Connect.
+
+## What's new in 0.3.9
+
+### New features
+- **"New game" by voice:** when the app has been hearing the players well in the car, the
+  ending says "If you'd like to play some more, just say "new game"!" and listens for 10
+  seconds. "New game", "play again" or "one more" starts the same topic and players again.
+  - Only offered when listening has worked: a voice game, the app on screen, at least one
+    answer heard, and no more than 2 missed. Otherwise it says to start a new game by tap.
+  - "No" always wins, and cheers ("Yes, I won!") or chatter never start a game.
+  - Not offered after "stop", or when there aren't enough questions left today.
+  - The finished screen has a **Play again** button too, for any game.
+
+### Changes and fixes
+- **No winner when the scores can't be trusted:** a voice game that went to the background, or
+  where more than 2 answers weren't heard, ends with "Great job, Mia and Leo!" instead of the
+  scores and the winner. Points still count towards badges.
+- The scores show on screen while the ending is read out (it showed "Buckle up…" before).
 
 ## What's new in 0.3.8
 
@@ -23,9 +41,6 @@ in App Store Connect.
   - **In the background** (screen locked by hand, or another app open) the mic is off (no
     orange dot) and the answers are read out, as in "Just listen".
   - **Back on screen** it listens again from the next question.
-- **No winner when the scores can't be trusted:** a voice game that went to the background, or
-  where more than 2 answers weren't heard, ends with "Great job, Mia and Leo!" instead of the
-  scores and the winner. Points still count towards badges.
 
 ## What's new in 0.3.7
 
@@ -153,7 +168,8 @@ Each removes extra code that can go wrong. All are low risk, and recommended.
 - Skip before the answer gives the same player a new question.
 - Variety between questions (quiet, a short line or a tune), and long or hard questions sometimes
   read twice.
-- The ending says how many questions were played and invites a new game.
+- The ending says how many questions were played and invites a new game. When the app has
+  been hearing the players, they can just say "new game"; otherwise tap Play again.
 - Voice answers while the app is on screen; the screen stays on during a voice game. In the
   background the answers are read out (ADR-0029).
 - Scoreboard during the game (can be turned off). Scores are read out at the end, with streaks

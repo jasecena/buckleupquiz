@@ -205,8 +205,26 @@ struct HomeView: View {
                !(await SystemSpeechListener.requestPermission()) {
                 settingsStore.settings.answerMode = .listen
             }
-            activeSession = environment.makeListenSession(topics: [topic.id], profiles: players, length: length)
+            launch(topic, players: players, length: length)
         }
+    }
+
+    /// Starts a game, and lets it start the next one with the same topic, players and length
+    /// ("new game" out loud, or "Play again"), when there are enough questions left today.
+    private func launch(_ topic: Topic, players: [PlayerProfile], length: SessionLength) {
+        guard let model = environment.makeListenSession(topics: [topic.id], profiles: players, length: length) else {
+            return
+        }
+        model.playAgain = .init(
+            isAvailable: { [environment] in
+                guard let plan = environment.plannedEach(topics: [topic.id], profiles: players, length: length) else {
+                    return false
+                }
+                // Same rule as starting from the topic grid: a short game needs a warning first.
+                return plan.planned > 0 && !(plan.planned < plan.requested && plan.planned < SessionLength.minimumEach)
+            },
+            start: { launch(topic, players: players, length: length) })
+        activeSession = model
     }
 
     private func normaliseSelection() {

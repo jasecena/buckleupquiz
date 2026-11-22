@@ -110,6 +110,28 @@ final class ListenSessionModel {
     /// Answers not heard in a voice game: silence, mumbles, a mic that failed, or the background.
     @ObservationIgnored private var unheardAnswers = 0
 
+    /// Starting the next game from the end of this one (same topic, players and length).
+    struct PlayAgain {
+        /// Whether there are enough new questions left today for a full game (ADR-0022).
+        /// Asked after this game's questions are charged.
+        var isAvailable: @MainActor () -> Bool
+        var start: @MainActor () -> Void
+    }
+    @ObservationIgnored var playAgain: PlayAgain?
+    /// The finished screen offers "Play again".
+    private(set) var canPlayAgain = false
+    /// After the outro: listening for "new game" (product decision, 2026-11-22). Only offered when
+    /// the app has clearly been hearing the players in this car: a voice game, on screen, at
+    /// least one answer heard, and the results reliable (never in the background, at most
+    /// `maxUnheardForResults` missed). Otherwise the outro says to start a new game by tap.
+    private(set) var isListeningForNewGame = false
+    /// Long enough for the kids to agree, short enough not to keep the mic on for nothing.
+    static let newGameListenSeconds: Double = 10
+    /// "Stop" ends the game without an invitation to play more.
+    @ObservationIgnored private var stoppedByVoice = false
+    /// The audio session and the mic are still held (until just after the outro).
+    @ObservationIgnored private var holdsAudio = false
+
     /// Called when a grown-up fixes a score after the game: player id and the change in points.
     @ObservationIgnored var onScoreAdjusted: ((String, Int) -> Void)?
 
@@ -242,6 +264,7 @@ final class ListenSessionModel {
         deps.nowPlaying?.onCommand = { [weak self] in self?.handle($0) }
         deps.nowPlaying?.enable()
         deps.cues.startSession()
+        holdsAudio = true
         status = .playing
         launchRunner()
     }
@@ -262,15 +285,21 @@ final class ListenSessionModel {
     private(set) var isInBackground = false
 
     func movedToBackground() {
-        guard !isInBackground, status != .finished else { return }
+        guard !isInBackground else { return }
         isInBackground = true
+        if status == .finished {
+            // Waiting for "new game" needs the app on screen too.
+            if isListeningForNewGame { haltRunner(); releaseAudio() }
+            return
+        }
         if startedInVoice { wentToBackground = true }
         if isVoice { deps.listener?.stopMic() }
     }
 
     func movedToForeground() {
-        guard isInBackground, status != .finished else { return }
+        guard isInBackground else { return }
         isInBackground = false
+        guard status != .finished else { return }
         // After a long pause the mic comes back with play (`takeAudioBack`).
         guard isVoice, !needsAudioBack else { return }
         do {
@@ -282,7 +311,7 @@ final class ListenSessionModel {
     }
 
     /// Voice answers need the app on screen, so the screen stays on during a voice game.
-    var keepsScreenOn: Bool { startedInVoice && status != .finished }
+    var keepsScreenOn: Bool { startedInVoice && (status != .finished || isListeningForNewGame) }
 
     func pause() {
         guard status == .playing else { return }
@@ -394,9 +423,13 @@ final class ListenSessionModel {
         launchRunner()
     }
 
-    /// Ends the session immediately, without the spoken outro.
+    /// Ends the session immediately, without the spoken outro. After the end, it stops the
+    /// outro or the wait for "new game".
     func stop() {
-        guard status != .finished else { return }
+        guard status != .finished else {
+            haltRunner()
+            return releaseAudio()
+        }
         haltRunner()
         closeUnrecordedTurn()
         session.stop()
@@ -691,6 +724,7 @@ final class ListenSessionModel {
             try await deps.speech.speak(Phrases.pausedByVoice)
             pause()
         case .stop:
+            stoppedByVoice = true
             haltSpeechOnly()
             closeUnrecordedTurn()
             session.stop()
@@ -777,9 +811,53 @@ final class ListenSessionModel {
         if showsFinalScores, canFixScores, let ending = closingMessage {
             closingMessage = ending + " " + Phrases.scoreFixNote
         }
-        closingMessage = (closingMessage ?? Phrases.outroPrefix) + " " + Phrases.playAgain
-        if let closingMessage { try await deps.speech.speak(closingMessage) }
-        tearDown()
+        let ending = closingMessage ?? Phrases.outroPrefix
+        let hearsPlayers = isVoice && !isInBackground && hasAttempts && resultsAreReliable && !stoppedByVoice
+        // Saves the game first, so the next one is planned with what's left today. The mic and
+        // the audio stay on for the outro and the "new game" reply.
+        endGame()
+        canPlayAgain = playAgain?.isAvailable() == true
+        let byVoice = canPlayAgain && hearsPlayers && deps.listener != nil
+        closingMessage = ending + " " + (byVoice ? Phrases.playAgainByVoice : Phrases.playAgain)
+        try await deps.speech.speak(closingMessage ?? ending)
+        if byVoice, !isInBackground { try await listenForNewGame() }
+        releaseAudio()
+    }
+
+    /// Listens once for "new game" (`PlayAgainReply`). Chatter and cheers keep it listening until
+    /// the time is up; silence, "no" or a mic problem just end the game quietly, and the
+    /// "Play again" button is still there.
+    private func listenForNewGame() async throws {
+        guard let listener = deps.listener else { return }
+        // Lets the end of the outro finish playing over Bluetooth, as before an answer.
+        try await deps.sleeper.sleep(seconds: 0.3)
+        isListeningForNewGame = true
+        defer { isListeningForNewGame = false }
+        let reply: PlayAgainReply?
+        do {
+            reply = PlayAgainReply.parse(try await listener.listen(
+                for: Self.newGameListenSeconds, hints: PlayAgainReply.hints,
+                isConclusive: { PlayAgainReply.parse($0) != nil }))
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            deps.telemetry?.record("game.playAgain", ["reply": "failed"].merging(Self.describe(error)) { a, _ in a })
+            return
+        }
+        // Counts only, to see how well this is heard in cars (ADR-0020).
+        deps.telemetry?.record("game.playAgain", ["reply": reply.map { $0 == .newGame ? "newGame" : "noThanks" } ?? "none"])
+        guard reply == .newGame, !isInBackground else { return }
+        try await deps.speech.speak(Phrases.newGameStarting)
+        startNextGame()
+    }
+
+    /// "Play again" on the finished screen, or "new game" out loud.
+    func startNextGame() {
+        guard status == .finished, canPlayAgain, let playAgain else { return }
+        haltRunner()
+        releaseAudio()
+        canPlayAgain = false
+        playAgain.start()
     }
 
     private func newlyEarnedBadges() -> [EarnedBadge] {
@@ -794,6 +872,12 @@ final class ListenSessionModel {
     }
 
     private func tearDown() {
+        endGame()
+        releaseAudio()
+    }
+
+    /// The game is over: saves it and reports it. The audio is released separately.
+    private func endGame() {
         guard status != .finished else { return }
         status = .finished
         micOffTimer?.cancel()
@@ -808,6 +892,13 @@ final class ListenSessionModel {
         onFinish = nil
         turn = nil
         if closingMessage == nil { closingMessage = Phrases.outroPrefix }
+    }
+
+    /// Turns the mic off and gives the audio back to the car and other apps.
+    private func releaseAudio() {
+        guard holdsAudio else { return }
+        holdsAudio = false
+        isListeningForNewGame = false
         deps.cues.endSession()
         deps.nowPlaying?.disable()
         deps.listener?.stopMic()
