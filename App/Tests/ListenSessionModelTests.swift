@@ -501,6 +501,7 @@ struct ListenSessionModelTests {
     // MARK: Play again by voice
 
     /// Counts the next games started from the end of this one.
+    @MainActor
     final class NextGames {
         var started = 0
         var available = true
