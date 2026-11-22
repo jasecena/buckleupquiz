@@ -158,6 +158,11 @@ final class ListenSessionModel {
     @ObservationIgnored private var discussionTimer: Task<Void, Never>?
     /// Bumped on every (re)launch so a cancelled runner can't touch the new one's state.
     @ObservationIgnored private var generation = 0
+    /// How long a game can stay paused before the mic is turned off (5 minutes).
+    static let micOffAfterPause: Double = 300
+    @ObservationIgnored private var micOffTimer: Task<Void, Never>?
+    /// After a phone call or a long pause, the audio and the mic are taken back on play.
+    @ObservationIgnored private var needsAudioBack = false
     /// Breathers between questions and long or hard questions read twice (`TurnVariety`).
     /// The app turns it on; tests leave it off so the script is predictable.
     private let addsVariety: Bool
@@ -240,12 +245,41 @@ final class ListenSessionModel {
         status = .paused
         haltRunner()
         updateNowPlaying()
+        if isVoice { startMicOffTimer() }
     }
 
     func resume() {
         guard status == .paused else { return }
+        micOffTimer?.cancel()
+        if needsAudioBack { takeAudioBack() }
         status = .playing
         launchRunner()
+    }
+
+    /// A short stop keeps the mic on, so the car's play button resumes hands-free with the screen
+    /// locked (iOS won't start the mic in the background). A forgotten pause doesn't leave it on:
+    /// after `micOffAfterPause` it's turned off, and play turns it back on (ADR-0028).
+    private func startMicOffTimer() {
+        micOffTimer?.cancel()
+        micOffTimer = Task { [weak self, sleeper = deps.sleeper] in
+            do { try await sleeper.sleep(seconds: Self.micOffAfterPause) } catch { return }
+            guard let self, self.status == .paused else { return }
+            self.deps.listener?.stopMic()
+            self.needsAudioBack = true
+        }
+    }
+
+    /// After a phone call or a long pause: takes the audio back from iOS and turns the mic on
+    /// again before playing. If the mic can't start yet (screen locked), the next answer tries.
+    private func takeAudioBack() {
+        needsAudioBack = false
+        guard isVoice else { return activateForListening() }
+        do {
+            _ = try deps.audioSession?.activateForVoice(duckOthers: duckOthers, mic: mic)
+            try deps.listener?.startMic()
+        } catch {
+            deps.telemetry?.record("voice.micResumeFailed", Self.describe(error))
+        }
     }
 
     func togglePause() { status == .playing ? pause() : resume() }
@@ -332,6 +366,8 @@ final class ListenSessionModel {
             pause()
         case .interruptionEnded(let shouldResume):
             guard status == .paused else { return }
+            // The call had the mic and the audio: take them back before playing again.
+            needsAudioBack = true
             welcomeBackPending = true
             restartCurrentQuestion()
             if shouldResume { resume() }
@@ -709,6 +745,8 @@ final class ListenSessionModel {
     private func tearDown() {
         guard status != .finished else { return }
         status = .finished
+        micOffTimer?.cancel()
+        micOffTimer = nil
         discussionTimer?.cancel()
         discussionTimer = nil
         isDiscussing = false

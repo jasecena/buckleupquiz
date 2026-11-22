@@ -257,6 +257,46 @@ struct ListenSessionModelTests {
         #expect(!listener.micOn, "off when the game ends")
     }
 
+    func makePausableVoiceModel(_ listener: FakeListener) -> ListenSessionModel {
+        let config = SessionConfig(topics: ["animals"], players: [Player(id: "mia", name: "Mia", age: 7)],
+                                   length: .questions(1))
+        return ListenSessionModel(
+            bank: makeBank(questions: 1), config: config, settings: ListenSettings(), duckOthers: true,
+            dependencies: .init(speech: speech, cues: cues, sleeper: InstantSleeper(), audioSession: audio,
+                                listener: listener),
+            answerMode: .voice, rng: AnyRandomGenerator(seed: 1))
+    }
+
+    @Test func aForgottenPauseTurnsTheMicOffAndPlayTurnsItBackOn() async {
+        let listener = FakeListener([])
+        let model = makePausableVoiceModel(listener)
+        model.start()
+        model.pause()
+        for _ in 0..<100 where listener.micOn { await Task.yield() }
+        #expect(!listener.micOn, "off after a long pause (instant in tests)")
+        #expect(model.status == .paused)
+        model.resume()
+        #expect(listener.micOn, "back on with play")
+        #expect(listener.micStarts == 2)
+        model.stop()
+        #expect(!listener.micOn)
+    }
+
+    @Test func afterAPhoneCallTheMicIsTakenBack() async {
+        let listener = FakeListener([])
+        let model = makePausableVoiceModel(listener)
+        model.start()
+        audio.onEvent?(.interruptionBegan)
+        #expect(model.status == .paused)
+        audio.onEvent?(.interruptionEnded(shouldResume: true))
+        #expect(model.status == .playing)
+        #expect(listener.micOn)
+        #expect(listener.micStarts == 2, "the mic is started again after the call")
+        #expect(audio.voice && audio.active)
+        model.stop()
+        #expect(!listener.micOn)
+    }
+
     @Test func aBusyMicIsTriedAgainNextTurn() async {
         let listener = FakeListener([[FakeListener.rightLetter]],
                                     failure: SpeechListenerError.micBusy("call"), failsOnce: true)

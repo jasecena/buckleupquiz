@@ -28,6 +28,9 @@ in App Store Connect.
   The orange mic dot now shows for the whole game.
 - If the microphone is busy for one answer (a phone call), the game tries again on the next
   question, instead of stopping listening for the rest of the game.
+- **After a phone call** the app takes the audio and the mic back before carrying on.
+- **A forgotten pause** turns the mic off after 5 minutes. Play turns it back on. The mic is
+  always turned off when a game ends.
 - **The ending is clearer:** "That's the end of the game! That was 15 questions each. … If you'd
   like to play some more, start a new game!" It said "end of the ride", which sounded like the
   car trip. The number is what was really played: when there aren't enough new questions left

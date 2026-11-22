@@ -23,6 +23,13 @@ off for the rest of that game.
 - If the mic is busy for one answer (a phone call), the game reads the answer out as usual
   and tries the mic again next turn, instead of turning voice off for the whole game.
   Anything else (Dictation off) still turns voice off for that game.
+- **After a phone call** the app takes the audio session back and starts the mic again before
+  the game carries on, instead of waiting for the next answer.
+- **A paused game** keeps the mic on for up to 5 minutes, so the car's play button still
+  resumes hands-free with the screen locked. After that the mic is turned off, and play turns
+  it back on (or, if iOS won't allow it with the screen locked, the next answer tries again).
+- When the game ends, by finishing, the ✕ button or leaving the screen, the mic is turned off
+  and the audio is handed back to iOS.
 - Mic check still turns the mic on only for its own test.
 
 ## Alternatives considered
