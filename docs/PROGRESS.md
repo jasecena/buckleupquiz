@@ -148,11 +148,13 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 ### Big (weeks, or needs other people)
 - [ ] **Grow every topic from about 15 to about 60 questions per age group** (Claude, in
       progress, one topic at a time; `make validate-strict` shows the gap). All 10 of Basic's
-      topics have questions now. Started with Aussie History, using the citizenship test
-      resource as a fact source (docs/CONTENT.md). Once question updates are on, new batches
-      reach phones without an app update.
+      topics have questions now. **Aussie History is done** (60 per age group, 22 November
+      2026; civics and symbols from the citizenship test resource, no First Nations content
+      until it can be reviewed). Next: Science, Sport, Food, then the rest. Once question
+      updates are on, new batches reach phones without an app update.
 - [ ] Parent or teacher review of the values and safety questions (Manners, and Honesty &
-      Fairness), and a fact check of the new knowledge questions, batch by batch.
+      Fairness), and a fact check of the new knowledge questions, batch by batch. First batch
+      to check: Aussie History his-0016–0060, his-0116–0160 and his-0216–0260.
 - [ ] Real-car tests: 3 or more cars plus CarPlay, road noise, kids. Tune listening and speech
       speed (ADR-0008, ADR-0018).
 - [ ] Record about 100 real answers (quiet and with road noise) and turn them into tests for
@@ -270,8 +272,9 @@ the ones not built yet, then built ones with something left, then the finished o
   starts the question over. An unheard answer counts as remembered.
 - Each game is about 80% new questions, 10% the player's own reviews, and 10% questions a
   brother or sister had recently.
-- 436 questions across 10 topics: Animals, Geography, Maths, Space, Science, Sport, Food,
-  Aussie History, Manners & Friendship, and Honesty & Fairness.
+- 571 questions across 10 topics: Animals, Geography, Maths, Space, Science, Sport, Food,
+  Aussie History, Manners & Friendship, and Honesty & Fairness. Aussie History is the first
+  topic at the launch target: 60 per age group.
 
 ### Accounts and data
 - Progress survives deleting and reinstalling the app, through iCloud and the Keychain. There's
