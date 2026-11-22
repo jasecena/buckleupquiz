@@ -14,8 +14,7 @@ off for the rest of that game.
 
 ## Decision
 - One microphone stream (`MicInput`) is started when the game starts, while the app is on
-  screen, and runs until the game ends. Both recognisers (SFSpeechRecognizer and iOS 26's
-  SpeechAnalyzer) listen on it.
+  screen, and runs until the game ends. The recogniser (SFSpeechRecognizer) listens on it.
 - Between answers its audio goes nowhere. It's only passed to the recogniser while it listens,
   and it's never recorded, stored or sent anywhere (ADR-0004).
 - A route change (the car connects, headphones come out) stops the engine, so it's started

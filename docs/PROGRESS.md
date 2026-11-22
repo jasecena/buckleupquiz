@@ -30,6 +30,8 @@ in App Store Connect.
   where more than 2 answers weren't heard, ends with "Great job, Mia and Leo!" instead of the
   scores and the winner. Points still count towards badges.
 - The scores show on screen while the ending is read out (it showed "Buckle up…" before).
+- **One speech engine:** the untested iOS 26 fallback for phones with Dictation off is gone.
+  Those families see the "Turn on Dictation" guide in Mic check, as before.
 
 ## What's new in 0.3.8
 
@@ -68,9 +70,6 @@ in App Store Connect.
 
 ### Easy (a quick yes or no)
 Each removes extra code that can go wrong. All are low risk, and recommended.
-- [ ] **Remove the second speech engine** (the iOS 26 one used when Dictation is off). It's 180
-      lines that have never been checked on a phone. Families with Dictation off get the "Turn on
-      Dictation" guide instead, which is already built.
 - [ ] **Use one recogniser and listen once per turn**, instead of trying 9 English accents with
       retries (up to 14 restarts per listen).
 - [ ] **Skip moves on to the next planned question** for the same player, instead of picking an

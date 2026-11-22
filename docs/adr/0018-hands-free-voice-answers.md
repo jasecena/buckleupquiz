@@ -43,13 +43,12 @@ mics.
   on-device, fails at once with "Siri and Dictation are disabled" (kLSRErrorDomain 201) when
   both are off. The app detects that and tells the grown-ups the fix (Settings → General →
   Keyboard → Enable Dictation; Siri can stay off) in Mic check and as a small in-game note,
-  never out loud. On iOS 26 the app then falls back to `SpeechAnalyzer` + `SpeechTranscriber`
-  (also on-device), downloading the English model once through `AssetInventory` if needed.
-  Telemetry records `voice.trySpeechAnalyzer` / `voice.speechAnalyzerFailed`, so we can see
-  whether the fallback works with Dictation off.
+  never out loud. (Until 2026-11-22, iOS 26 fell back to `SpeechAnalyzer` + `SpeechTranscriber`
+  with Dictation off. It was removed unproven on a real phone, to keep one speech path; the
+  fix guide covers it. It's in git history if it's ever needed.)
 - **Fix guides:** known problems map to a short fix (`FixGuide`): Dictation off → "Settings ›
   General › Keyboard › Enable Dictation"; permission off → "Settings › Apps › BuckleUp Quiz";
-  mic busy; model downloading; no offline English. Mic check shows the problem name, the fix
+  mic busy; no offline English. Mic check shows the problem name, the fix
   path and an Open Settings button, with the raw error in small print. Unknown errors are shown
   as they are. The in-game note uses the same mapping.
 - **Scores can be fixed:** detection can miss answers, so after the scores are read out the app

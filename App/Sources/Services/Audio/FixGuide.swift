@@ -25,11 +25,6 @@ struct FixGuide: Equatable, Sendable {
         steps: ["End any call or recording", "Close other apps using the mic", "Try again"],
         opensSettings: false)
 
-    static let preparing = FixGuide(
-        problem: "Getting speech ready (one-time download)",
-        steps: ["Stay on Wi-Fi", "Try again in a minute"],
-        opensSettings: false)
-
     static let noOnDeviceSpeech = FixGuide(
         problem: "No offline English speech on this iPhone",
         steps: ["Settings", "General", "Keyboard", "Enable Dictation", "Dictation Languages: English"])
@@ -39,7 +34,6 @@ struct FixGuide: Equatable, Sendable {
         switch error {
         case SpeechListenerError.dictationOff: return .dictationOff
         case SpeechListenerError.micBusy: return .micBusy
-        case SpeechListenerError.preparing: return .preparing
         default: break
         }
         let ns = error as NSError

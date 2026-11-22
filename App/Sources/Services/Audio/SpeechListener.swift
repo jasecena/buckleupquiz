@@ -31,8 +31,6 @@ enum SpeechListenerError: Error, LocalizedError {
     case dictationOff
     /// The microphone couldn't start (in use by a call or another app, or no input).
     case micBusy(String)
-    /// The on-device speech model is downloading (one time).
-    case preparing
 
     static let dictationOffHelp = "Dictation is turned off on this iPhone, and spoken answers need it. "
         + "Turn it on in Settings → General → Keyboard → Enable Dictation. Siri can stay off."
@@ -42,7 +40,6 @@ enum SpeechListenerError: Error, LocalizedError {
         case .unavailable(let reason): reason
         case .dictationOff: "Siri and Dictation are disabled [kLSRErrorDomain 201]"
         case .micBusy(let detail): "The microphone didn't start. \(detail)"
-        case .preparing: "Getting speech recognition ready (a one-time download)."
         }
     }
 
@@ -107,10 +104,6 @@ final class SystemSpeechListener: SpeechListening {
             && AVAudioApplication.shared.recordPermission == .granted
     }
 
-    /// iOS 26's SpeechAnalyzer, used once SFSpeechRecognizer has said Dictation is off.
-    private var analyzer: AnyObject?
-    private var analyzerFailed = false
-
     private let mic = MicInput()
     /// A game is on: the mic stays on between answers.
     private var keepMicOn = false
@@ -144,43 +137,8 @@ final class SystemSpeechListener: SpeechListening {
             mic.send(to: nil)
             if !keepMicOn { mic.stop() }
         }
-        if #available(iOS 26.0, *), let analyzer = analyzer as? SpeechAnalyzerListener {
-            return try await listen(with: analyzer, until: end, isConclusive: isConclusive)
-        }
-        do {
-            return try await listenWithRecognizer(until: end, hints: hints, isConclusive: isConclusive)
-        } catch SpeechListenerError.dictationOff {
-            // Siri and Dictation are off. iOS 26 has a newer on-device recogniser that may still work.
-            guard #available(iOS 26.0, *), !analyzerFailed else { throw SpeechListenerError.dictationOff }
-            let analyzer = SpeechAnalyzerListener()
-            self.analyzer = analyzer
-            telemetry?.record("voice.trySpeechAnalyzer", [:])
-            return try await listen(with: analyzer, until: end, isConclusive: isConclusive)
-        }
-    }
-
-    @available(iOS 26.0, *)
-    private func listen(with analyzer: SpeechAnalyzerListener, until end: Date,
-                        isConclusive: @escaping @MainActor ([String]) -> Bool) async throws -> [String] {
-        do {
-            let heard = try await analyzer.listen(until: end, locales: Self.defaultLocales, mic: mic,
-                                                  isConclusive: isConclusive)
-            Self.lastProblem = nil
-            return heard
-        } catch is CancellationError {
-            throw CancellationError()
-        } catch SpeechAnalyzerListener.Problem.downloading {
-            // The model is on its way (keep this analyzer so the download isn't started twice).
-            Self.lastProblem = SpeechAnalyzerListener.Problem.downloading.localizedDescription
-            throw SpeechListenerError.preparing
-        } catch {
-            telemetry?.record("voice.speechAnalyzerFailed", ["error": error.localizedDescription,
-                                                             "type": String(describing: type(of: error))])
-            analyzerFailed = true
-            self.analyzer = nil
-            Self.lastProblem = SpeechListenerError.dictationOffHelp
-            throw SpeechListenerError.dictationOff
-        }
+        // With Dictation off this throws `dictationOff`, and the "Turn on Dictation" guide shows.
+        return try await listenWithRecognizer(until: end, hints: hints, isConclusive: isConclusive)
     }
 
     private func listenWithRecognizer(until end: Date, hints: [String],
