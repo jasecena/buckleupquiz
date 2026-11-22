@@ -7,7 +7,7 @@ import Testing
 /// New questions without an app update (ADR-0031): only signed, matching, readable sets are used.
 @MainActor
 struct ContentUpdaterTests {
-    static let base = URL(string: "https://example.invalid/content/v1/")!
+    nonisolated static let base = URL(string: "https://example.invalid/content/v1/")!
 
     /// A fake CDN: path → bytes. Missing paths throw, like a failed download.
     final class Server: @unchecked Sendable {
