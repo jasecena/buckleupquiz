@@ -15,7 +15,9 @@ and COPPA also apply to children's data. Parents need to trust that a microphone
 - Audio is never recorded or stored. Speech recognition uses `requiresOnDeviceRecognition`.
 - App Privacy label: **Data Not Collected**. `PrivacyInfo.xcprivacy` declares no tracking and
   only the required-reason APIs we use (UserDefaults: CA92.1).
-- A parental gate guards purchases, settings, external links and support email (M6).
+- A parental gate guards purchases, settings, external links and support email (M6). Since
+  2026-11-22 it asks to type three numbers written as words ("seven, two, nine"); a sum like
+  17 × 8 was too hard for a parent in the car. iOS has no built-in gate for this.
 - Crash insight comes from Xcode Organizer and TestFlight, which are Apple's opt-in
   diagnostics and need no SDK.
 

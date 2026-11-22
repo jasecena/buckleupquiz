@@ -1,11 +1,13 @@
 import SwiftUI
 
-/// "Ask a grown-up": a sum a young child can't do in their head, required before any purchase
-/// or link out of the app (Kids Category, App Review 1.3; FEATURES §5).
+/// "Ask a grown-up", required before any purchase or link out of the app (Kids Category, App
+/// Review 1.3; FEATURES §5). Three numbers written as words ("seven, two, nine") to type as
+/// digits: quick for any adult, hard for a young child. It replaced a sum like 17 × 8, which
+/// was too hard for a parent in the car (product decision, 2026-11-22).
 struct ParentalGate<Content: View>: View {
     @ViewBuilder var content: () -> Content
     @State private var passed = false
-    @State private var question = Self.makeQuestion()
+    @State private var digits = Self.makeDigits()
     @State private var answer = ""
     @State private var wrong = false
     @FocusState private var focused: Bool
@@ -19,7 +21,10 @@ struct ParentalGate<Content: View>: View {
                     .font(.system(size: 56))
                     .foregroundStyle(Theme.accent)
                 Text("Grown-ups only").font(Theme.title)
-                Text("What is \(question.a) × \(question.b)?")
+                Text("Type these numbers:")
+                    .font(Theme.body)
+                    .foregroundStyle(.secondary)
+                Text(digits.map { Self.words[$0] }.joined(separator: ", "))
                     .font(Theme.headline)
                 TextField("Answer", text: $answer)
                     .keyboardType(.numberPad)
@@ -41,16 +46,18 @@ struct ParentalGate<Content: View>: View {
     }
 
     private func check() {
-        if Int(answer) == question.a * question.b {
+        if answer.filter(\.isNumber) == digits.map(String.init).joined() {
             passed = true
         } else {
             wrong = true
             answer = ""
-            question = Self.makeQuestion()
+            digits = Self.makeDigits()
         }
     }
 
-    private static func makeQuestion() -> (a: Int, b: Int) {
-        (Int.random(in: 12...19), Int.random(in: 3...9))
+    private static let words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+
+    private static func makeDigits() -> [Int] {
+        (0..<3).map { _ in Int.random(in: 1...9) }
     }
 }

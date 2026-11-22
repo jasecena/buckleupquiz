@@ -87,7 +87,10 @@ struct HomeView: View {
         }
         .onAppear(perform: normaliseSelection)
         .onChange(of: entitlements.hasBasic) { normaliseSelection() }
-        .sheet(isPresented: $showSettings) { SettingsView() }
+        .sheet(isPresented: $showSettings) {
+            // Grown-ups only: Settings has links out of the app and Reset all data (ADR-0004).
+            ParentalGate { SettingsView() }
+        }
         .sheet(item: $setup, onDismiss: {
             if let topic = startAfterSetup {
                 startAfterSetup = nil

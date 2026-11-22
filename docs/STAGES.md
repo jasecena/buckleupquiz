@@ -129,7 +129,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 - [ ] Create the products in App Store Connect
 - [x] Progress survives a reinstall: iCloud key-value storage + Keychain backup, merged at launch (ADR-0023)
 - [x] No Endless mode; games are 5/10/15 each, at most 50 questions
-- [ ] Parental gate before settings, links and support email
+- [x] Parental gate before settings, links and support email (typed numbers, 2026-11-22)
 - [ ] Locked topics and custom mixes enforced
 - [x] Free games: up to 2 players; BuckleUp Basic: up to 6 (Game setup note + alert). TestFlight-only switch to try Basic until purchases land
 

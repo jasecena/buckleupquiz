@@ -2,7 +2,7 @@ import AVFoundation
 import QuizCore
 import SwiftUI
 
-/// FEATURES §2.5. A parental gate will guard this screen in M6 (FEATURES §5).
+/// FEATURES §2.5. Opened behind the parental gate (ADR-0004).
 struct SettingsView: View {
     @Environment(SettingsStore.self) private var store
     @Environment(Telemetry.self) private var telemetry
@@ -149,7 +149,7 @@ struct SettingsView: View {
                     Text("No ads, no tracking and no accounts. Error reports help us fix problems like a microphone that won't start. They hold the app version, iPhone model and what went wrong. Never names, ages, answers, recordings or anything that identifies you.")
                 }
             }
-            .sheet(isPresented: $showPlans) { GetMoreQuestionsSheet() }
+            .sheet(isPresented: $showPlans) { PlansView(reason: nil) } // already past the gate
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

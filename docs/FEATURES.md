@@ -311,7 +311,7 @@ These use the same question types as 4.3 (scenario, true/false, Talk About) and 
 
 ## 5. Kids Category & Privacy Compliance
 
-- **Parental gate** before any purchase, settings change, external link or support email. For example, a simple adult maths question or a press-and-hold.
+- **Parental gate** before any purchase, settings change, external link or support email. The parent types three numbers written as words ("seven, two, nine" → 729): quick for an adult, hard for a young child.
 - No third-party analytics, ads or tracking SDKs.
 - Microphone and speech-recognition permission prompts with clear wording, for example: "Used to hear your child's answers. Audio is processed on this device and never stored or sent anywhere."
 - Never store or record audio.

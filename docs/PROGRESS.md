@@ -32,6 +32,8 @@ in App Store Connect.
 - The scores show on screen while the ending is read out (it showed "Buckle up…" before).
 - **One speech engine:** the untested iOS 26 fallback for phones with Dictation off is gone.
   Those families see the "Turn on Dictation" guide in Mic check, as before.
+- **Easier grown-ups check:** type "seven, two, nine" as 729, instead of working out 17 × 8.
+  It now guards Settings too (sharing reports, links out of the app, Reset all data).
 - **Two recognisers instead of nine:** the phone's English (or Australian English) and a US
   English backup. Listening still restarts if it stops early, so late answers are heard.
 
@@ -95,8 +97,6 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 - [ ] App Store listing: description (it must explain the subscription), age rating, Kids
       Category age band and App Review contact details (ADR-0022).
 - [ ] Privacy label (Diagnostics, not linked) and the final privacy policy (ADR-0020).
-- [ ] Parental gate before settings, links and support email (the gate already exists for
-      purchases).
 - [ ] Network check: the app only talks to api.buckleupquiz.com, and only sends anonymous error
       reports (ADR-0004, ADR-0020).
 - [ ] Build with Xcode 27 before April 2027 (a setting, once GitHub has it).
@@ -189,7 +189,8 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 - BuckleUp Basic: A$4.99/month. Gives 10 topics, 40 new questions each day the app is opened,
   6 players and fixing scores. No free trial.
 - Out of questions: 0–2 each blocks the game, 3–4 each warns, 5 each is the minimum.
-- Parental gate in front of purchases.
+- Parental gate in front of purchases and Settings: type three numbers written as words
+  ("seven, two, nine"). It was a sum like 17 × 8, which was too hard in the car.
 - Paid Applications agreement accepted, with banking and tax. Launch prices agreed.
 
 ### Testing
