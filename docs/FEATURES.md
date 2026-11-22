@@ -321,10 +321,14 @@ These use the same question types as 4.3 (scenario, true/false, Talk About) and 
 
 ## 6. Onboarding
 
-1. Welcome screen: "Welcome to BuckleUp Quiz, the screen-free quiz for car trips."
-2. Ask for microphone permission, only when a paid voice feature is first used, or during onboarding if a free trial is offered.
-3. Quick 3-question demo in Listen mode.
-4. Optional: create the first player.
+Decided 2026-11-22: three short cards, shown once before the first game, then "Who's playing?"
+as before. The first real game is the demo (no separate practice game).
+1. "A quiz for the car": the app reads out loud, the kids answer out loud.
+2. "Say the letter": A, B or C, or true or false; "skip", "repeat" and "pause" work too (ADR-0026).
+3. "Phone in a cradle, app open": answers are only heard on screen, the screen stays on, plug in
+   for long trips; some cars show a phone-call screen (ADR-0008, ADR-0029); "Just listen" if
+   the car is too noisy.
+4. Microphone permission is asked when the first voice game starts.
 
 ---
 

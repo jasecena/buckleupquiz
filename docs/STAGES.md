@@ -76,7 +76,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
       bystanders move up on right answers only (ADR-0016)
 - [x] One-tap start: remembered players and length, Play = random topic, tap a topic = start,
       Game setup only first time or via Change (ADR-0017)
-- [ ] Onboarding (FEATURES §6): welcome, 3-question demo, add the first player
+- [x] Onboarding (FEATURES §6): three welcome cards once, then add the first player (no demo game, 2026-11-22)
 - [ ] Mascot and app icon (original, not seatbelt-themed)
 - [ ] Mixed-topic sessions (paid): custom mixes chosen by a parent, after launch (2026-11-22)
 - [ ] Accessibility pass: Dynamic Type, VoiceOver labels, contrast

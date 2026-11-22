@@ -124,6 +124,15 @@ struct HomeView: View {
         .fullScreenCover(item: $activeSession) { model in
             QuizView(model: model)
         }
+        // Once, before the first game (WelcomeView). Attached to its own view so it never
+        // competes with the game's full-screen cover.
+        .background {
+            Color.clear.fullScreenCover(isPresented: Binding(
+                get: { !settingsStore.settings.hasCompletedOnboarding },
+                set: { if !$0 { settingsStore.settings.hasCompletedOnboarding = true } })) {
+                WelcomeView { settingsStore.settings.hasCompletedOnboarding = true }
+            }
+        }
         .alert(notice ?? "", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
             Button("OK", role: .cancel) {}
         }

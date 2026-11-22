@@ -32,6 +32,8 @@ in App Store Connect.
 - The scores show on screen while the ending is read out (it showed "Buckle up…" before).
 - **One speech engine:** the untested iOS 26 fallback for phones with Dictation off is gone.
   Those families see the "Turn on Dictation" guide in Mic check, as before.
+- **Welcome cards:** three short cards before the first game: how it works, "say the letter",
+  and the phone in a cradle with the app open (some cars show a call screen).
 - **Easier grown-ups check:** type "seven, two, nine" as 729, instead of working out 17 × 8.
   It now guards Settings too (sharing reports, links out of the app, Reset all data).
 - **Two recognisers instead of nine:** the phone's English (or Australian English) and a US
@@ -107,9 +109,6 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 ### Medium (a few days of work, or tests on a real phone)
 - [ ] On a real phone in the car: a phone call during a voice game, and a 20-question voice
       game with the phone in a cradle (screen on), including saying "new game" at the end.
-- [ ] Onboarding: welcome, a 3-question demo, add the first player. Teach "say the letter"
-      (ADR-0026), explain that some cars show a phone-call screen while the mic is on
-      (ADR-0008), and that voice answers need the app on screen, ideally in a cradle (ADR-0029).
 - [ ] Accessibility pass (text size, VoiceOver) and iPad layout.
 - [ ] Name and trademark check.
 
@@ -154,6 +153,7 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 ## Done (what the app does today)
 
 ### Playing
+- Three welcome cards before the first game.
 - Topic grid. One tap starts a game with the players and length from last time.
 - Named players (up to 6), each getting questions for their own age.
 - Every player gets the same number of questions, planned before the game starts. Games are 5, 10,
