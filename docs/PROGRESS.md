@@ -35,6 +35,8 @@ in App Store Connect.
 - **iPhone only** for now (iPad after launch).
 - **Large text and VoiceOver:** every font follows the phone's text size, the game screen
   scrolls when text is large, and side-by-side buttons stack.
+- **Five new topics** for BuckleUp Basic, 45 questions each (15 per age group): Science,
+  Sport, Food, Aussie History, and Honesty & Fairness. Basic's 10 topics all play now.
 - **Welcome cards:** three short cards before the first game: how it works, "say the letter",
   and the phone in a cradle with the app open (some cars show a call screen).
 - **Easier grown-ups check:** type "seven, two, nine" as 729, instead of working out 17 × 8.
@@ -128,9 +130,10 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
 - [ ] Record about 100 real answers (quiet and with road noise) and turn them into tests for
       letter matching (ADR-0007, ADR-0026).
 - [ ] Mascot, app icon, sounds and App Store screenshots.
-- [ ] Parent or teacher review of the values and safety questions.
-- [ ] Questions for Aussie History, Science, Sport, Food and a second values topic, so Basic's
-      10 topics all play. Target about 60 per topic per age group.
+- [ ] Parent or teacher review of the values and safety questions (Manners, and Honesty &
+      Fairness, which is new), and a fact check of the new knowledge questions.
+- [ ] Grow every topic from about 15 to about 60 questions per age group (`make
+      validate-strict` shows the gap). All 10 of Basic's topics have questions now.
 
 ## After launch
 - [ ] **Free access for chosen people** with Apple offer codes for BuckleUp Basic (clicks in App
@@ -191,7 +194,8 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
   starts the question over. An unheard answer counts as remembered.
 - Each game is about 80% new questions, 10% the player's own reviews, and 10% questions a
   brother or sister had recently.
-- 211 questions across Animals, Geography, Maths, Space and Manners.
+- 436 questions across 10 topics: Animals, Geography, Maths, Space, Science, Sport, Food,
+  Aussie History, Manners & Friendship, and Honesty & Fairness.
 
 ### Accounts and data
 - Progress survives deleting and reinstalling the app, through iCloud and the Keychain. There's

@@ -1,0 +1,736 @@
+[
+  {
+    "id": "his-0001",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which famous building in Sydney has a roof that looks like sails?",
+    "options": [
+      "The Opera House",
+      "The Town Hall",
+      "Parliament House"
+    ],
+    "answer": "The Opera House",
+    "acceptedAnswers": [],
+    "funFact": "It opened in 1973.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0002",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What colours are on the Australian flag?",
+    "options": [
+      "Red, white and blue",
+      "Green and gold",
+      "Black and red"
+    ],
+    "answer": "Red, white and blue",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0003",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Australia's national sporting colours are green and gold. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0004",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which bridge is nicknamed the Coathanger?",
+    "options": [
+      "Sydney Harbour Bridge",
+      "Story Bridge",
+      "West Gate Bridge"
+    ],
+    "answer": "Sydney Harbour Bridge",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0005",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which day in April remembers Australian and New Zealand soldiers?",
+    "options": [
+      "Anzac Day",
+      "Labour Day",
+      "Boxing Day"
+    ],
+    "answer": "Anzac Day",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0006",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Australia's Parliament meets in Canberra. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0007",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What were people looking for in the gold rush?",
+    "options": [
+      "Gold",
+      "Oil",
+      "Diamonds"
+    ],
+    "answer": "Gold",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0008",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which animal is on Australia's coat of arms, next to the emu?",
+    "options": [
+      "Kangaroo",
+      "Koala",
+      "Platypus"
+    ],
+    "answer": "Kangaroo",
+    "acceptedAnswers": [],
+    "funFact": "It's often said neither animal can easily walk backwards.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0009",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What kind of money does Australia use?",
+    "options": [
+      "Dollars",
+      "Pounds",
+      "Euros"
+    ],
+    "answer": "Dollars",
+    "acceptedAnswers": [],
+    "funFact": "Australian coins have Australian animals on them.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0010",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "The first Olympic Games in Australia were in Melbourne. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "That was in 1956.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0011",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "How does the Royal Flying Doctor Service reach people in the outback?",
+    "options": [
+      "By plane",
+      "By boat",
+      "By train"
+    ],
+    "answer": "By plane",
+    "acceptedAnswers": [],
+    "funFact": "It started in 1928.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0012",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which famous racehorse from the 1930s is a hero to many Australians?",
+    "options": [
+      "Phar Lap",
+      "Black Beauty",
+      "Seabiscuit"
+    ],
+    "answer": "Phar Lap",
+    "acceptedAnswers": [],
+    "funFact": "Phar Lap's heart is kept at the National Museum in Canberra.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0013",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "The bushranger Ned Kelly wore homemade metal armour. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "His armour is at the State Library of Victoria.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0014",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is Australia's national anthem called?",
+    "options": [
+      "Advance Australia Fair",
+      "Waltzing Matilda",
+      "Down Under"
+    ],
+    "answer": "Advance Australia Fair",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0015",
+    "topic": "aussie-history",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "The Sydney Harbour Bridge opened before the Sydney Opera House. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "The bridge opened in 1932, the Opera House in 1973.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0101",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In which year did Australia's colonies join to become one nation?",
+    "options": [
+      "1901",
+      "1788",
+      "1956"
+    ],
+    "answer": "1901",
+    "acceptedAnswers": [],
+    "funFact": "This is called Federation.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0102",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which city was Australia's capital before Canberra?",
+    "options": [
+      "Melbourne",
+      "Sydney",
+      "Adelaide"
+    ],
+    "answer": "Melbourne",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0103",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What were the ships that arrived at Sydney Cove in 1788 called?",
+    "options": [
+      "The First Fleet",
+      "The Gold Fleet",
+      "The Royal Fleet"
+    ],
+    "answer": "The First Fleet",
+    "acceptedAnswers": [],
+    "funFact": "There were eleven ships.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0104",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Before dollars, Australia used pounds, shillings and pence. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "Australia switched to dollars in 1966.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0105",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In which gold rush town did the Eureka Stockade happen?",
+    "options": [
+      "Ballarat",
+      "Bendigo",
+      "Geelong"
+    ],
+    "answer": "Ballarat",
+    "acceptedAnswers": [],
+    "funFact": "In 1854, miners there stood up for fairer rules.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0106",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Who was Australia's first Prime Minister?",
+    "options": [
+      "Edmund Barton",
+      "John Curtin",
+      "Robert Menzies"
+    ],
+    "answer": "Edmund Barton",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0107",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Women in South Australia were some of the first in the world allowed to stand for parliament. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "That law was passed in the 1890s.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0108",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which famous song is about a swagman camping by a billabong?",
+    "options": [
+      "Waltzing Matilda",
+      "Advance Australia Fair",
+      "Click Go the Shears"
+    ],
+    "answer": "Waltzing Matilda",
+    "acceptedAnswers": [],
+    "funFact": "Banjo Paterson wrote the words.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0109",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In the word Anzac, what do the letters N and Z stand for?",
+    "options": [
+      "New Zealand",
+      "North Zone",
+      "Navy Zone"
+    ],
+    "answer": "New Zealand",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0110",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which of these was invented in Australia?",
+    "options": [
+      "The flight recorder",
+      "The telephone",
+      "The light bulb"
+    ],
+    "answer": "The flight recorder",
+    "acceptedAnswers": [],
+    "funFact": "It's often called the black box. David Warren invented it in Melbourne in the 1950s.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0111",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "The Snowy Mountains Scheme built dams and power stations. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "More than one hundred thousand people from over thirty countries worked on it.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0112",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Who designed the city of Canberra with his wife, Marion?",
+    "options": [
+      "Walter Burley Griffin",
+      "Banjo Paterson",
+      "Henry Lawson"
+    ],
+    "answer": "Walter Burley Griffin",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0113",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Who wrote the poem 'The Man from Snowy River'?",
+    "options": [
+      "Banjo Paterson",
+      "Henry Lawson",
+      "Dorothea Mackellar"
+    ],
+    "answer": "Banjo Paterson",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0114",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Tasmania was once called Van Diemen's Land. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0115",
+    "topic": "aussie-history",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What did bushrangers do?",
+    "options": [
+      "Robbed travellers",
+      "Built railways",
+      "Herded sheep"
+    ],
+    "answer": "Robbed travellers",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0201",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Who wrote the poem 'My Country', which begins 'I love a sunburnt country'?",
+    "options": [
+      "Dorothea Mackellar",
+      "Banjo Paterson",
+      "Henry Lawson"
+    ],
+    "answer": "Dorothea Mackellar",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0202",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "In which year did Australia switch to decimal currency?",
+    "options": [
+      "1966",
+      "1901",
+      "1988"
+    ],
+    "answer": "1966",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0203",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Australia's Constitution started on the first of January, 1901. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0204",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Who was the first woman elected to the House of Representatives?",
+    "options": [
+      "Enid Lyons",
+      "Edith Cowan",
+      "Julia Gillard"
+    ],
+    "answer": "Enid Lyons",
+    "acceptedAnswers": [],
+    "funFact": "Dorothy Tangney became the first woman in the Senate at the same election.",
+    "difficulty": 4,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0205",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which sea captain mapped Australia's east coast in 1770?",
+    "options": [
+      "James Cook",
+      "Abel Tasman",
+      "Matthew Flinders"
+    ],
+    "answer": "James Cook",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0206",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Who sailed all the way around Australia and helped give it its name?",
+    "options": [
+      "Matthew Flinders",
+      "James Cook",
+      "Abel Tasman"
+    ],
+    "answer": "Matthew Flinders",
+    "acceptedAnswers": [],
+    "funFact": "His cat, Trim, sailed with him and has a statue in Sydney.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0207",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Darwin was bombed during World War Two. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "The first attack was in February 1942.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0208",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which Prime Minister led Australia through most of World War Two?",
+    "options": [
+      "John Curtin",
+      "Robert Menzies",
+      "Ben Chifley"
+    ],
+    "answer": "John Curtin",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0209",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which device that helps deaf people hear was developed in Australia?",
+    "options": [
+      "The cochlear implant",
+      "The stethoscope",
+      "The X-ray"
+    ],
+    "answer": "The cochlear implant",
+    "acceptedAnswers": [],
+    "funFact": "Graeme Clark developed it in Melbourne.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0210",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Australian scientists helped invent Wi-Fi. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "Scientists at the CSIRO worked on it.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0211",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which was the first British colony in Australia?",
+    "options": [
+      "New South Wales",
+      "Victoria",
+      "Queensland"
+    ],
+    "answer": "New South Wales",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0212",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which Australian yacht won the America's Cup in 1983?",
+    "options": [
+      "Australia II",
+      "Southern Cross",
+      "Endeavour"
+    ],
+    "answer": "Australia II",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0213",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Australia's Parliament House in Canberra opened in 1988. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0214",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Early settlers who took up large areas of land for sheep and cattle were called what?",
+    "options": [
+      "Squatters",
+      "Swagmen",
+      "Diggers"
+    ],
+    "answer": "Squatters",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "his-0215",
+    "topic": "aussie-history",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What nickname were Australian soldiers given in World War One?",
+    "options": [
+      "Diggers",
+      "Jackaroos",
+      "Swaggies"
+    ],
+    "answer": "Diggers",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  }
+]

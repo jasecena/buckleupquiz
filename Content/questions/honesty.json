@@ -1,0 +1,734 @@
+[
+  {
+    "id": "hon-0001",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "You broke a cup by accident. What's the honest thing to do?",
+    "options": [
+      "Tell a grown-up what happened",
+      "Hide the pieces",
+      "Say the dog broke the cup"
+    ],
+    "answer": "Tell a grown-up what happened",
+    "acceptedAnswers": [],
+    "explanation": "Telling the truth is brave, and accidents happen to everyone.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0002",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Taking turns makes a game fair for everyone. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "When everyone gets a go, everyone has fun.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0003",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "You find a toy that isn't yours. What should you do?",
+    "options": [
+      "Give the toy to the teacher",
+      "Put the toy in your bag",
+      "Leave the toy there"
+    ],
+    "answer": "Give the toy to the teacher",
+    "acceptedAnswers": [],
+    "explanation": "Handing it in helps the toy find its way home.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0004",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What's a fair way to share a cake?",
+    "options": [
+      "One cuts, the other picks",
+      "Grab the biggest piece",
+      "The fastest gets more"
+    ],
+    "answer": "One cuts, the other picks",
+    "acceptedAnswers": [],
+    "explanation": "If one person cuts and the other chooses, both get a fair share.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0005",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "If you make a mistake, saying sorry can help fix things. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "Saying sorry shows you care about how the other person feels.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0006",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Your friend won the race fair and square. What could you say?",
+    "options": [
+      "Well done, great race!",
+      "That race doesn't count!",
+      "I wasn't even trying"
+    ],
+    "answer": "Well done, great race!",
+    "acceptedAnswers": [],
+    "explanation": "Being a good sport makes playing together fun.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0007",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "You promised to help a friend, but you'd rather play. What's honest?",
+    "options": [
+      "Keep your promise, or explain kindly",
+      "Pretend you forgot the promise",
+      "Hide until your friend leaves"
+    ],
+    "answer": "Keep your promise, or explain kindly",
+    "acceptedAnswers": [],
+    "explanation": "People trust us when we keep our word.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0008",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "talkAbout",
+    "question": "What does being fair mean to you?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0009",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Everyone wants a turn on the swing. What's a fair idea?",
+    "options": [
+      "Take turns, counting to twenty each",
+      "The biggest kid always goes first",
+      "Stay on the swing all lunch"
+    ],
+    "answer": "Take turns, counting to twenty each",
+    "acceptedAnswers": [],
+    "explanation": "Turns mean everyone gets a go.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0010",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Telling a fib to get out of trouble is a good idea. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "explanation": "The truth can feel hard, but it helps people trust you.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0011",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "You see your friend drop some money. What should you do?",
+    "options": [
+      "Pick up the money and give it back",
+      "Keep the money quietly",
+      "Walk away and say nothing"
+    ],
+    "answer": "Pick up the money and give it back",
+    "acceptedAnswers": [],
+    "explanation": "Giving it back is what you'd hope someone would do for you.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0012",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "talkAbout",
+    "question": "Can you think of a time someone was honest with you? How did it feel?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0013",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "In a card game, you could peek at the other cards. What's the honest choice?",
+    "options": [
+      "Play fairly without peeking",
+      "Peek when nobody is looking",
+      "Peek just one time"
+    ],
+    "answer": "Play fairly without peeking",
+    "acceptedAnswers": [],
+    "explanation": "A game is only fun when everyone plays fair.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0014",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "When someone cheats to win, the win isn't really fair. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "A win feels best when everyone played by the same rules.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0015",
+    "topic": "honesty",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Your friend asks if you like their drawing. What's a kind and honest answer?",
+    "options": [
+      "Tell them a part you really like",
+      "Say yours is way better",
+      "Say drawing is boring"
+    ],
+    "answer": "Tell them a part you really like",
+    "acceptedAnswers": [],
+    "explanation": "Honest words can be kind words too.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0101",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Your teacher gave you a mark you didn't earn. What's the honest thing to do?",
+    "options": [
+      "Tell the teacher",
+      "Keep quiet and keep the mark",
+      "Ask friends to keep quiet"
+    ],
+    "answer": "Tell the teacher",
+    "acceptedAnswers": [],
+    "explanation": "Honesty matters most when no one would find out.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0102",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Being honest also means thinking about how you say things. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "The truth lands better when it's said kindly.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0103",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Your team could break a rule while the umpire isn't looking. What's fair?",
+    "options": [
+      "Follow the rules for both teams",
+      "Break the rule just this once",
+      "Argue with the umpire instead"
+    ],
+    "answer": "Follow the rules for both teams",
+    "acceptedAnswers": [],
+    "explanation": "Fair play means the same rules for everyone.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0104",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "A friend asks you to lie to their parents. What could you do?",
+    "options": [
+      "Kindly say no",
+      "Agree so they're not upset",
+      "Make up a bigger story"
+    ],
+    "answer": "Kindly say no",
+    "acceptedAnswers": [],
+    "explanation": "Good friends help each other do the right thing.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0105",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "talkAbout",
+    "question": "Is it ever hard to be honest? What helps you do it anyway?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0106",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "You and your sister both want the front seat. What's a fair plan?",
+    "options": [
+      "Take turns each trip",
+      "Whoever shouts first gets it",
+      "The oldest always gets it"
+    ],
+    "answer": "Take turns each trip",
+    "acceptedAnswers": [],
+    "explanation": "A simple plan stops the same argument every trip.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0107",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "If everyone else is cheating, it's okay for you to cheat too. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "explanation": "Doing the right thing matters, even when others don't.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0108",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Someone is always picked last. What's a fair way to make teams?",
+    "options": [
+      "Pick names out of a hat",
+      "Captains always pick their friends",
+      "Let the fastest kids choose"
+    ],
+    "answer": "Pick names out of a hat",
+    "acceptedAnswers": [],
+    "explanation": "Random teams give everyone the same chance.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0109",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "You spilled juice on a borrowed book. What should you do?",
+    "options": [
+      "Tell the owner and offer help",
+      "Return the book and hope",
+      "Say the book was already wet"
+    ],
+    "answer": "Tell the owner and offer help",
+    "acceptedAnswers": [],
+    "explanation": "Owning up shows you respect your friend's things.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0110",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Owning up to a mistake takes courage. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "It's brave to say 'that was me'.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0111",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "A friend tells you a secret that someone is being hurt. What should you do?",
+    "options": [
+      "Tell a trusted adult",
+      "Keep the secret forever",
+      "Post about it in a group chat"
+    ],
+    "answer": "Tell a trusted adult",
+    "acceptedAnswers": [],
+    "explanation": "A secret that keeps someone unsafe should always be shared with a trusted adult.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0112",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "The other team scored, but only you saw it. What's the fair thing to do?",
+    "options": [
+      "Tell everyone they scored",
+      "Keep quiet and keep playing",
+      "Say the goal didn't count"
+    ],
+    "answer": "Tell everyone they scored",
+    "acceptedAnswers": [],
+    "explanation": "Being fair to the other team is what makes a game good.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0113",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "talkAbout",
+    "question": "What would be a fair way to share screen time in your family?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0114",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Copying a friend's homework and saying it's yours is honest. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "explanation": "Your own work shows what you've really learned.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0115",
+    "topic": "honesty",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "The shop gave you too much change. What's the honest choice?",
+    "options": [
+      "Go back and return the extra",
+      "Keep the extra as a bonus",
+      "Spend the extra on lollies"
+    ],
+    "answer": "Go back and return the extra",
+    "acceptedAnswers": [],
+    "explanation": "Returning it is fair to the shopkeeper.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0201",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "A classmate is blamed for something you did. What's the honest thing to do?",
+    "options": [
+      "Own up to what happened",
+      "Stay quiet to avoid trouble",
+      "Blame someone else instead"
+    ],
+    "answer": "Own up to what happened",
+    "acceptedAnswers": [],
+    "explanation": "It isn't fair for someone else to take the blame.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0202",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Fair doesn't always mean everyone gets exactly the same. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "Fair can mean everyone gets what they need, like glasses for someone who needs them to see.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0203",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Your project partner did most of the work. What's fair when you present?",
+    "options": [
+      "Say how much they did",
+      "Take most of the credit",
+      "Don't mention who did what"
+    ],
+    "answer": "Say how much they did",
+    "acceptedAnswers": [],
+    "explanation": "Giving credit is honest, and it builds trust.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0204",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "A rumour about a classmate is going around online. What's the best choice?",
+    "options": [
+      "Don't share it, and tell an adult",
+      "Share it with a few friends",
+      "Add a funny comment"
+    ],
+    "answer": "Don't share it, and tell an adult",
+    "acceptedAnswers": [],
+    "explanation": "Rumours can really hurt, and stopping them is kind and honest.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0205",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "talkAbout",
+    "question": "Why do people sometimes tell white lies? Are they ever okay?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0206",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "If you find a wallet with a name inside, you should try to return it. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "Returning it is what you'd hope someone would do for you.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0207",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Your friend is winning a game by breaking a rule. What could you say?",
+    "options": [
+      "Let's all stick to the rules",
+      "Say nothing at all",
+      "Start breaking the rules too"
+    ],
+    "answer": "Let's all stick to the rules",
+    "acceptedAnswers": [],
+    "explanation": "A friendly reminder keeps the game fair for everyone.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0208",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "You're umpiring, and your best friend is playing. What's fair?",
+    "options": [
+      "Same calls for both teams",
+      "Give your friend the close calls",
+      "Let your friend decide"
+    ],
+    "answer": "Same calls for both teams",
+    "acceptedAnswers": [],
+    "explanation": "A fair umpire treats everyone the same.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0209",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Being honest can mean saying 'I don't know'. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "explanation": "Admitting what we don't know is how we learn.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0210",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Someone offers you the answers before a test. What's the honest choice?",
+    "options": [
+      "Say no, and tell the teacher",
+      "Take a quick look",
+      "Share the answers with friends"
+    ],
+    "answer": "Say no, and tell the teacher",
+    "acceptedAnswers": [],
+    "explanation": "A test only means something when it's fair for everyone.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0211",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "talkAbout",
+    "question": "What makes someone trustworthy?",
+    "options": null,
+    "answer": null,
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0212",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Two friends need help at once. What's a fair way to decide?",
+    "options": [
+      "Help one, then the other",
+      "Only help the friend you like more",
+      "Help neither of them"
+    ],
+    "answer": "Help one, then the other",
+    "acceptedAnswers": [],
+    "explanation": "Sharing your time fairly shows both friends you care.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0213",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Cheating only hurts the person who gets caught. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "explanation": "Cheating is unfair to everyone who played by the rules.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0214",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "You told a friend something untrue, and now they believe it. What should you do?",
+    "options": [
+      "Tell the truth and say sorry",
+      "Hope your friend forgets",
+      "Add more to the story"
+    ],
+    "answer": "Tell the truth and say sorry",
+    "acceptedAnswers": [],
+    "explanation": "Fixing it quickly keeps your friendship strong.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "hon-0215",
+    "topic": "honesty",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "You're handing out snacks to your brothers and sisters. What's fair?",
+    "options": [
+      "Share them out evenly",
+      "Keep the most for yourself",
+      "Hide some for later"
+    ],
+    "answer": "Share them out evenly",
+    "acceptedAnswers": [],
+    "explanation": "Sharing evenly means nobody feels left out.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  }
+]

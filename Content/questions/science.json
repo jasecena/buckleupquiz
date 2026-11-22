@@ -1,0 +1,742 @@
+[
+  {
+    "id": "sci-0001",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do plants need from the sun to grow?",
+    "options": [
+      "Light",
+      "Wind",
+      "Snow"
+    ],
+    "answer": "Light",
+    "acceptedAnswers": [],
+    "funFact": "Plants use sunlight to make their own food.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0002",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What is ice made of?",
+    "options": [
+      "Frozen water",
+      "Glass",
+      "Plastic"
+    ],
+    "answer": "Frozen water",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0003",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which sense do you use your nose for?",
+    "options": [
+      "Smell",
+      "Taste",
+      "Hearing"
+    ],
+    "answer": "Smell",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0004",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Ice floats on water. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "That's why ponds freeze from the top down.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0005",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What colour do you get when you mix blue and yellow?",
+    "options": [
+      "Green",
+      "Purple",
+      "Orange"
+    ],
+    "answer": "Green",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0006",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do scientists use to see very tiny things up close?",
+    "options": [
+      "A microscope",
+      "A compass",
+      "A ruler"
+    ],
+    "answer": "A microscope",
+    "acceptedAnswers": [],
+    "funFact": "Some microscopes can make things look a million times bigger.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0007",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Magnets can pick up paper clips. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "Paper clips are made of steel, and magnets pull on steel.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0008",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What do we call water falling from clouds?",
+    "options": [
+      "Rain",
+      "Fog",
+      "Dew"
+    ],
+    "answer": "Rain",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0009",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which part of your body pumps blood?",
+    "options": [
+      "Heart",
+      "Lungs",
+      "Stomach"
+    ],
+    "answer": "Heart",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0010",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Sound can travel through water. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "Whales call to each other across the ocean.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0011",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What gas do we breathe in to stay alive?",
+    "options": [
+      "Oxygen",
+      "Smoke",
+      "Helium"
+    ],
+    "answer": "Oxygen",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0012",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which of these is a solid?",
+    "options": [
+      "A rock",
+      "Milk",
+      "Steam"
+    ],
+    "answer": "A rock",
+    "acceptedAnswers": [],
+    "funFact": "Milk is a liquid, and steam is a gas.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0013",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "A shadow forms when something blocks the light. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0014",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What happens to chocolate left in the hot sun?",
+    "options": [
+      "It melts",
+      "It freezes",
+      "It grows"
+    ],
+    "answer": "It melts",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0015",
+    "topic": "science",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which of these floats on water?",
+    "options": [
+      "A cork",
+      "A rock",
+      "A coin"
+    ],
+    "answer": "A cork",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0101",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What force pulls things down to the ground?",
+    "options": [
+      "Gravity",
+      "Magnetism",
+      "Friction"
+    ],
+    "answer": "Gravity",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0102",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is the hardest natural material?",
+    "options": [
+      "Diamond",
+      "Gold",
+      "Iron"
+    ],
+    "answer": "Diamond",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0103",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Light travels faster than sound. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "That's why you see lightning before you hear the thunder.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0104",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What do we call animals that eat only plants?",
+    "options": [
+      "Herbivores",
+      "Carnivores",
+      "Omnivores"
+    ],
+    "answer": "Herbivores",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0105",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "At sea level, water boils at how many degrees Celsius?",
+    "options": [
+      "100",
+      "60",
+      "200"
+    ],
+    "answer": "100",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0106",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which organs help you breathe?",
+    "options": [
+      "Lungs",
+      "Kidneys",
+      "Liver"
+    ],
+    "answer": "Lungs",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0107",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Your bones are alive and can grow. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "That's how a broken bone heals.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0108",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What makes a rainbow?",
+    "options": [
+      "Sunlight and raindrops",
+      "Wind and clouds",
+      "Moonlight and snow"
+    ],
+    "answer": "Sunlight and raindrops",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0109",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is the biggest organ of the human body?",
+    "options": [
+      "Skin",
+      "Brain",
+      "Liver"
+    ],
+    "answer": "Skin",
+    "acceptedAnswers": [],
+    "funFact": "Your skin is an organ, and it keeps germs out.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0110",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which material lets electricity flow through it best?",
+    "options": [
+      "Copper",
+      "Wood",
+      "Rubber"
+    ],
+    "answer": "Copper",
+    "acceptedAnswers": [],
+    "funFact": "That's why wires are made of copper.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0111",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Plants give off oxygen when they make food from sunlight. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0112",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "About how many bones does an adult human have?",
+    "options": [
+      "206",
+      "106",
+      "306"
+    ],
+    "answer": "206",
+    "acceptedAnswers": [],
+    "funFact": "Babies are born with around 300, and some join together as they grow.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0113",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What do we call a scientist who studies rocks?",
+    "options": [
+      "Geologist",
+      "Biologist",
+      "Chemist"
+    ],
+    "answer": "Geologist",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0114",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "Sound travels faster in space than on Earth. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Space has no air, so sound can't travel there at all.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0115",
+    "topic": "science",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What do we call water turning into steam?",
+    "options": [
+      "Evaporation",
+      "Freezing",
+      "Melting"
+    ],
+    "answer": "Evaporation",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0201",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the chemical formula for water?",
+    "options": [
+      "H2O",
+      "CO2",
+      "O2"
+    ],
+    "answer": "H2O",
+    "acceptedAnswers": [],
+    "funFact": "Each water molecule has two hydrogen atoms and one oxygen atom.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0202",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which part of a plant cell makes food from sunlight?",
+    "options": [
+      "Chloroplast",
+      "Nucleus",
+      "Cell wall"
+    ],
+    "answer": "Chloroplast",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0203",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the centre of an atom called?",
+    "options": [
+      "Nucleus",
+      "Electron",
+      "Shell"
+    ],
+    "answer": "Nucleus",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0204",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Humans and bananas share some of the same genes. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "All living things share some of the same basic building blocks.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0205",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which gas do plants take in from the air?",
+    "options": [
+      "Carbon dioxide",
+      "Oxygen",
+      "Nitrogen"
+    ],
+    "answer": "Carbon dioxide",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0206",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which scientist is famous for explaining gravity?",
+    "options": [
+      "Isaac Newton",
+      "Albert Einstein",
+      "Charles Darwin"
+    ],
+    "answer": "Isaac Newton",
+    "acceptedAnswers": [],
+    "funFact": "The story of the falling apple may be partly a legend.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0207",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What kind of energy is stored in a stretched rubber band?",
+    "options": [
+      "Elastic energy",
+      "Heat energy",
+      "Sound energy"
+    ],
+    "answer": "Elastic energy",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0208",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "The blood in your veins is blue. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Blood is always red. Veins just look blue through your skin.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0209",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What is the most common gas in the air we breathe?",
+    "options": [
+      "Nitrogen",
+      "Oxygen",
+      "Carbon dioxide"
+    ],
+    "answer": "Nitrogen",
+    "acceptedAnswers": [],
+    "funFact": "About seventy-eight percent of the air is nitrogen.",
+    "difficulty": 4,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0210",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which blood cells fight germs?",
+    "options": [
+      "White blood cells",
+      "Red blood cells",
+      "Platelets"
+    ],
+    "answer": "White blood cells",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0211",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What do we call something that speeds up a chemical reaction without being used up?",
+    "options": [
+      "Catalyst",
+      "Solvent",
+      "Fuel"
+    ],
+    "answer": "Catalyst",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0212",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Lightning is hotter than the surface of the Sun. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "A lightning bolt can be about five times hotter than the Sun's surface.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0213",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which simple machine is a ramp?",
+    "options": [
+      "Inclined plane",
+      "Lever",
+      "Pulley"
+    ],
+    "answer": "Inclined plane",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0214",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What unit is used to measure electrical power?",
+    "options": [
+      "Watt",
+      "Litre",
+      "Metre"
+    ],
+    "answer": "Watt",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "sci-0215",
+    "topic": "science",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Who discovered penicillin, the first antibiotic?",
+    "options": [
+      "Alexander Fleming",
+      "Marie Curie",
+      "Louis Pasteur"
+    ],
+    "answer": "Alexander Fleming",
+    "acceptedAnswers": [],
+    "funFact": "Howard Florey, from Adelaide, helped turn it into a medicine.",
+    "difficulty": 4,
+    "minAge": null,
+    "region": null
+  }
+]

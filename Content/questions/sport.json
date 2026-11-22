@@ -1,0 +1,738 @@
+[
+  {
+    "id": "spt-0001",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "How many players does a soccer team have on the field?",
+    "options": [
+      "11",
+      "9",
+      "15"
+    ],
+    "answer": "11",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0002",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "In which sport do you hit a shuttlecock?",
+    "options": [
+      "Badminton",
+      "Tennis",
+      "Golf"
+    ],
+    "answer": "Badminton",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0003",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "A cricket ball is bigger than a soccer ball. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0004",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "In Aussie Rules, what do you score by kicking between the two tall posts?",
+    "options": [
+      "A goal",
+      "A try",
+      "A home run"
+    ],
+    "answer": "A goal",
+    "acceptedAnswers": [],
+    "funFact": "A goal is worth six points.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "spt-0005",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which sport uses a bat, a ball and stumps?",
+    "options": [
+      "Cricket",
+      "Basketball",
+      "Netball"
+    ],
+    "answer": "Cricket",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0006",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "How many rings are on the Olympic flag?",
+    "options": [
+      "5",
+      "3",
+      "7"
+    ],
+    "answer": "5",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0007",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "In netball, players can run while holding the ball. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "Netball players have to pass the ball within three seconds.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "spt-0008",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "What should you wear on your head when you ride a bike?",
+    "options": [
+      "A helmet",
+      "A cap",
+      "A scarf"
+    ],
+    "answer": "A helmet",
+    "acceptedAnswers": [],
+    "funFact": "In most of Australia, riding without a helmet is against the law.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "spt-0009",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "In which sport do you throw a ball through a hoop?",
+    "options": [
+      "Basketball",
+      "Rugby",
+      "Hockey"
+    ],
+    "answer": "Basketball",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0010",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "A marathon is a very long running race. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "A marathon is just over forty-two kilometres long.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0011",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which game do you play by hitting a small ball into holes with clubs?",
+    "options": [
+      "Golf",
+      "Cricket",
+      "Squash"
+    ],
+    "answer": "Golf",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0012",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "Which of these sports is played on ice?",
+    "options": [
+      "Ice hockey",
+      "Surfing",
+      "Netball"
+    ],
+    "answer": "Ice hockey",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0013",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "In tennis, what is a score of zero called?",
+    "options": [
+      "Love",
+      "Nil",
+      "Duck"
+    ],
+    "answer": "Love",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0014",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "trueFalse",
+    "question": "Surfers ride waves on a board. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0015",
+    "topic": "sport",
+    "ageBand": "6-8",
+    "type": "multipleChoice",
+    "question": "A long basketball shot from behind the big arc is worth how many points?",
+    "options": [
+      "3",
+      "2",
+      "5"
+    ],
+    "answer": "3",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0101",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "How often are the Summer Olympic Games usually held?",
+    "options": [
+      "Every four years",
+      "Every year",
+      "Every two years"
+    ],
+    "answer": "Every four years",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0102",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In cricket, what is it called when a batter scores one hundred runs?",
+    "options": [
+      "A century",
+      "A hat-trick",
+      "A duck"
+    ],
+    "answer": "A century",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0103",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which sport is played at Wimbledon?",
+    "options": [
+      "Tennis",
+      "Golf",
+      "Cricket"
+    ],
+    "answer": "Tennis",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0104",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "In rugby, you can throw the ball forward to a teammate. True or false?",
+    "options": null,
+    "answer": "False",
+    "acceptedAnswers": [],
+    "funFact": "In rugby, passes have to go sideways or backwards.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0105",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which Australian city hosted the Olympic Games in the year 2000?",
+    "options": [
+      "Sydney",
+      "Melbourne",
+      "Brisbane"
+    ],
+    "answer": "Sydney",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "spt-0106",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In which sport would you do a slam dunk?",
+    "options": [
+      "Basketball",
+      "Volleyball",
+      "Water polo"
+    ],
+    "answer": "Basketball",
+    "acceptedAnswers": [],
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0107",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "What is the Melbourne Cup?",
+    "options": [
+      "A horse race",
+      "A car race",
+      "A swimming race"
+    ],
+    "answer": "A horse race",
+    "acceptedAnswers": [],
+    "funFact": "It's called the race that stops a nation.",
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "spt-0108",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "A soccer goalkeeper can use their hands in their own penalty area. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0109",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "How many players does each netball team have on the court?",
+    "options": [
+      "7",
+      "5",
+      "11"
+    ],
+    "answer": "7",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "spt-0110",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In cricket, what is it called when a bowler takes three wickets in three balls?",
+    "options": [
+      "A hat-trick",
+      "A century",
+      "A grand slam"
+    ],
+    "answer": "A hat-trick",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0111",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "Which country did the game of rugby come from?",
+    "options": [
+      "England",
+      "New Zealand",
+      "Australia"
+    ],
+    "answer": "England",
+    "acceptedAnswers": [],
+    "funFact": "It's named after Rugby School in England.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0112",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "trueFalse",
+    "question": "The Paralympic Games are for athletes with disability. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "They're held after the Olympic Games, in the same city.",
+    "difficulty": 1,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0113",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In a triathlon, athletes swim, cycle and…",
+    "options": [
+      "Run",
+      "Row",
+      "Skate"
+    ],
+    "answer": "Run",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0114",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In golf, what is one stroke under par called?",
+    "options": [
+      "Birdie",
+      "Eagle",
+      "Bogey"
+    ],
+    "answer": "Birdie",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0115",
+    "topic": "sport",
+    "ageBand": "9-10",
+    "type": "multipleChoice",
+    "question": "In many martial arts, which belt colour is the highest?",
+    "options": [
+      "Black",
+      "White",
+      "Yellow"
+    ],
+    "answer": "Black",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0201",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Where were the ancient Olympic Games first held?",
+    "options": [
+      "Greece",
+      "Italy",
+      "Egypt"
+    ],
+    "answer": "Greece",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0202",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "How long is an Olympic swimming pool?",
+    "options": [
+      "50 metres",
+      "25 metres",
+      "100 metres"
+    ],
+    "answer": "50 metres",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0203",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which trophy do Australia and England play for in Test cricket?",
+    "options": [
+      "The Ashes",
+      "The Bledisloe Cup",
+      "The Davis Cup"
+    ],
+    "answer": "The Ashes",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "spt-0204",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "A Test cricket match can last up to five days. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0205",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "In tennis, what is a serve the other player can't even touch called?",
+    "options": [
+      "An ace",
+      "A let",
+      "Deuce"
+    ],
+    "answer": "An ace",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0206",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "What does AFL stand for?",
+    "options": [
+      "Australian Football League",
+      "Australian Fitness League",
+      "All Football League"
+    ],
+    "answer": "Australian Football League",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": "AU"
+  },
+  {
+    "id": "spt-0207",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "In which sport do teams play for the Stanley Cup?",
+    "options": [
+      "Ice hockey",
+      "Baseball",
+      "Basketball"
+    ],
+    "answer": "Ice hockey",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0208",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "The Tour de France bike race lasts about three weeks. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0209",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "How many events are in a decathlon?",
+    "options": [
+      "10",
+      "5",
+      "7"
+    ],
+    "answer": "10",
+    "acceptedAnswers": [],
+    "funFact": "A heptathlon has seven.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0210",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "In which sport is the highest break one hundred and forty-seven?",
+    "options": [
+      "Snooker",
+      "Darts",
+      "Bowling"
+    ],
+    "answer": "Snooker",
+    "acceptedAnswers": [],
+    "difficulty": 4,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0211",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "Which swimming stroke is usually the fastest?",
+    "options": [
+      "Freestyle",
+      "Breaststroke",
+      "Backstroke"
+    ],
+    "answer": "Freestyle",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0212",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "trueFalse",
+    "question": "Someone has played golf on the Moon. True or false?",
+    "options": null,
+    "answer": "True",
+    "acceptedAnswers": [],
+    "funFact": "Astronaut Alan Shepard hit two golf balls on the Moon in 1971.",
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0213",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "How many players does a rugby union team have on the field?",
+    "options": [
+      "15",
+      "13",
+      "11"
+    ],
+    "answer": "15",
+    "acceptedAnswers": [],
+    "funFact": "Rugby league teams have thirteen.",
+    "difficulty": 4,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0214",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "How many players does each basketball team have on the court?",
+    "options": [
+      "5",
+      "6",
+      "7"
+    ],
+    "answer": "5",
+    "acceptedAnswers": [],
+    "difficulty": 2,
+    "minAge": null,
+    "region": null
+  },
+  {
+    "id": "spt-0215",
+    "topic": "sport",
+    "ageBand": "11-12",
+    "type": "multipleChoice",
+    "question": "In cricket, what is it called when a batter is out for zero?",
+    "options": [
+      "A duck",
+      "A maiden",
+      "A bye"
+    ],
+    "answer": "A duck",
+    "acceptedAnswers": [],
+    "difficulty": 3,
+    "minAge": null,
+    "region": null
+  }
+]
