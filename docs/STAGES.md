@@ -138,7 +138,7 @@ The stages follow FEATURES §8 (M1–M8), with an M0 foundation stage and a late
 ## M7 — Content & polish ⬜
 - [x] +150 questions (2026-11-22): Animals, Geography, Maths, Space, Manners now 40–45 each (211 total)
 - [ ] About 1,500 questions: 8 knowledge topics × 3 bands × 60 or more
-- [ ] Content for Aussie History, Science, Sport, Food and a second values topic, so BuckleUp Basic's "10 topics" are all playable
+- [x] Content for Aussie History, Science, Sport, Food and a second values topic (Honesty & Fairness), so BuckleUp Basic's "10 topics" are all playable (45 each, 2026-11-22)
 - [ ] Manners & Friendship: at least 40 scored + 20 Talk About per band; other values and safety topics
 - [ ] Parent/teacher review of values and safety content; First Nations content with
       Aboriginal and Torres Strait Islander input
