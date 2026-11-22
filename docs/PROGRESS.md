@@ -32,6 +32,8 @@ in App Store Connect.
 - The scores show on screen while the ending is read out (it showed "Buckle up…" before).
 - **One speech engine:** the untested iOS 26 fallback for phones with Dictation off is gone.
   Those families see the "Turn on Dictation" guide in Mic check, as before.
+- **Two recognisers instead of nine:** the phone's English (or Australian English) and a US
+  English backup. Listening still restarts if it stops early, so late answers are heard.
 
 ## What's new in 0.3.8
 
@@ -70,8 +72,6 @@ in App Store Connect.
 
 ### Easy (a quick yes or no)
 Each removes extra code that can go wrong. All are low risk, and recommended.
-- [ ] **Use one recogniser and listen once per turn**, instead of trying 9 English accents with
-      retries (up to 14 restarts per listen).
 - [ ] **Skip moves on to the next planned question** for the same player, instead of picking an
       extra question mid-game (which also spends the day's allowance mid-game).
 

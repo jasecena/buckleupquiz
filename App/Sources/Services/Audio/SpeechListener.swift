@@ -64,9 +64,12 @@ final class SystemSpeechListener: SpeechListening {
     /// Anonymous error reports (ADR-0020): which recognisers fail on which devices.
     weak var telemetry: (any TelemetryRecording)?
 
-    /// Every English recogniser that can run on the device, best first. One that fails is
-    /// moved to the back, so the next turn starts with one that works.
+    /// The phone's English (or Australian English) and one backup, in case that model isn't on
+    /// the phone. One that fails is moved to the back, so the next turn starts with one that works.
     private var recognizers: [SFSpeechRecognizer]
+    /// A main recogniser and one backup. The answers are letters, true/false and a few
+    /// commands, so more accents don't help (product decision, 2026-11-22).
+    static let maxRecognizers = 2
 
     /// nil when on-device recognition isn't available (we never fall back to Apple's servers).
     init?(preferredLocales: [Locale] = SystemSpeechListener.defaultLocales) {
@@ -74,6 +77,8 @@ final class SystemSpeechListener: SpeechListening {
         recognizers = preferredLocales
             .compactMap { SFSpeechRecognizer(locale: $0) }
             .filter { $0.supportsOnDeviceRecognition && seen.insert($0.locale.identifier).inserted }
+            .prefix(Self.maxRecognizers)
+            .map { $0 }
         guard !recognizers.isEmpty else {
             Self.lastProblem = "This iPhone has no on-device English speech recognition."
             return nil
@@ -81,8 +86,8 @@ final class SystemSpeechListener: SpeechListening {
     }
 
     static var defaultLocales: [Locale] {
-        var locales = [Locale.current, Locale(identifier: "en-AU")]
-        locales += ["en-US", "en-GB", "en-NZ", "en-IE", "en-CA", "en-IN", "en-ZA"].map(Locale.init(identifier:))
+        // The phone's English first, else Australian; US English as the backup.
+        let locales = [Locale.current] + ["en-AU", "en-US", "en-GB"].map(Locale.init(identifier:))
         return locales.filter { $0.language.languageCode?.identifier == "en" }
     }
 

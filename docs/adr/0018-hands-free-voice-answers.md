@@ -34,8 +34,10 @@ mics.
   option, or a command) followed by a 1.2 s pause. Chatter, echo and mumbles keep it
   listening for the whole think time (plus up to 4 s to finish an answer already started).
 - **Recogniser resilience** (v0.3.1, after the first device test answered at once): the app
-  tries every on-device English recogniser (the phone's language, en-AU, en-US, en-GB, …).
-  One that stops within 2 s with nothing heard (for example its model isn't installed) is
+  has two on-device English recognisers: the phone's English (else en-AU), and one backup
+  (usually en-US). Until 2026-11-22 it tried up to 9 accents; the answers are letters,
+  true/false and a few commands, so more didn't help. Recognition that stops early is started
+  again, so the child still gets the whole think time. One that stops within 2 s with nothing heard (for example its model isn't installed) is
   skipped and moved to the back. If none work, or the mic won't start, that turn finishes its
   think time as a Listen-mode countdown and the game continues in Listen mode. The reason is
   shown in Settings → Mic check.
