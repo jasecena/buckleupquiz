@@ -70,19 +70,13 @@ in App Store Connect.
 
 ## Decisions for you
 
-### Easy (a quick yes or no)
-Each removes extra code that can go wrong. All are low risk, and recommended.
-- [ ] **Skip moves on to the next planned question** for the same player, instead of picking an
-      extra question mid-game (which also spends the day's allowance mid-game).
+Decided 2026-11-22: remove the second speech engine (done), two recognisers instead of nine
+(done), and Skip stays as it is (a new question for the same child, so everyone gets equal
+turns; it uses one question from the day's allowance). Also kept as they are: the review mix
+(80% new, 10% own reviews, 10% brothers' and sisters' questions), the grown-up's "Got it" /
+"Not yet" taps (the backup when the car mic doesn't hear), and Talk About (off by default).
 
 ### Hard (need more thought, or someone else)
-- [ ] **Review mix** (you're thinking it over): keep the Leitner boxes either way. The choice is
-      whether to drop only the 10% brothers' and sisters' questions, so each player gets their
-      own due reviews first, then new questions. Less variety, simpler code.
-- [ ] **Two answer modes:** keep voice and "Just listen", and drop tapping "Got it" / "Not yet"?
-      Medium risk: two scoring paths today.
-- [ ] **Talk About:** remove it from v1 and bring it back later as a simple timed prompt? It has
-      its own timer and listening loop, but parents may like it.
 - [ ] **Natural voices:** how many voices to launch with and which ones (after a listening test
       with the kids), and whether children's names are spoken in the natural voice (ADR-0019).
 - [ ] **Accounts:** a privacy check (COPPA and the Australian Privacy Act) that a first name or
