@@ -26,7 +26,7 @@ struct ParentalGate<Content: View>: View {
                 Text("Type these numbers:")
                     .font(Theme.body)
                     .foregroundStyle(.secondary)
-                Text(digits.map { Self.words[$0] }.joined(separator: ", "))
+                Text(digits.map { numberWords[$0] }.joined(separator: ", "))
                     .font(Theme.headline)
                 TextField("Answer", text: $answer)
                     .keyboardType(.numberPad)
@@ -59,9 +59,10 @@ struct ParentalGate<Content: View>: View {
         }
     }
 
-    private static let words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-
     private static func makeDigits() -> [Int] {
         (0..<3).map { _ in Int.random(in: 1...9) }
     }
 }
+
+/// Digits as words for the gate. Outside `ParentalGate`: a generic type can't hold a static constant.
+private let numberWords = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
