@@ -116,7 +116,11 @@ turns; it uses one question from the day's allowance). Also kept as they are: th
       the game screen scrolls when text is large, buttons stack, icons are hidden from
       VoiceOver). To finish: Settings → Accessibility → Display & Text Size → Larger Text at
       the biggest size, and VoiceOver on, then play a game and open each screen.
-- [ ] Name and trademark check.
+- [ ] Name and trademark check. An informal web search (22 November 2026) found no app called
+      "BuckleUp Quiz". Nearby names are road-safety programmes ("Buckle Up for Life", "Buckle Up
+      America", "BuckleUp School"), which the mascot and branding already stay clear of. To
+      finish: search "buckle up" on IP Australia (search.ipaustralia.gov.au) and the US
+      register (tmsearch.uspto.gov) in classes 9 (apps) and 41 (education and entertainment).
 
 ### Big (weeks, or needs other people)
 - [ ] Real-car tests: 3 or more cars plus CarPlay, road noise, kids. Tune listening and speech
